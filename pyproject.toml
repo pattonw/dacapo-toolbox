@@ -1,0 +1,41 @@
+[project]
+name = "dacapo-toolbox"
+version = "0.1.0"
+description = "A suite of tools and convenience functions to help start training with DaCapo."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "dacapo-ml>=0.3.6",
+    "iohub",
+    "torch",
+]
+
+
+[tool.uv.sources]
+dacapo-ml = { path = "../dacapo" }
+iohub = { git = "https://github.com/czbiohub-sf/iohub.git" }
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-xdist", "pytest-cov", "pytest-lazy-fixtures"]
+dev = [
+    "black",
+    "mypy",
+    "pdbpp",
+    "rich",
+    "ruff",
+    "pre-commit",
+]
+docs = [
+    "matplotlib",
+    "pooch",
+    "sphinx",
+    "nbsphinx",
+    "sphinx-autodoc-typehints",
+    "sphinx-autoapi",
+    "sphinx-click",
+    "sphinx-rtd-theme",
+    "myst-parser",
+    "jupytext",
+    "ipykernel",
+    "myst_nb",
+]
