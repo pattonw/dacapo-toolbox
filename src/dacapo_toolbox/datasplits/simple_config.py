@@ -35,14 +35,14 @@ class SimpleDataSplitConfig(DataSplitConfig):
         level_1_matches = glob.glob(level_1)
         level_2_matches = glob.glob(level_2)
         if len(level_0_matches) > 0:
-            assert (
-                len(level_1_matches) == len(level_2_matches) == 0
-            ), f"Found raw data at {level_0} and {level_1} and {level_2}"
+            assert len(level_1_matches) == len(level_2_matches) == 0, (
+                f"Found raw data at {level_0} and {level_1} and {level_2}"
+            )
             return [Path(x).parent for x in level_0_matches]
         elif len(level_1_matches) > 0:
-            assert (
-                len(level_2_matches) == 0
-            ), f"Found raw data at {level_1} and {level_2}"
+            assert len(level_2_matches) == 0, (
+                f"Found raw data at {level_1} and {level_2}"
+            )
             return [Path(x).parent for x in level_1_matches]
         elif len(level_2_matches) > 0:
             return [Path(x).parent for x in level_2_matches]

@@ -517,9 +517,7 @@ class ConvPass(torch.nn.Module):
                         {
                             2: torch.nn.BatchNorm2d,
                             3: torch.nn.BatchNorm3d,
-                        }[
-                            self.dims
-                        ](out_channels)
+                        }[self.dims](out_channels)
                     )
             except KeyError:
                 raise RuntimeError("%dD convolution not implemented" % self.dims)
@@ -692,9 +690,9 @@ class Upsample(torch.nn.Module):
 
         if activation is not None:
             activation = getattr(torch.nn, activation)
-        assert (crop_factor is None) == (
-            next_conv_kernel_sizes is None
-        ), "crop_factor and next_conv_kernel_sizes have to be given together"
+        assert (crop_factor is None) == (next_conv_kernel_sizes is None), (
+            "crop_factor and next_conv_kernel_sizes have to be given together"
+        )
 
         self.crop_factor = crop_factor
         self.next_conv_kernel_sizes = next_conv_kernel_sizes

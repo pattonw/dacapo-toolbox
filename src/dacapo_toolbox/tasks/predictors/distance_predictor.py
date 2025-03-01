@@ -1,6 +1,6 @@
 from .predictor import Predictor
-from dacapo.experiments import Model
-from dacapo.experiments.arraytypes import DistanceArray
+from dacapo_toolbox import Model
+from dacapo_toolbox.arraytypes import DistanceArray
 from dacapo.utils.balance_weights import balance_weights
 from dacapo.tmp import np_to_funlib_array
 

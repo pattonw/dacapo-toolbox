@@ -139,8 +139,8 @@ class HotDistanceLoss(Loss):
             This method must be implemented in the subclass. It should return the two split tensors.
         """
         # Shape[0] is the batch size and Shape[1] is the number of channels.
-        assert (
-            x.shape[1] % 2 == 0
-        ), f"First dimension (Channels) of target {x.shape} must be even to be splitted in hot and distance."
+        assert x.shape[1] % 2 == 0, (
+            f"First dimension (Channels) of target {x.shape} must be even to be splitted in hot and distance."
+        )
         mid = x.shape[1] // 2
         return torch.split(x, mid, dim=1)

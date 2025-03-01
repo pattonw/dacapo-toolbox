@@ -1,6 +1,6 @@
-from dacapo.experiments.arraytypes.probabilities import ProbabilityArray
+from dacapo_toolbox.arraytypes.probabilities import ProbabilityArray
 from .predictor import Predictor
-from dacapo.experiments import Model
+from dacapo_toolbox import Model
 from dacapo.tmp import np_to_funlib_array
 from dacapo.utils.balance_weights import balance_weights
 

@@ -1,6 +1,6 @@
 from .predictor import Predictor
-from dacapo.experiments import Model
-from dacapo.experiments.arraytypes import EmbeddingArray
+from dacapo_toolbox import Model
+from dacapo_toolbox.arraytypes import EmbeddingArray
 from dacapo.tmp import np_to_funlib_array
 
 import numpy as np

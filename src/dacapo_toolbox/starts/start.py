@@ -139,7 +139,7 @@ def _set_weights(model, weights, run, criterion, old_head=None, new_head=None):
                 }
                 model_dict.update(pretrained_dict)
                 model.load_state_dict(model_dict)
-                logger.warning(f"loaded only common layers from weights")
+                logger.warning("loaded only common layers from weights")
     except RuntimeError as e:
         logger.warning(f"ERROR starter: {e}")
 

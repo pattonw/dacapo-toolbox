@@ -1,4 +1,3 @@
-from abc import ABC
 import logging
 from cellmap_models import cosem
 from pathlib import Path

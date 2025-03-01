@@ -12,8 +12,8 @@ import numpy as np
 
 from funlib.geometry import Coordinate
 from funlib.persistence import Array
-from dacapo.experiments.datasplits.datasets import Dataset
-from dacapo.experiments.tasks.predictors import Predictor
+from dacapo_toolbox.datasplits.datasets import Dataset
+from dacapo_toolbox.tasks.predictors import Predictor
 
 import torch
 

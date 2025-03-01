@@ -1,10 +1,9 @@
 from .predictor import Predictor
-from dacapo.experiments import Model
-from dacapo.experiments.arraytypes import EmbeddingArray
+from dacapo_toolbox import Model
+from dacapo_toolbox.arraytypes import EmbeddingArray
 from dacapo.tmp import np_to_funlib_array
 from dacapo.utils.affinities import seg_to_affgraph, padding as aff_padding
 from dacapo.utils.balance_weights import balance_weights
-from dacapo.tmp import np_to_funlib_array
 from funlib.geometry import Coordinate
 from funlib.persistence import Array
 from lsd.train import LsdExtractor
@@ -222,9 +221,9 @@ class AffinitiesPredictor(Predictor):
             "Cannot create affinities from ground truth with nonspatial dimensions.\n"
             f"GT axis_names: {gt.axis_names}"
         )
-        assert (
-            gt.channel_dims <= 1
-        ), "Cannot create affinities from ground truth with more than one channel dimension."
+        assert gt.channel_dims <= 1, (
+            "Cannot create affinities from ground truth with more than one channel dimension."
+        )
         label_data = gt[gt.roi]
         axis_names = gt.axis_names
         if gt.channel_dims == 1:

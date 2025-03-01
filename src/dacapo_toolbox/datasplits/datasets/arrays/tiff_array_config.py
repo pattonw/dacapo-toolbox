@@ -6,7 +6,6 @@ from funlib.geometry import Coordinate
 from funlib.persistence import Array
 
 from upath import UPath as Path
-from typing import List
 import tifffile
 
 

@@ -5,7 +5,7 @@ from funlib.persistence import Array
 from typing import Iterable, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from dacapo.experiments.tasks.post_processors.post_processor_parameters import (
+    from dacapo_toolbox.tasks.post_processors.post_processor_parameters import (
         PostProcessorParameters,
     )
     from dacapo.store.local_array_store import LocalArrayIdentifier

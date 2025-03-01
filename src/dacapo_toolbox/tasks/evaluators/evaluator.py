@@ -7,11 +7,11 @@ import itertools
 from funlib.persistence import Array
 
 if TYPE_CHECKING:
-    from dacapo.experiments.tasks.evaluators.evaluation_scores import EvaluationScores
-    from dacapo.experiments.datasplits.datasets import Dataset
+    from dacapo_toolbox.tasks.evaluators.evaluation_scores import EvaluationScores
+    from dacapo_toolbox.datasplits.datasets import Dataset
     from dacapo.store.local_array_store import LocalArrayIdentifier
-    from dacapo.experiments.tasks.post_processors import PostProcessorParameters
-    from dacapo.experiments.validation_scores import ValidationScores
+    from dacapo_toolbox.tasks.post_processors import PostProcessorParameters
+    from dacapo_toolbox.validation_scores import ValidationScores
 
 # Custom types for improved readability
 OutputIdentifier = Tuple["Dataset", "PostProcessorParameters", str]

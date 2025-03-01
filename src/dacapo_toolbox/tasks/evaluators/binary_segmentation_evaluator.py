@@ -134,9 +134,9 @@ class BinarySegmentationEvaluator(Evaluator):
         logger.info(
             f"Evaluating binary segmentations on evaluation_data of shape: {evaluation_data.shape}"
         )
-        assert (
-            evaluation_data.shape == output_data.shape
-        ), f"{evaluation_data.shape} vs {output_data.shape}"
+        assert evaluation_data.shape == output_data.shape, (
+            f"{evaluation_data.shape} vs {output_data.shape}"
+        )
         if "c^" in evaluation_array.axis_names and "c^" in output_array.axis_names:
             score_dict = []
             for indx, channel in enumerate(

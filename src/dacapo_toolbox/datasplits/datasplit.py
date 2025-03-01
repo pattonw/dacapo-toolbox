@@ -2,7 +2,6 @@ from .datasets import Dataset
 import neuroglancer
 from abc import ABC
 from typing import List, Optional
-import json
 import itertools
 
 import logging

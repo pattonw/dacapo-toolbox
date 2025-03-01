@@ -7,7 +7,6 @@ from typing import List, Tuple
 from dacapo.tmp import num_channels_from_array
 
 import dask.array as da
-import numpy as np
 
 
 @attr.s

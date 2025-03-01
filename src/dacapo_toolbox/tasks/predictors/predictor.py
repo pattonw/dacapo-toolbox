@@ -5,8 +5,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Tuple
 
 if TYPE_CHECKING:
-    from dacapo.experiments.architectures.architecture import Architecture
-    from dacapo.experiments.model import Model
+    from dacapo_toolbox.architectures.architecture import Architecture
+    from dacapo_toolbox.model import Model
 
 
 class Predictor(ABC):

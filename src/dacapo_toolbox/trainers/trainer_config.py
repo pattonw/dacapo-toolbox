@@ -3,8 +3,8 @@ import attr
 from abc import ABC, abstractmethod
 
 from funlib.geometry import Coordinate
-from dacapo.experiments.datasplits.datasets import Dataset
-from dacapo.experiments.tasks.predictors import Predictor
+from dacapo_toolbox.datasplits.datasets import Dataset
+from dacapo_toolbox.tasks.predictors import Predictor
 
 import torch
 

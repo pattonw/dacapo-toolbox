@@ -1,12 +1,11 @@
 import attr
 
-from dacapo.experiments.datasplits.datasets import DatasetConfig
-from dacapo.experiments.tasks.predictors import Predictor
+from dacapo_toolbox.datasplits.datasets import DatasetConfig
+from dacapo_toolbox.tasks.predictors import Predictor
 from .trainer_config import TrainerConfig
 
 from funlib.geometry import Roi, Coordinate
 
-from typing import Tuple
 
 import numpy as np
 import torch
