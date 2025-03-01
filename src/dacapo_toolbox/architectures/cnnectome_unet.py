@@ -1,6 +1,6 @@
 import attr
 
-from .cnnectome_unet_impl import CNNectomeUNetModule, Upsample, ConvPass
+from .impl.cnnectome_unet_impl import CNNectomeUNetModule, Upsample, ConvPass
 from .architecture import ArchitectureConfig
 
 from funlib.geometry import Coordinate
