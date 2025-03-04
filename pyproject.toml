@@ -55,3 +55,39 @@ docs = [
     "ipykernel",
     "myst_nb",
 ]
+
+[tool.mypy]
+files = "src/dacapo_toolbox"
+strict = false
+disallow_any_generics = false
+disallow_subclassing_any = false
+show_error_codes = true
+pretty = true
+exclude = ["docs/*"]
+
+[[tool.mypy.overrides]]
+module = [
+    "xarray_multiscale.*",
+    "cellmap_models.*",
+    "funlib.*",
+    "toml.*",
+    "gunpowder.*",
+    "scipy.*",
+    "augment.*",
+    "tifffile.*",
+    "daisy.*",
+    "lazy_property.*",
+    "skimage.*",
+    "cellmap_schemas.*",
+    "neuroglancer.*",
+    "tqdm.*",
+    "zarr.*",
+    "SimpleITK.*",
+    "lsd.*",
+    "yaml.*",
+    "mwatershed.*",
+    "numpy_indexed.*",
+    "cellmap_schemas.*",
+    "IPython.*",
+]
+ignore_missing_imports = true
