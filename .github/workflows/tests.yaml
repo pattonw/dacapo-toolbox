@@ -24,20 +24,13 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[test]"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Test
-        run: pytest --color=yes --cov --cov-report=xml --cov-report=term-missing
+        run: uv run --extra test --python ${{ matrix.python-version }} pytest --color=yes --cov --cov-report=xml --cov-report=term-missing
       
       - name: Coverage
         uses: codecov/codecov-action@v3
