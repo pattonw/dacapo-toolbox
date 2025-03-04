@@ -1,6 +1,7 @@
 import attr
 
-from typing import Tuple
+from funlib.geometry import Coordinate
+from .arrays import ArrayConfig
 
 
 @attr.s
@@ -34,35 +35,55 @@ class DatasetConfig:
             "and avoid special characters."
         }
     )
-    weight: int = attr.ib(
-        metadata={
-            "help_text": "A weight to indicate this dataset should be sampled from more "
-            "heavily"
-        },
-        default=1,
-    )
 
-    def verify(self) -> Tuple[bool, str]:
+    weight: int
+    raw: ArrayConfig
+    gt: ArrayConfig | None
+    mask: ArrayConfig | None
+    sample_points: list[Coordinate] | None
+
+    def _neuroglancer_layers(self, prefix="", exclude_layers=None):
         """
-        Method to verify the dataset configuration.
+        Generates neuroglancer layers for raw, gt and mask if they can be viewed by neuroglance, excluding those in
+        the exclude_layers.
 
-        Since there is no specific validation logic defined for this DataSet, this
-        method will always return True as default reaction and a message stating
-        the lack of validation.
-
+        Args:
+            prefix (str, optional): A prefix to be added to the layer names.
+            exclude_layers (set, optional): A set of layer names to exclude.
         Returns:
-            tuple: A tuple of boolean value indicating the check (True or False) and
-            message specifying result of validation.
+            dict: A dictionary containing layer names as keys and corresponding neuroglancer layer as values.
         Raises:
             NotImplementedError: If the method is not implemented in the derived class.
         Examples:
-            >>> dataset_config = DatasetConfig(name="sample_dataset")
-            >>> dataset_config.verify()
-            (True, "No validation for this DataSet")
+            >>> dataset = Dataset("dataset")
+            >>> dataset._neuroglancer_layers()
+            {"raw": neuroglancer_layer}
         Notes:
-            This method is used to validate the configuration of the dataset.
+            This method is used to generate neuroglancer layers for raw, gt and mask if they can be viewed by neuroglance.
         """
-        return True, "No validation for this DataSet"
-
-    def __hash__(self) -> int:
-        return hash(self.name)
+        layers = {}
+        exclude_layers = exclude_layers if exclude_layers is not None else set()
+        if (
+            self.raw._can_neuroglance()
+            and self.raw._source_name() not in exclude_layers
+        ):
+            layers[self.raw._source_name()] = self.raw._neuroglancer_layer()
+        if self.gt is not None and self.gt._can_neuroglance():
+            new_layers = self.gt._neuroglancer_layer()
+            if isinstance(new_layers, list):
+                names = self.gt._source_name()
+                for name, layer in zip(names, new_layers):
+                    if name not in exclude_layers:
+                        layers[name] = layer
+            elif self.gt._source_name() not in exclude_layers:
+                layers[self.gt._source_name()] = new_layers
+        if self.mask is not None and self.mask._can_neuroglance():
+            new_layers = self.mask._neuroglancer_layer()
+            if isinstance(new_layers, list):
+                names = self.mask._source_name()
+                for name, layer in zip(names, new_layers):
+                    if name not in exclude_layers:
+                        layers[name] = layer
+            elif self.gt._source_name() not in exclude_layers:
+                layers["mask_" + self.mask._source_name()] = new_layers
+        return layers

@@ -96,6 +96,7 @@ class ArchitectureConfig(ABC):
         checkpoint: int | str | None = None,
         in_voxel_size: Coordinate | None = None,
     ):
+        # TODO: can we remove this circular logic?
         from dacapo.experiments.run_config import RunConfig
 
         run = RunConfig(name=f"{self.name}-bioimage-io", architecture_config=self)

@@ -3,7 +3,7 @@ import attr
 from abc import ABC, abstractmethod
 
 from funlib.geometry import Coordinate
-from dacapo_toolbox.datasplits.datasets import Dataset
+from dacapo_toolbox.datasplits.datasets import DatasetConfig
 from dacapo_toolbox.tasks.predictors import Predictor
 
 import torch
@@ -32,7 +32,7 @@ class TrainerConfig(ABC):
     @abstractmethod
     def iterable_dataset(
         self,
-        datasets: list[Dataset],
+        datasets: list[DatasetConfig],
         input_size: Coordinate,
         output_size: Coordinate,
         predictor: Predictor | None = None,

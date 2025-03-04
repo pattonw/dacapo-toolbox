@@ -1,4 +1,4 @@
-from .datasets import Dataset
+from .datasets import DatasetConfig
 import neuroglancer
 from abc import ABC
 from typing import List, Optional
@@ -27,8 +27,8 @@ class DataSplit(ABC):
         This class is used to split the data into training and validation datasets.
     """
 
-    train: List[Dataset]
-    validate: Optional[List[Dataset]]
+    train: List[DatasetConfig]
+    validate: Optional[List[DatasetConfig]]
 
     def _neuroglancer(self, embedded=False, bind_address="0.0.0.0", bind_port=0):
         """

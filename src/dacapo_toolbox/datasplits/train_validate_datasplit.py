@@ -1,5 +1,5 @@
 from .datasplit import DataSplit
-from .datasets import Dataset
+from .datasets import DatasetConfig
 
 from typing import List
 import warnings
@@ -25,8 +25,8 @@ class TrainValidateDataSplit(DataSplit):
         This class is used to split the data into training and validation datasets.
     """
 
-    train: List[Dataset]
-    validate: List[Dataset]
+    train: List[DatasetConfig]
+    validate: List[DatasetConfig]
 
     def __init__(self, datasplit_config):
         """

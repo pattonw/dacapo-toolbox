@@ -8,12 +8,12 @@ from funlib.persistence import Array
 
 if TYPE_CHECKING:
     from dacapo_toolbox.tasks.evaluators.evaluation_scores import EvaluationScores
-    from dacapo_toolbox.datasplits.datasets import Dataset
+    from dacapo_toolbox.datasplits.datasets import DatasetConfig
     from dacapo_toolbox.tmp import LocalArrayIdentifier
     from dacapo_toolbox.tasks.post_processors import PostProcessorParameters
 
 # Custom types for improved readability
-OutputIdentifier = tuple["Dataset", "PostProcessorParameters", str]
+OutputIdentifier = tuple["DatasetConfig", "PostProcessorParameters", str]
 Iteration = int
 Score = float
 BestScore = tuple[Iteration, Score] | None
@@ -107,7 +107,7 @@ class Evaluator(ABC):
 
     def is_best(
         self,
-        dataset: "Dataset",
+        dataset: "DatasetConfig",
         parameter: "PostProcessorParameters",
         criterion: str,
         score: "EvaluationScores",
@@ -116,7 +116,7 @@ class Evaluator(ABC):
         Check if the provided score is the best for this dataset/parameter/criterion combo.
 
         Args:
-            dataset : Dataset
+            dataset : DatasetConfig
                 the dataset
             parameter : PostProcessorParameters
                 the post-processor parameters
@@ -131,7 +131,7 @@ class Evaluator(ABC):
             NotImplementedError: if the function is not implemented
         Examples:
             >>> evaluator = Evaluator()
-            >>> dataset = Dataset()
+            >>> dataset = DatasetConfig()
             >>> parameter = PostProcessorParameters()
             >>> criterion = "criterion"
             >>> score = EvaluationScores()
@@ -151,12 +151,12 @@ class Evaluator(ABC):
                 getattr(score, criterion), previous_best_score, criterion
             )
 
-    def get_overall_best(self, dataset: "Dataset", criterion: str):
+    def get_overall_best(self, dataset: "DatasetConfig", criterion: str):
         """
         Return the best score for the given dataset and criterion.
 
         Args:
-            dataset : Dataset
+            dataset : DatasetConfig
                 the dataset
             criterion : str
                 the criterion
@@ -167,7 +167,7 @@ class Evaluator(ABC):
             NotImplementedError: if the function is not implemented
         Examples:
             >>> evaluator = Evaluator()
-            >>> dataset = Dataset()
+            >>> dataset = DatasetConfig()
             >>> criterion = "criterion"
             >>> evaluator.get_overall_best(dataset, criterion)
             None
@@ -194,12 +194,12 @@ class Evaluator(ABC):
                                 overall_best = current_parameter_score
         return overall_best
 
-    def get_overall_best_parameters(self, dataset: "Dataset", criterion: str):
+    def get_overall_best_parameters(self, dataset: "DatasetConfig", criterion: str):
         """
         Return the best parameters for the given dataset and criterion.
 
         Args:
-            dataset : Dataset
+            dataset : DatasetConfig
                 the dataset
             criterion : str
                 the criterion
@@ -210,7 +210,7 @@ class Evaluator(ABC):
             NotImplementedError: if the function is not implemented
         Examples:
             >>> evaluator = Evaluator()
-            >>> dataset = Dataset()
+            >>> dataset = DatasetConfig()
             >>> criterion = "criterion"
             >>> evaluator.get_overall_best_parameters(dataset, criterion)
             None

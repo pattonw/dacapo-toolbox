@@ -51,12 +51,12 @@ class DummyTrainerConfig(TrainerConfig):
     ):
         in_roi = Roi(input_shape * 0, input_shape)
         out_roi = Roi(output_shape * 0, output_shape)
-        in_voxel_size = datasets[0].raw.voxel_size
+        in_voxel_size = datasets[0].raw.array("r").voxel_size
         raw = torch.from_numpy(
-            datasets[0].raw[in_roi * in_voxel_size].astype(np.float32)
+            datasets[0].raw.array("r")[in_roi * in_voxel_size].astype(np.float32)
         )
         out_raw = torch.from_numpy(
-            datasets[0].raw[out_roi * in_voxel_size].astype(np.float32)
+            datasets[0].raw.array("r")[out_roi * in_voxel_size].astype(np.float32)
         )
 
         def generator():

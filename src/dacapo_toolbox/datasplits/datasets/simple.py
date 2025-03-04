@@ -10,7 +10,8 @@ import numpy as np
 
 
 @attr.s
-class SimpleDataset(DatasetConfig):
+class SimpleDataset():
+    name: str = attr.ib()
     path: Path = attr.ib()
     weight: int = attr.ib(default=1)
     raw_name: str = attr.ib(default="raw")

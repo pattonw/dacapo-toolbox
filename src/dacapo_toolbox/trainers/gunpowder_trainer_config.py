@@ -12,7 +12,7 @@ import numpy as np
 
 from funlib.geometry import Coordinate
 from funlib.persistence import Array
-from dacapo_toolbox.datasplits.datasets import Dataset
+from dacapo_toolbox.datasplits.datasets import DatasetConfig
 from dacapo_toolbox.tasks.predictors import Predictor
 
 import torch
@@ -97,7 +97,7 @@ class GunpowderTrainerConfig(TrainerConfig):
 
     def iterable_dataset(
         self,
-        datasets: List[Dataset],
+        datasets: List[DatasetConfig],
         input_shape: Coordinate,
         output_shape: Coordinate,
         predictor: Predictor | None = None,
@@ -111,8 +111,8 @@ class GunpowderTrainerConfig(TrainerConfig):
         assert datasets[0].gt is not None, "Trainer without GT is not yet implemented"
 
         # get voxel sizes
-        raw_voxel_size = datasets[0].raw.voxel_size
-        target_voxel_size = datasets[0].gt.voxel_size
+        raw_voxel_size = datasets[0].raw.array("r").voxel_size
+        target_voxel_size = datasets[0].gt.array("r").voxel_size
 
         # define input and output size:
         # switch to world units
@@ -145,15 +145,18 @@ class GunpowderTrainerConfig(TrainerConfig):
             assert isinstance(dataset.weight, int), dataset
 
             assert dataset.gt is not None, "Trainer without GT is not yet implemented"
+            raw = dataset.raw.array("r")
+            gt = dataset.gt.array("r")
+            mask = dataset.mask.array("r") if dataset.mask is not None else None
 
-            raw_source = gp.ArraySource(raw_key, dataset.raw)
-            if dataset.raw.channel_dims == 0:
+            raw_source = gp.ArraySource(raw_key, raw)
+            if raw.channel_dims == 0:
                 raw_source += gp.Unsqueeze([raw_key], axis=0)
             if self.clip_raw:
                 raw_source += gp.Crop(
-                    raw_key, dataset.gt.roi.snap_to_grid(dataset.raw.voxel_size)
+                    raw_key, gt.roi.snap_to_grid(raw.voxel_size)
                 )
-            gt_source = gp.ArraySource(gt_key, dataset.gt)
+            gt_source = gp.ArraySource(gt_key, gt)
 
             points_source = None
             if self.sample_strategy == "sample_points":
@@ -164,11 +167,11 @@ class GunpowderTrainerConfig(TrainerConfig):
                 graph = gp.Graph(
                     [gp.Node(i, np.array(loc)) for i, loc in enumerate(sample_points)],
                     [],
-                    gp.GraphSpec(dataset.gt.roi),
+                    gp.GraphSpec(gt.roi),
                 )
                 points_source = GraphSource(sample_points_key, graph)
-            if dataset.mask is not None:
-                mask_source = gp.ArraySource(mask_key, dataset.mask)
+            if mask is not None:
+                mask_source = gp.ArraySource(mask_key, mask)
             else:
                 # Always provide a mask. By default it is simply an array
                 # of ones with the same shape/roi as gt. Avoids making us
@@ -178,11 +181,11 @@ class GunpowderTrainerConfig(TrainerConfig):
                 mask_source = gp.ArraySource(
                     mask_key,
                     Array(
-                        np.ones(dataset.gt.data.shape, dtype=dataset.gt.data.dtype),
-                        offset=dataset.gt.roi.offset,
-                        voxel_size=dataset.gt.voxel_size,
-                        axis_names=dataset.gt.axis_names,
-                        units=dataset.gt.units,
+                        np.ones(gt.data.shape, dtype=gt.data.dtype),
+                        offset=gt.roi.offset,
+                        voxel_size=gt.voxel_size,
+                        axis_names=gt.axis_names,
+                        units=gt.units,
                     ),
                 )
             array_sources = [raw_source, gt_source, mask_source] + (
