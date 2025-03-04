@@ -5,14 +5,12 @@ description = "A suite of tools and convenience functions to help start training
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "dacapo-ml>=0.3.6",
     "iohub",
     "torch",
 ]
 
 
 [tool.uv.sources]
-dacapo-ml = { path = "../dacapo" }
 iohub = { git = "https://github.com/czbiohub-sf/iohub.git" }
 
 [project.optional-dependencies]
