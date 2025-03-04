@@ -165,7 +165,7 @@ def test_architectures(
     )
 
     if isinstance(architecture_config, WrappedArchitectureConfig):
-        with pytest.raises(cattrs.errors.ClassValidationError):
+        with pytest.raises(AssertionError):
             serde_test(architecture_config)
     else:
         serde_test(architecture_config)

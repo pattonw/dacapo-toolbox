@@ -13,10 +13,9 @@ import json
 from upath import UPath as Path
 from typing import Optional, Tuple
 
-from pydantic import BaseModel
 
-
-class LocalArrayIdentifier(BaseModel):
+@attr.s
+class LocalArrayIdentifier:
     """
     Represents a local array identifier.
 
@@ -31,7 +30,8 @@ class LocalArrayIdentifier(BaseModel):
     dataset: str = attr.ib()
 
 
-class LocalContainerIdentifier(BaseModel):
+@attr.s
+class LocalContainerIdentifier:
     """
     Represents a local container identifier.
 
