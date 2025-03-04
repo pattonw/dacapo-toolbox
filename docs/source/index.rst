@@ -9,7 +9,7 @@
 
    overview
    install
-   notebooks/minimal_tutorial
+   .. notebooks/minimal_tutorial
 
 .. include:: ../../README.md
    :parser: myst_parser.sphinx_
