@@ -1,5 +1,5 @@
-import attr
 from dacapo_toolbox.converter import converter
+
 
 def serde_test(config):
     # Serialize and deserialize the config

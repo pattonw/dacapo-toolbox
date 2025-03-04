@@ -72,9 +72,9 @@ class DaCapoTargetFilter(gp.BatchFilter):
 
         self.moving_counts = None
 
-        assert (
-            target_key is not None or weights_key is not None
-        ), "Must provide either target or weights"
+        assert target_key is not None or weights_key is not None, (
+            "Must provide either target or weights"
+        )
 
     def setup(self):
         """

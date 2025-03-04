@@ -1,16 +1,16 @@
 # star imports ensure visibility of concrete classes, so here they are accepted
 # flake8: noqa: F405
-from dacapo_toolbox.architectures import *
-from dacapo_toolbox.datasplits import *
-from dacapo_toolbox.datasplits.datasets import *
-from dacapo_toolbox.datasplits.datasets.arrays import *
-from dacapo_toolbox.datasplits.datasets.graphstores import *
-from dacapo_toolbox.tasks import *
-from dacapo_toolbox.tasks.evaluators import *
-from dacapo_toolbox.tasks.post_processors import *
-from dacapo_toolbox.trainers import *
-from dacapo_toolbox.trainers.gp_augments import *
-from dacapo.experiments.starts import *
+from dacapo_toolbox.architectures import *  # noqa
+from dacapo_toolbox.datasplits import *  # noqa
+from dacapo_toolbox.datasplits.datasets import *  # noqa
+from dacapo_toolbox.datasplits.datasets.arrays import *  # noqa
+from dacapo_toolbox.datasplits.datasets.graphstores import *  # noqa
+from dacapo_toolbox.tasks import *  # noqa
+from dacapo_toolbox.tasks.evaluators import *  # noqa
+from dacapo_toolbox.tasks.post_processors import *  # noqa
+from dacapo_toolbox.trainers import *  # noqa
+from dacapo_toolbox.trainers.gp_augments import *  # noqa
+# from dacapo.experiments.starts import *
 
 from funlib.geometry import Coordinate, Roi
 
@@ -49,7 +49,6 @@ def register_hierarchy_hooks(converter):
     """
 
     converter.register_hierarchy(TaskConfig, cls_fun)
-    converter.register_hierarchy(StartConfig, cls_fun)
     converter.register_hierarchy(ArchitectureConfig, cls_fun)
     converter.register_hierarchy(TrainerConfig, cls_fun)
     converter.register_hierarchy(AugmentConfig, cls_fun)
@@ -59,6 +58,8 @@ def register_hierarchy_hooks(converter):
     converter.register_hierarchy(GraphStoreConfig, cls_fun)
     converter.register_hierarchy(EvaluationScores, cls_fun)
     converter.register_hierarchy(PostProcessorParameters, cls_fun)
+
+    # converter.register_hierarchy(StartConfig, cls_fun)
 
 
 def register_hooks(converter):

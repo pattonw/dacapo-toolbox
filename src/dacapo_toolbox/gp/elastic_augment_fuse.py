@@ -387,9 +387,9 @@ class ElasticAugment(BatchFilter):
         )
 
         for key, spec in request.items():
-            assert isinstance(key, ArrayKey) or isinstance(
-                key, GraphKey
-            ), f"Only ArrayKey/GraphKey supported but got {type(key)} in request"
+            assert isinstance(key, ArrayKey) or isinstance(key, GraphKey), (
+                f"Only ArrayKey/GraphKey supported but got {type(key)} in request"
+            )
 
             logger.debug(f"key {key}: preparing with spec {spec}")
 

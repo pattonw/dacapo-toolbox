@@ -7,72 +7,10 @@ from dacapo_toolbox.utils.voi import voi as _voi
 from dacapo_toolbox.tmp import open_from_identifier
 
 import numpy as np
-import numpy_indexed as npi
 
 import logging
 
 logger = logging.getLogger(__name__)
-
-
-def relabel(array, return_backwards_map=False, inplace=False):
-    """
-    Relabel array, such that IDs are consecutive. Excludes 0.
-
-    Args:
-        array (ndarray):
-                The array to relabel.
-        return_backwards_map (``bool``, optional):
-                If ``True``, return an ndarray that maps new labels (indices in
-                the array) to old labels.
-        inplace (``bool``, optional):
-                Perform the replacement in-place on ``array``.
-    Returns:
-        A tuple ``(relabelled, n)``, where ``relabelled`` is the relabelled
-        array and ``n`` the number of unique labels found.
-        If ``return_backwards_map`` is ``True``, returns ``(relabelled, n,
-        backwards_map)``.
-    Raises:
-        ValueError:
-                If ``array`` is not of type ``np.ndarray``.
-    Examples:
-        >>> array = np.array([[1, 2, 0], [0, 2, 1]])
-        >>> relabel(array)
-        (array([[1, 2, 0], [0, 2, 1]]), 2)
-        >>> relabel(array, return_backwards_map=True)
-        (array([[1, 2, 0], [0, 2, 1]]), 2, [0, 1, 2])
-    Note:
-        This function is used to relabel an array, such that IDs are consecutive. Excludes 0.
-
-    """
-
-    if array.size == 0:
-        if return_backwards_map:
-            return array, 0, []
-        else:
-            return array, 0
-
-    # get all labels except 0
-    old_labels = np.unique(array)
-    old_labels = old_labels[old_labels != 0]
-
-    if old_labels.size == 0:
-        if return_backwards_map:
-            return array, 0, [0]
-        else:
-            return array, 0
-
-    n = len(old_labels)
-    new_labels = np.arange(1, n + 1, dtype=array.dtype)
-
-    replaced = npi.remap(
-        array.flatten(), old_labels, new_labels, inplace=inplace
-    ).reshape(array.shape)
-
-    if return_backwards_map:
-        backwards_map = np.insert(old_labels, 0, 0)
-        return replaced, n, backwards_map
-
-    return replaced, n
 
 
 class InstanceEvaluator(Evaluator):

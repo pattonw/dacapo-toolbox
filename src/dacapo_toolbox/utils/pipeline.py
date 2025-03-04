@@ -159,7 +159,9 @@ class MakeRaw(gp.BatchFilter):
             for id in np.unique(labels):
                 if id == 0:
                     continue
-                raw[distance_transform_edt(labels == id) > self.membrane_size] = self.inside_value  # type: ignore
+                raw[distance_transform_edt(labels == id) > self.membrane_size] = (
+                    self.inside_value
+                )  # type: ignore
 
         # now add blur
         raw = gaussian_filter(raw, random.uniform(*self.gaussian_blur_args))

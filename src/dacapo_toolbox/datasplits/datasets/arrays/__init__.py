@@ -12,10 +12,10 @@ from .concat_array_config import ConcatArrayConfig  # noqa
 from .logical_or_array_config import LogicalOrArrayConfig  # noqa
 from .crop_array_config import CropArrayConfig  # noqa
 from .merge_instances_array_config import (
-    MergeInstancesArrayConfig,
-)  # noqa
-from .dvid_array_config import DVIDArrayConfig
-from .sum_array_config import SumArrayConfig
+    MergeInstancesArrayConfig,  # noqa
+)
+from .dvid_array_config import DVIDArrayConfig  # noqa
+from .sum_array_config import SumArrayConfig  # noqa
 
 # nonconfigurable arrays (helpers)
 from .constant_array_config import ConstantArrayConfig  # noqa

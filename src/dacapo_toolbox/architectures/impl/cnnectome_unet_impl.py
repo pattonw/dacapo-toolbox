@@ -197,7 +197,7 @@ class CNNectomeUNetModule(torch.nn.Module):
         self.out_channels = num_fmaps_out if num_fmaps_out else num_fmaps
         upsample_channel_contraction = (
             [upsample_channel_contraction] * self.num_levels
-            if type(upsample_channel_contraction) == bool
+            if isinstance(upsample_channel_contraction, bool)
             else upsample_channel_contraction
         )
 
@@ -714,7 +714,9 @@ class Upsample(torch.nn.Module):
             )
 
         else:
-            layers.append(torch.nn.Upsample(scale_factor=tuple(scale_factor), mode=mode))
+            layers.append(
+                torch.nn.Upsample(scale_factor=tuple(scale_factor), mode=mode)
+            )
             conv = {2: torch.nn.Conv2d, 3: torch.nn.Conv3d}[self.dims]
             layers.append(
                 conv(

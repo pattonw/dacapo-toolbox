@@ -9,6 +9,8 @@ from upath import UPath as Path
 
 from typing import Optional, List, Tuple
 
+import warnings
+
 
 @attr.s
 class ZarrArrayConfig(ArrayConfig):
@@ -64,30 +66,22 @@ class ZarrArrayConfig(ArrayConfig):
         if self.ome_metadata:
             name = self.dataset.split("/")[-1]
             dataset = self.dataset.replace(f"/{name}", "")
-            return open_ome_ds(self.file_name / dataset, name=name, mode=mode)
+            array = open_ome_ds(self.file_name / dataset, name=name, mode=mode)
         else:
-            return open_ds(self.file_name / self.dataset, mode=mode)
+            array = open_ds(self.file_name / self.dataset, mode=mode)
+
+        if array.offset % array.voxel_size != Coordinate((0,) * array.voxel_size.dims):
+            warnings.warn(
+                f"Array {self.dataset} has an offset that is not a multiple of the voxel size, "
+                "it will be snapped to the voxel grid",
+                UserWarning,
+            )
+            array.offset = (array.offset // array.voxel_size) * array.voxel_size
+        return array
 
     def verify(self) -> Tuple[bool, str]:
         """
         Check whether this is a valid Array
-
-        Returns:
-            Tuple[bool, str]: A tuple of a boolean and a string. The boolean indicates whether the Array is valid or not.
-            The string provides a reason why the Array is not valid.
-        Raises:
-            NotImplementedError: This method is not implemented for this Array
-        Examples:
-            >>> zarr_array_config = ZarrArrayConfig(
-            ...     file_name=Path("data.zarr"),
-            ...     dataset="data",
-            ...     snap_to_grid=Coordinate(1, 1, 1),
-            ...     _axes=["x", "y", "z"]
-            ... )
-            >>> zarr_array_config.verify()
-            (True, 'No validation for this Array')
-        Note:
-            This method is not implemented for this Array
         """
         if not self.file_name.exists():
             return False, f"{self.file_name} does not exist!"
@@ -97,4 +91,4 @@ class ZarrArrayConfig(ArrayConfig):
             return False, f"{self.file_name} is not a zarr or n5 container"
         elif not (self.file_name / self.dataset).exists():
             return False, f"{self.dataset} is not contained in {self.file_name}"
-        return True, "No validation for this Array"
+        return True, "Valid ZarrArrayConfig"

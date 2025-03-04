@@ -75,15 +75,15 @@ def balance_weights(
     if moving_counts is None:
         moving_counts = []
     unique_labels = np.unique(label_data)
-    assert (
-        len(unique_labels) <= num_classes
-    ), f"Found unique labels {unique_labels} but expected only {num_classes}."
-    assert (
-        0 <= np.min(label_data) < num_classes
-    ), f"Labels {unique_labels} are not in [0, {num_classes})."
-    assert (
-        0 <= np.max(label_data) < num_classes
-    ), f"Labels {unique_labels} are not in [0, {num_classes})."
+    assert len(unique_labels) <= num_classes, (
+        f"Found unique labels {unique_labels} but expected only {num_classes}."
+    )
+    assert 0 <= np.min(label_data) < num_classes, (
+        f"Labels {unique_labels} are not in [0, {num_classes})."
+    )
+    assert 0 <= np.max(label_data) < num_classes, (
+        f"Labels {unique_labels} are not in [0, {num_classes})."
+    )
 
     # initialize error scale with 1s
     error_scale = np.ones(label_data.shape, dtype=np.float32)

@@ -1,6 +1,5 @@
 from funlib.geometry import Coordinate
 from .serde import serde_test
-import cattrs
 
 import torch
 

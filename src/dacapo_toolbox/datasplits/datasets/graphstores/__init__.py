@@ -1,1 +1,1 @@
-from .graph_source_config import GraphStoreConfig
+from .graph_source_config import GraphStoreConfig  # noqa

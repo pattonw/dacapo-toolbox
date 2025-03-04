@@ -1,7 +1,6 @@
 import gunpowder as gp
 
 import pytest
-from pytest_lazy_fixtures import lf
 import numpy as np
 
 from dacapo_toolbox.datasplits.datasets.arrays import (
@@ -11,15 +10,11 @@ from dacapo_toolbox.datasplits.datasets.arrays import (
 )
 
 import zarr
-import numpy as np
 from numcodecs import Zstd
-import pytest
 from .serde import serde_test
 
 from dacapo_toolbox.tmp import num_channels_from_array
 
-import pytest
-from pytest_lazy_fixtures import lf
 from funlib.persistence import Array
 
 

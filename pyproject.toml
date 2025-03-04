@@ -5,13 +5,31 @@ description = "A suite of tools and convenience functions to help start training
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "attrs>=25.1.0",
+    "bioimageio-core[pytorch]>=0.7.0",
+    "cattrs>=24.1.2",
+    "cellmap-schemas>=0.8.1",
+    "dacapo-toolbox",
+    "daisy>=1.2.2",
+    "funlib-persistence",
+    "gunpowder>=1.4.0",
     "iohub",
-    "torch",
+    "lazy-property>=0.0.1",
+    "lsds>=0.1.3",
+    "mwatershed>=0.5.2",
+    "neuroglancer>=2.40.1",
+    "numpy-indexed>=0.3.7",
+    "ruff[dev]>=0.9.6",
+    "simpleitk>=2.4.1",
+    "torch>=2.6.0",
+    "universal-pathlib>=0.2.6",
+    "xarray-multiscale>=2.1.0",
 ]
 
 
 [tool.uv.sources]
 iohub = { git = "https://github.com/czbiohub-sf/iohub.git" }
+funlib-persistence = { git = "https://github.com/funkelab/funlib.persistence", rev = "ome-ngff" }
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-xdist", "pytest-cov", "pytest-lazy-fixtures"]
