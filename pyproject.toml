@@ -25,6 +25,9 @@ dependencies = [
     "universal-pathlib>=0.2.6",
     "xarray-multiscale>=2.1.0",
 ]
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
 
 
 [tool.uv.sources]
