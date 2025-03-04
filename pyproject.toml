@@ -33,14 +33,7 @@ funlib-persistence = { git = "https://github.com/funkelab/funlib.persistence", r
 
 [project.optional-dependencies]
 test = ["pytest", "pytest-xdist", "pytest-cov", "pytest-lazy-fixtures"]
-dev = [
-    "black",
-    "mypy",
-    "pdbpp",
-    "rich",
-    "ruff",
-    "pre-commit",
-]
+dev = ["black", "mypy", "pdbpp", "rich", "ruff", "pre-commit"]
 docs = [
     "matplotlib",
     "pooch",

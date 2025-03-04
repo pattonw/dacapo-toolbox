@@ -1,15 +1,7 @@
 # %% [markdown]
 # # Simple Examples
-# This tutorial goes through a few common ML tasks using `cremi dataset <https://cremi.org/data/>` and a *2D U-Net*.
+# This tutorial goes through a few common ML tasks using the `cremi dataset <https://cremi.org/data/>` and a *2D U-Net*.
 
-
-#  %% [markdown]
-# ## Needed Libraries for this Tutorial
-# For this tutorial you will need to install the `dacapo_toolbox` library via:
-#
-# ```bash
-# pip install git+https://github.com/pattonw/dacapo-toolbox.git
-# ```
 
 # %% [markdown]
 # ## Introduction and overview
@@ -17,7 +9,7 @@
 # In this tutorial we will cover a few basic ML tasks using the DaCapo toolbox. We will:
 #
 # - Prepare a dataloader for the CREMI dataset
-# - Train a simple 2D U-Net
+# - Train a simple 2D U-Net for both instance and semantic segmentation
 # - Visualize the results
 # 
 
@@ -87,18 +79,21 @@ plt.show()
 
 # %%
 from dacapo_toolbox.convenience import dataset_from_zarr
-dataset = dataset_from_zarr(
+import torch
+
+dataset: torch.utils.data.IterableDataset = dataset_from_zarr(
     zarr_container="cremi.zarr",
     input_shape=(1, 132, 132),
     output_shape=(1, 132, 132),
-    augments=["elastic", "noise", "intensity"],
+    augments=[],
     task="instance",
     mode="train",
 )
 
+# %%
+
+torch.utils.data.DataLoader(dataset, batch_size=5, num_workers=3)
 batch = next(iter(dataset))
-for k,v in batch.items():
-    print(k, v.shape)
 fig, axes = plt.subplots(1, 3, figsize=(12, 6))
 
 # Show the raw data
@@ -113,3 +108,4 @@ axes[2].imshow(batch["gt"][0], cmap=label_cmap, interpolation="none")
 axes[2].set_title("Labels")
 
 plt.show()
+# %%
