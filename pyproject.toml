@@ -9,7 +9,6 @@ dependencies = [
     "bioimageio-core[pytorch]>=0.7.0",
     "cattrs>=24.1.2",
     "cellmap-schemas>=0.8.1",
-    "dacapo-toolbox",
     "daisy>=1.2.2",
     "funlib-persistence",
     "gunpowder>=1.4.0",
@@ -19,7 +18,6 @@ dependencies = [
     "mwatershed>=0.5.2",
     "neuroglancer>=2.40.1",
     "numpy-indexed>=0.3.7",
-    "ruff[dev]>=0.9.6",
     "simpleitk>=2.4.1",
     "torch>=2.6.0",
     "universal-pathlib>=0.2.6",
@@ -35,7 +33,12 @@ iohub = { git = "https://github.com/czbiohub-sf/iohub.git" }
 funlib-persistence = { git = "https://github.com/funkelab/funlib.persistence", rev = "ome-ngff" }
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-xdist", "pytest-cov", "pytest-lazy-fixtures"]
+test = [
+    "pytest",
+    "pytest-xdist",
+    "pytest-cov",
+    "pytest-lazy-fixtures",
+]
 dev = ["black", "mypy", "pdbpp", "rich", "ruff", "pre-commit"]
 docs = [
     "matplotlib",
