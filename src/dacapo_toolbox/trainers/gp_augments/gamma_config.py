@@ -1,5 +1,5 @@
 from .augment_config import AugmentConfig
-from dacapo.gp.gamma_noise import GammaAugment
+from dacapo_toolbox.gp.gamma_noise import GammaAugment
 
 import gunpowder as gp
 

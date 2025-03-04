@@ -1,12 +1,12 @@
 from .threshold_post_processor_parameters import ThresholdPostProcessorParameters
-from dacapo.store.array_store import LocalArrayIdentifier
+from dacapo_toolbox.tmp import LocalArrayIdentifier
 from .post_processor import PostProcessor
 import numpy as np
 import daisy
 from daisy import Roi, Coordinate
 from funlib.persistence import open_ds
 
-from dacapo.tmp import (
+from dacapo_toolbox.tmp import (
     open_from_identifier,
     create_from_identifier,
     num_channels_from_array,

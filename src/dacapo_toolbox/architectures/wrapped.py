@@ -81,6 +81,6 @@ class WrappedArchitectureConfig(ArchitectureConfig):
 
     def scale(self, input_voxel_size: Coordinate) -> Coordinate:
         if self._scale is not None:
-            return input_voxel_size // self._scale
+            return input_voxel_size // Coordinate(self._scale)
         else:
             return input_voxel_size

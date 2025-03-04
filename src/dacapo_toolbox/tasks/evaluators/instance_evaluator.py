@@ -3,8 +3,8 @@ from typing import List
 
 from .evaluator import Evaluator
 from .instance_evaluation_scores import InstanceEvaluationScores
-from dacapo.utils.voi import voi as _voi
-from dacapo.tmp import open_from_identifier
+from dacapo_toolbox.utils.voi import voi as _voi
+from dacapo_toolbox.tmp import open_from_identifier
 
 import numpy as np
 import numpy_indexed as npi

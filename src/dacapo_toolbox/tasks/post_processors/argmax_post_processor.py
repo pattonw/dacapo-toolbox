@@ -1,9 +1,9 @@
-from dacapo.store.array_store import LocalArrayIdentifier
+from dacapo_toolbox.tmp import LocalArrayIdentifier
 from .argmax_post_processor_parameters import ArgmaxPostProcessorParameters
 from .post_processor import PostProcessor
 import numpy as np
 from daisy import Roi, Coordinate
-from dacapo.tmp import create_from_identifier, open_from_identifier
+from dacapo_toolbox.tmp import create_from_identifier, open_from_identifier
 from funlib.persistence import open_ds
 
 import daisy

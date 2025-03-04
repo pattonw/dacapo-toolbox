@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from dacapo_toolbox.tasks.post_processors.post_processor_parameters import (
         PostProcessorParameters,
     )
-    from dacapo.store.local_array_store import LocalArrayIdentifier
+    from dacapo_toolbox.tmp import LocalArrayIdentifier
 
 
 class PostProcessor(ABC):

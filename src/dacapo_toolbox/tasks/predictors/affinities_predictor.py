@@ -1,9 +1,9 @@
 from .predictor import Predictor
-from dacapo_toolbox import Model
+from dacapo_toolbox.model import Model
 from dacapo_toolbox.arraytypes import EmbeddingArray
-from dacapo.tmp import np_to_funlib_array
-from dacapo.utils.affinities import seg_to_affgraph, padding as aff_padding
-from dacapo.utils.balance_weights import balance_weights
+from dacapo_toolbox.tmp import np_to_funlib_array
+from dacapo_toolbox.utils.affinities import seg_to_affgraph, padding as aff_padding
+from dacapo_toolbox.utils.balance_weights import balance_weights
 from funlib.geometry import Coordinate
 from funlib.persistence import Array
 from lsd.train import LsdExtractor

@@ -1,24 +1,30 @@
-from dacapo.store.create_store import create_config_store
-
 import pytest
-from pytest_lazy_fixtures import lf
+
+from dacapo_toolbox.trainers import DummyTrainerConfig, GunpowderTrainerConfig
+from .serde import serde_test
+
+
+@pytest.fixture()
+def dummy_trainer():
+    yield DummyTrainerConfig(name="dummy_trainer", dummy_attr=True)
+
+
+@pytest.fixture()
+def gunpowder_trainer():
+    yield GunpowderTrainerConfig(
+        name="default_gp_trainer",
+    )
 
 
 @pytest.mark.parametrize(
     "trainer_config",
     [
-        lf("dummy_trainer"),
-        lf("gunpowder_trainer"),
+        "dummy_trainer",
+        "gunpowder_trainer",
     ],
 )
 def test_trainer(
-    options,
     trainer_config,
 ):
     # Initialize the config store (uses options behind the scene)
-    store = create_config_store()
-
-    # Test store/retrieve
-    store.store_trainer_config(trainer_config)
-    fetched_array_config = store.retrieve_trainer_config(trainer_config.name)
-    assert fetched_array_config == trainer_config
+    serde_test(trainer_config)

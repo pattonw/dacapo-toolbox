@@ -9,7 +9,7 @@ from funlib.persistence import Array
 if TYPE_CHECKING:
     from dacapo_toolbox.tasks.evaluators.evaluation_scores import EvaluationScores
     from dacapo_toolbox.datasplits.datasets import Dataset
-    from dacapo.store.local_array_store import LocalArrayIdentifier
+    from dacapo_toolbox.tmp import LocalArrayIdentifier
     from dacapo_toolbox.tasks.post_processors import PostProcessorParameters
     from dacapo_toolbox.validation_scores import ValidationScores
 

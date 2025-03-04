@@ -1,4 +1,4 @@
-from dacapo.store.array_store import LocalArrayIdentifier
+from dacapo_toolbox.tmp import LocalArrayIdentifier
 from funlib.persistence import open_ds
 import mwatershed as mws
 
@@ -6,7 +6,7 @@ from .watershed_post_processor_parameters import WatershedPostProcessorParameter
 from .post_processor import PostProcessor
 
 from funlib.geometry import Coordinate
-from dacapo.tmp import create_from_identifier, open_from_identifier
+from dacapo_toolbox.tmp import create_from_identifier, open_from_identifier
 
 
 import numpy as np

@@ -1,11 +1,11 @@
-from dacapo.utils.voi import voi
+from dacapo_toolbox.utils.voi import voi
 from .evaluator import Evaluator
 from .binary_segmentation_evaluation_scores import (
     BinarySegmentationEvaluationScores,
     MultiChannelBinarySegmentationEvaluationScores,
 )
 
-from dacapo.tmp import open_from_identifier
+from dacapo_toolbox.tmp import open_from_identifier
 
 
 import numpy as np

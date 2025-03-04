@@ -714,7 +714,7 @@ class Upsample(torch.nn.Module):
             )
 
         else:
-            layers.append(torch.nn.Upsample(scale_factor=scale_factor, mode=mode))
+            layers.append(torch.nn.Upsample(scale_factor=tuple(scale_factor), mode=mode))
             conv = {2: torch.nn.Conv2d, 3: torch.nn.Conv3d}[self.dims]
             layers.append(
                 conv(

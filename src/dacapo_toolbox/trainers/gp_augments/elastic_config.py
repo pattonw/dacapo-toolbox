@@ -1,5 +1,5 @@
 from .augment_config import AugmentConfig
-from dacapo.gp.elastic_augment_fuse import ElasticAugment
+from dacapo_toolbox.gp.elastic_augment_fuse import ElasticAugment
 
 import attr
 

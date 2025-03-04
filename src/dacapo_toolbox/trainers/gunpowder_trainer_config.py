@@ -4,7 +4,7 @@ import logging
 
 from .gp_augments import AugmentConfig
 from .trainer_config import TrainerConfig
-from dacapo.gp import GraphSource, CopyMask, DaCapoTargetFilter
+from dacapo_toolbox.gp import GraphSource, CopyMask, DaCapoTargetFilter
 
 from typing import Optional, List
 import gunpowder as gp

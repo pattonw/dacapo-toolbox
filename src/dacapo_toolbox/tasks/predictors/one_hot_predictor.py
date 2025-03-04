@@ -1,7 +1,7 @@
 from .predictor import Predictor
-from dacapo_toolbox import Model
+from dacapo_toolbox.model import Model
 from dacapo_toolbox.arraytypes import ProbabilityArray
-from dacapo.tmp import np_to_funlib_array
+from dacapo_toolbox.tmp import np_to_funlib_array
 from funlib.persistence import Array
 
 import numpy as np

@@ -3,7 +3,7 @@ import attr
 from .array_config import ArrayConfig
 from funlib.persistence import Array
 import dask.array as da
-from dacapo.tmp import num_channels_from_array
+from dacapo_toolbox.tmp import num_channels_from_array
 
 
 @attr.s
