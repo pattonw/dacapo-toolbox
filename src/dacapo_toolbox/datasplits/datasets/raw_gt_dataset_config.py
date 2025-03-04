@@ -8,7 +8,6 @@ import attr
 
 @attr.s
 class RawGTDatasetConfig(DatasetConfig):
-
     raw: ArrayConfig = attr.ib(
         metadata={"help_text": "The raw dataset. This is the input data for training."}
     )

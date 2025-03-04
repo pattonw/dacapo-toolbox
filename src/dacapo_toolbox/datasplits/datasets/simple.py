@@ -1,5 +1,3 @@
-from .dataset_config import DatasetConfig
-
 from funlib.persistence import Array, open_ds
 
 
@@ -10,7 +8,7 @@ import numpy as np
 
 
 @attr.s
-class SimpleDataset():
+class SimpleDataset:
     name: str = attr.ib()
     path: Path = attr.ib()
     weight: int = attr.ib(default=1)

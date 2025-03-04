@@ -153,9 +153,7 @@ class GunpowderTrainerConfig(TrainerConfig):
             if raw.channel_dims == 0:
                 raw_source += gp.Unsqueeze([raw_key], axis=0)
             if self.clip_raw:
-                raw_source += gp.Crop(
-                    raw_key, gt.roi.snap_to_grid(raw.voxel_size)
-                )
+                raw_source += gp.Crop(raw_key, gt.roi.snap_to_grid(raw.voxel_size))
             gt_source = gp.ArraySource(gt_key, gt)
 
             points_source = None
