@@ -155,7 +155,7 @@ class CNNectomeUNetConfig(ArchitectureConfig):
         # downsample factors has to be a list of tuples
         downsample_factors = [tuple(x) for x in self.downsample_factors]
 
-        unet = CNNectomeUNetModule(
+        unet: torch.nn.Module = CNNectomeUNetModule(
             in_channels=fmaps_in,
             num_fmaps=self.num_fmaps,
             num_fmaps_out=self.fmaps_out,

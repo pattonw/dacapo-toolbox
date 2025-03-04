@@ -67,9 +67,14 @@ class ModelZooConfig(ArchitectureConfig):
         if self._model_adapter is None:
             weights = self.model_description.weights
 
+            pytorch_state_dict = weights.pytorch_state_dict
+            assert pytorch_state_dict is not None, (
+                "We only support loading bioimageio models with a pytorch state dict"
+            )
+
             return PytorchModelAdapter(
                 outputs=self.model_description.outputs,
-                weights=weights.pytorch_state_dict,
+                weights=pytorch_state_dict,
                 devices=None,
             )
         return self._model_adapter
@@ -80,13 +85,17 @@ class ModelZooConfig(ArchitectureConfig):
             if isinstance(self.model_id, Path) and self.model_id.suffix == ".zip":
                 with zipfile.ZipFile(self.model_id, "r") as zip_ref:
                     zip_ref.extractall(Path(f"{self.model_id}.unzip"))
-                self._model_description = load_description(
-                    Path(f"{self.model_id}.unzip")
-                )
+                descr = load_description(Path(f"{self.model_id}.unzip"))
+                descr = load_description(self.model_id)
+                assert isinstance(descr, ModelDescr)
+                self._model_description = descr
             else:
-                self._model_description = load_description(self.model_id)
+                descr = load_description(self.model_id)
+                assert isinstance(descr, ModelDescr)
+                self._model_description = descr
             if isinstance(self._model_description, InvalidDescr):
                 raise Exception("Invalid model description")
+        assert self._model_description is not None
         return self._model_description
 
     @property

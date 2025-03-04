@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Tuple
 
 if TYPE_CHECKING:
-    from dacapo_toolbox.architectures.architecture import Architecture
+    from dacapo_toolbox.architectures.architecture import ArchitectureConfig
     from dacapo_toolbox.model import Model
 
 
@@ -18,7 +18,7 @@ class Predictor(ABC):
     and the output array type for a given training architecture.
 
     Methods:
-        create_model(self, architecture: "Architecture") -> "Model": Given a training architecture, create a model for this predictor.
+        create_model(self, architecture: "ArchitectureConfig") -> "Model": Given a training architecture, create a model for this predictor.
         create_target(self, gt: Array) -> Array: Create the target array for training, given a ground-truth array.
         create_weight(self, gt: Array, target: Array, mask: Array, moving_class_counts: Any) -> Tuple[Array, Any]: Create the weight array for training, given a ground-truth and associated target array.
         gt_region_for_roi(self, target_spec): Report how much spatial context this predictor needs to generate a target for the given ROI.
@@ -28,7 +28,7 @@ class Predictor(ABC):
     """
 
     @abstractmethod
-    def create_model(self, architecture: "Architecture") -> "Model":
+    def create_model(self, architecture: "ArchitectureConfig") -> "Model":
         """
         Given a training architecture, create a model for this predictor.
         This is usually done by appending a single final conv layer to the output of the

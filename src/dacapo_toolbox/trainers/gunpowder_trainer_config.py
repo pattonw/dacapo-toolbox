@@ -108,6 +108,8 @@ class GunpowderTrainerConfig(TrainerConfig):
         """
         assert len(datasets) >= 1, "Expected at least one dataset, got an empty list"
 
+        assert datasets[0].gt is not None, "Trainer without GT is not yet implemented"
+
         # get voxel sizes
         raw_voxel_size = datasets[0].raw.voxel_size
         target_voxel_size = datasets[0].gt.voxel_size
@@ -142,6 +144,8 @@ class GunpowderTrainerConfig(TrainerConfig):
             weights.append(dataset.weight)
             assert isinstance(dataset.weight, int), dataset
 
+            assert dataset.gt is not None, "Trainer without GT is not yet implemented"
+
             raw_source = gp.ArraySource(raw_key, dataset.raw)
             if dataset.raw.channel_dims == 0:
                 raw_source += gp.Unsqueeze([raw_key], axis=0)
@@ -154,6 +158,9 @@ class GunpowderTrainerConfig(TrainerConfig):
             points_source = None
             if self.sample_strategy == "sample_points":
                 sample_points = dataset.sample_points
+                assert sample_points is not None, (
+                    "Sample points must be provided to use 'sample_points' strategy"
+                )
                 graph = gp.Graph(
                     [gp.Node(i, np.array(loc)) for i, loc in enumerate(sample_points)],
                     [],

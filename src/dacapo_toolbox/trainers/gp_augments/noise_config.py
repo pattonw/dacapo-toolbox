@@ -4,6 +4,8 @@ import gunpowder as gp
 
 import attr
 
+from typing import Any
+
 
 @attr.s
 class NoiseAugmentConfig(AugmentConfig):
@@ -17,7 +19,7 @@ class NoiseAugmentConfig(AugmentConfig):
         node(): Constructs a node in the augmentation pipeline.
     """
 
-    kwargs: dict[str, any] = attr.ib(
+    kwargs: dict[str, Any] = attr.ib(
         metadata={
             "help_text": "key word arguments for skimage `random_noise`. For more details see "
             "https://scikit-image.org/docs/stable/api/skimage.util.html#skimage.util.random_noise"

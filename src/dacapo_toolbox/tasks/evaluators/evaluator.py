@@ -1,7 +1,7 @@
 import xarray as xr
 
 from abc import ABC, abstractmethod
-from typing import Tuple, Dict, Optional, List, TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 import math
 import itertools
 from funlib.persistence import Array
@@ -11,13 +11,12 @@ if TYPE_CHECKING:
     from dacapo_toolbox.datasplits.datasets import Dataset
     from dacapo_toolbox.tmp import LocalArrayIdentifier
     from dacapo_toolbox.tasks.post_processors import PostProcessorParameters
-    from dacapo_toolbox.validation_scores import ValidationScores
 
 # Custom types for improved readability
-OutputIdentifier = Tuple["Dataset", "PostProcessorParameters", str]
+OutputIdentifier = tuple["Dataset", "PostProcessorParameters", str]
 Iteration = int
 Score = float
-BestScore = Optional[Tuple[Iteration, Score]]
+BestScore = tuple[Iteration, Score] | None
 
 
 class Evaluator(ABC):
@@ -29,7 +28,7 @@ class Evaluator(ABC):
     determine the quality of the post-processor's output.
 
     Attributes:
-        best_scores : Dict[OutputIdentifier, BestScore]
+        best_scores : dict[OutputIdentifier, BestScore]
             the best scores for each dataset/post-processing parameter/criterion combination
     Methods:
         evaluate(output_array_identifier, evaluation_array)
@@ -86,12 +85,12 @@ class Evaluator(ABC):
     @property
     def best_scores(
         self,
-    ) -> Dict[OutputIdentifier, BestScore]:
+    ) -> dict[OutputIdentifier, BestScore]:
         """
         The best scores for each dataset/post-processing parameter/criterion combination.
 
         Returns:
-            Dict[OutputIdentifier, BestScore]
+            dict[OutputIdentifier, BestScore]
                 the best scores for each dataset/post-processing parameter/criterion combination
         Raises:
             AttributeError: if the best scores are not set
@@ -103,7 +102,7 @@ class Evaluator(ABC):
             This function is used to return the best scores for each dataset/post-processing parameter/criterion combination.
         """
         if not hasattr(self, "_best_scores"):
-            self._best_scores: Dict[OutputIdentifier, BestScore] = {}
+            self._best_scores: dict[OutputIdentifier, BestScore] = {}
         return self._best_scores
 
     def is_best(
@@ -162,7 +161,7 @@ class Evaluator(ABC):
             criterion : str
                 the criterion
         Returns:
-            Optional[float]
+            float | None
                 the best score for the given dataset and criterion
         Raises:
             NotImplementedError: if the function is not implemented
@@ -205,7 +204,7 @@ class Evaluator(ABC):
             criterion : str
                 the criterion
         Returns:
-            Optional[PostProcessorParameters]
+            PostProcessorParameters | None
                 the best parameters for the given dataset and criterion
         Raises:
             NotImplementedError: if the function is not implemented
@@ -270,7 +269,7 @@ class Evaluator(ABC):
         else:
             return score_1 < score_2
 
-    def set_best(self, validation_scores: "ValidationScores") -> None:
+    def set_best(self, validation_scores) -> None:
         """
         Find the best iteration for each dataset/post_processing_parameter/criterion.
 
@@ -291,8 +290,8 @@ class Evaluator(ABC):
         scores = validation_scores.to_xarray()
 
         # type these variables for mypy
-        best_indexes: Optional[xr.DataArray]
-        best_scores: Optional[xr.DataArray]
+        best_indexes: xr.DataArray | None
+        best_scores: xr.DataArray | None
 
         if len(validation_scores.scores) > 0:
             best_indexes, best_scores = validation_scores.get_best(
@@ -337,7 +336,7 @@ class Evaluator(ABC):
 
     @property
     @abstractmethod
-    def criteria(self) -> List[str]:
+    def criteria(self) -> list[str]:
         """
         A list of all criteria for which a model might be "best". i.e. your
         criteria might be "precision", "recall", and "jaccard". It is unlikely
@@ -345,7 +344,7 @@ class Evaluator(ABC):
         for all 3 of these criteria
 
         Returns:
-            List[str]
+            list[str]
                 the evaluation criteria
         Raises:
             NotImplementedError: if the function is not implemented
@@ -380,9 +379,7 @@ class Evaluator(ABC):
         """
         return self.score.higher_is_better(criterion)
 
-    def bounds(
-        self, criterion: str
-    ) -> Tuple[Union[int, float, None], Union[int, float, None]]:
+    def bounds(self, criterion: str) -> tuple[int | float | None, int | float | None]:
         """
         The bounds for this criterion
 
@@ -390,7 +387,7 @@ class Evaluator(ABC):
             criterion : str
                 the criterion
         Returns:
-            Tuple[Union[int, float, None], Union[int, float, None]]
+            tuple[int | float | None, int | float | None]
                 the bounds for the given criterion
         Raises:
             NotImplementedError: if the function is not implemented
