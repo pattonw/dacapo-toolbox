@@ -82,5 +82,6 @@ module = [
     "numpy_indexed.*",
     "cellmap_schemas.*",
     "IPython.*",
+    "dacapo.*"
 ]
 ignore_missing_imports = true
