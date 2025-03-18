@@ -33,15 +33,14 @@ class RawGTDatasetConfig(DatasetConfig):
         default=1,
     )
 
-
     @property
     def raw(self) -> Array:
         return self.raw_config.array("r")
-    
+
     @property
     def gt(self) -> Array | None:
         return self.gt_config.array("r") if self.gt_config is not None else None
-    
+
     @property
     def mask(self) -> Array | None:
         return self.mask_config.array("r") if self.mask_config is not None else None

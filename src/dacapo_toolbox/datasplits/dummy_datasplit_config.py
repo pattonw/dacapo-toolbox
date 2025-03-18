@@ -31,11 +31,11 @@ class DummyDataSplitConfig(DataSplitConfig):
 
     def verify(self) -> Tuple[bool, str]:
         return False, "This is a DummyDataSplit and is never valid"
-    
+
     @property
     def train(self) -> list[DatasetConfig]:
         return [self.train_config]
-    
+
     @property
     def validate(self) -> list[DatasetConfig]:
         return []

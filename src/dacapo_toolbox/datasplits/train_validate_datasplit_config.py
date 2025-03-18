@@ -38,7 +38,7 @@ class TrainValidateDataSplitConfig(DataSplitConfig):
     @property
     def train(self) -> list[DatasetConfig]:
         return self.train_configs
-    
+
     @property
     def validate(self) -> list[DatasetConfig]:
         return self.validate_configs

@@ -4,8 +4,6 @@ from funlib.geometry import Coordinate
 
 import torch
 
-from typing import Tuple
-
 
 class Model(torch.nn.Module):
     """

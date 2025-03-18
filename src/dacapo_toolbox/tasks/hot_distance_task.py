@@ -4,8 +4,6 @@ from .post_processors import ThresholdPostProcessor
 from .predictors import HotDistancePredictor
 from .task import Task
 
-import warnings
-
 
 class HotDistanceTask(Task):
     """

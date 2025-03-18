@@ -4,6 +4,8 @@ from funlib.geometry import Coordinate
 from funlib.persistence import Array
 
 from abc import ABC, abstractmethod
+
+
 @attr.s
 class DatasetConfig(ABC):
     """
