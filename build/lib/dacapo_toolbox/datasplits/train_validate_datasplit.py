@@ -53,11 +53,7 @@ class TrainValidateDataSplit(DataSplit):
             DeprecationWarning,
         )
 
-        self.train = [
-            train_config.dataset_type(train_config)
-            for train_config in datasplit_config.train_configs
-        ]
+        self.train = [train_config for train_config in datasplit_config.train_configs]
         self.validate = [
-            validate_config.dataset_type(validate_config)
-            for validate_config in datasplit_config.validate_configs
+            validate_config for validate_config in datasplit_config.validate_configs
         ]

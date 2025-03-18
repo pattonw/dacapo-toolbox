@@ -53,7 +53,6 @@ class HotDistancePredictor(Predictor):
         channels: List[str],
         scale_factor: float,
         mask_distances: bool,
-        kernel_size: int,
     ):
         """
         Initializes the HotDistancePredictor.
@@ -69,7 +68,6 @@ class HotDistancePredictor(Predictor):
         Note:
             The channels argument is a list of strings, each string is the name of a class that is being segmented.
         """
-        self.kernel_size = kernel_size
         self.channels = (
             channels * 2
         )  # one hot + distance (TODO: add hot/distance to channel names)
@@ -125,11 +123,11 @@ class HotDistancePredictor(Predictor):
         """
         if architecture.dims == 2:
             head = torch.nn.Conv2d(
-                architecture.num_out_channels, self.embedding_dims, self.kernel_size
+                architecture.num_out_channels, self.embedding_dims, 1
             )
         elif architecture.dims == 3:
             head = torch.nn.Conv3d(
-                architecture.num_out_channels, self.embedding_dims, self.kernel_size
+                architecture.num_out_channels, self.embedding_dims, 1
             )
 
         return Model(architecture, head)

@@ -56,7 +56,3 @@ class HotDistanceTaskConfig(TaskConfig):
             "is less than the distance to object boundary."
         },
     )
-
-    kernel_size: int | None = attr.ib(
-        default=None,
-    )

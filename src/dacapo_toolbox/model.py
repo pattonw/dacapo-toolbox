@@ -44,7 +44,7 @@ class Model(torch.nn.Module):
     def __init__(
         self,
         architecture: ArchitectureConfig,
-        prediction_head: torch.nn.Module,
+        prediction_head: torch.nn.modules.conv._ConvNd | torch.nn.Identity,
         eval_activation: torch.nn.Module | None = None,
     ):
         """
@@ -92,8 +92,11 @@ class Model(torch.nn.Module):
 
         self.input_shape = architecture.input_shape
         self.eval_input_shape = self.input_shape + architecture.eval_shape_increase
-        self.num_out_channels, self.output_shape = self.compute_output_shape(
-            self.input_shape
+        self.output_shape = architecture.compute_output_shape(self.input_shape)
+        self.num_out_channels = (
+            prediction_head.out_channels
+            if isinstance(prediction_head, torch.nn.modules.conv._ConvNd)
+            else architecture.num_out_channels
         )
         self.eval_activation = eval_activation
 
@@ -124,61 +127,6 @@ class Model(torch.nn.Module):
         if not self.training and self.eval_activation is not None:
             result = self.eval_activation(result)
         return result
-
-    def compute_output_shape(self, input_shape: Coordinate) -> Tuple[int, Coordinate]:
-        """
-        Compute the spatial shape (i.e., not accounting for channels and
-        batch dimensions) of this model, when fed a tensor of the given spatial
-        shape as input.
-
-        Args:
-            input_shape (Coordinate): The shape of the input tensor.
-        Returns:
-            Tuple[int, Coordinate]: The number of output channels and the spatial shape of the output.
-        Raises:
-            AssertionError: If the input_shape is not a Coordinate.
-        Examples:
-            >>> model = Model(architecture, prediction_head)
-            >>> model.compute_output_shape(input_shape)
-            (1, Coordinate(1, 1, 1))
-        Note:
-            The output shape is the spatial shape of the model, i.e., not accounting for channels and batch dimensions.
-        """
-
-        return self.__get_output_shape(input_shape, self.num_in_channels)
-
-    def __get_output_shape(
-        self, input_shape: Coordinate, in_channels: int
-    ) -> Tuple[int, Coordinate]:
-        """
-        Compute the spatial shape (i.e., not accounting for channels and
-        batch dimensions) of this model, when fed a tensor of the given spatial
-        shape as input.
-
-        Args:
-            input_shape (Coordinate): The shape of the input tensor.
-            in_channels (int): The number of input channels.
-        Returns:
-            Tuple[int, Coordinate]: The number of output channels and the spatial shape of the output.
-        Raises:
-            AssertionError: If the input_shape is not a Coordinate.
-        Examples:
-            >>> model = Model(architecture, prediction_head)
-            >>> model.__get_output_shape(input_shape, in_channels)
-            (1, Coordinate(1, 1, 1))
-        Note:
-            The output shape is the spatial shape of the model, i.e., not accounting for channels and batch dimensions.
-
-        """
-        device = torch.device("cpu")
-        for parameter in self.parameters():
-            device = parameter.device
-            break
-
-        dummy_data = torch.zeros((1, in_channels) + input_shape, device=device)
-        with torch.no_grad():
-            out = self.forward(dummy_data)
-        return out.shape[1], Coordinate(out.shape[2:])
 
     def scale(self, voxel_size: Coordinate) -> Coordinate:
         """
