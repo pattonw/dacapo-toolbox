@@ -1,6 +1,8 @@
 from .dataset_config import DatasetConfig
 from .arrays import ArrayConfig, DummyArrayConfig
 
+from funlib.persistence import Array
+
 import attr
 
 
@@ -22,5 +24,5 @@ class DummyDatasetConfig(DatasetConfig):
     weight: int = attr.ib(default=1)
 
     @property
-    def raw(self) -> ArrayConfig:
-        return self.raw_config
+    def raw(self) -> Array:
+        return self.raw_config.array("r")

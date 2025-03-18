@@ -50,7 +50,7 @@ class SimpleDataSplitConfig(DataSplitConfig):
         raise Exception(f"No raw data found at {level_0} or {level_1} or {level_2}")
 
     @property
-    def train(self) -> list[SimpleDataset]:
+    def train(self) -> list[SimpleDataset]:  # type: ignore
         return [
             SimpleDataset(
                 name=x.stem,
@@ -60,7 +60,7 @@ class SimpleDataSplitConfig(DataSplitConfig):
         ]
 
     @property
-    def validate(self) -> list[SimpleDataset]:
+    def validate(self) -> list[SimpleDataset]:  # type: ignore
         return [
             SimpleDataset(
                 name=x.stem,

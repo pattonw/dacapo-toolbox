@@ -3,9 +3,9 @@ import attr
 from funlib.geometry import Coordinate
 from funlib.persistence import Array
 
-
+from abc import ABC, abstractmethod
 @attr.s
-class DatasetConfig:
+class DatasetConfig(ABC):
     """
     A class used to define configuration for datasets. This provides the
     framework to create a Dataset instance.
@@ -37,10 +37,20 @@ class DatasetConfig:
     )
 
     weight: int
-    raw: Array
-    gt: Array | None
-    mask: Array | None
     sample_points: list[Coordinate] | None
+
+    @property
+    @abstractmethod
+    def raw(self) -> Array:
+        pass
+
+    @property
+    def gt(self) -> Array | None:
+        pass
+
+    @property
+    def mask(self) -> Array | None:
+        pass
 
     def _neuroglancer_layers(self, prefix="", exclude_layers=None):
         """
