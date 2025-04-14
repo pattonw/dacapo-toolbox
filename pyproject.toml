@@ -6,13 +6,12 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "attrs>=25.1.0",
-    "bioimageio-core[pytorch]>=0.7.0",
+    "bioimageio-core[pytorch]>=0.8.0",
     "cattrs>=24.1.2",
     "cellmap-schemas>=0.8.1",
     "daisy>=1.2.2",
-    "funlib-persistence",
+    "funlib-persistence>=0.6",
     "gunpowder>=1.4.0",
-    "iohub",
     "lazy-property>=0.0.1",
     "lsds>=0.1.3",
     "mwatershed>=0.5.2",
@@ -27,10 +26,6 @@ dependencies = [
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
-
-[tool.uv.sources]
-iohub = { git = "https://github.com/czbiohub-sf/iohub.git" }
-funlib-persistence = { git = "https://github.com/funkelab/funlib.persistence", rev = "ome-ngff" }
 
 [project.optional-dependencies]
 dev = [
@@ -50,7 +45,7 @@ docs = [
     "sphinx-autoapi>=3.6.0",
     "sphinx-autodoc-typehints",
     "sphinx-click>=3.0.2",
-    "sphinx-rtd-theme",
+    "sphinx-rtd-theme>=3.0.0",
     "sphinx>=8.1.3",
 ]
 

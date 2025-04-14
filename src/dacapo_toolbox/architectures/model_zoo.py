@@ -7,7 +7,7 @@ from .architecture import ArchitectureConfig
 from funlib.geometry import Coordinate
 
 from bioimageio.core import load_description
-from bioimageio.core.model_adapters._pytorch_model_adapter import PytorchModelAdapter
+from bioimageio.core.backends.pytorch_backend import PytorchModelAdapter
 from bioimageio.spec import InvalidDescr
 from bioimageio.spec.model.v0_5 import (
     ModelDescr,
