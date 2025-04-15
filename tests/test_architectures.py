@@ -91,6 +91,7 @@ def build_test_architecture_config(
         batch_norm=batch_norm,
         use_attention=use_attention,
         padding=padding,
+        activation="LeakyReLU",
     )
 
     if source == "config":
@@ -105,13 +106,11 @@ def build_test_architecture_config(
             scale=(upsample_factors[0]) if upsample else None,
         )
     elif source == "bioimage_modelzoo":
-        # TODO: This is failing due to a circular import but I don't want to deal with it right now
-        return cnnectom_unet_config
         cnnectom_unet_config.save_bioimage_io_model(
             tmp_path / "dacapo_modelzoo_test.zip", authors=[Author(name="Test")]
         )
         return ModelZooConfig(
-            model_id=tmp_path / "dacapo_modelzoo_test.zip", name="test_model_zoo"
+            model_id=str(tmp_path / "dacapo_modelzoo_test.zip"), name="test_model_zoo"
         )
     else:
         raise RuntimeError(f"Unknown source {source}")
@@ -140,6 +139,16 @@ def build_test_architecture_config(
         ),
     ],
 )
+@pytest.mark.parametrize(
+    "device",
+    [
+        "cpu",
+        pytest.param(
+            "cuda",
+            marks=pytest.mark.skipif(not torch.cuda.is_available(), reason="no cuda"),
+        ),
+    ],
+)
 def test_architectures(
     data_dims,
     channels,
@@ -149,8 +158,11 @@ def test_architectures(
     use_attention,
     padding,
     source,
+    device,
     tmp_path,
 ):
+    device = torch.device(device)
+
     architecture_config = build_test_architecture_config(
         data_dims,
         architecture_dims,
@@ -171,8 +183,8 @@ def test_architectures(
 
     in_data = torch.rand(
         (*(1, architecture_config.num_in_channels), *architecture_config.input_shape)
-    )
-    out_data = architecture_config.module()(in_data)
+    ).to(device)
+    out_data = architecture_config.module().to(device)(in_data)
     scale = architecture_config.scale(Coordinate((2,) * data_dims))
     if upsample:
         assert scale == Coordinate((1,) * data_dims)

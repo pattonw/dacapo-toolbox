@@ -1,7 +1,8 @@
 import attr
+from collections.abc import Sequence
 
 from dacapo_toolbox.datasplits.datasets import DatasetConfig
-from dacapo_toolbox.tasks.predictors import Predictor
+from dacapo_toolbox.tasks import TaskConfig
 from .trainer_config import TrainerConfig
 
 from funlib.geometry import Roi, Coordinate
@@ -45,10 +46,12 @@ class DummyTrainerConfig(TrainerConfig):
     def iterable_dataset(
         self,
         datasets: list[DatasetConfig],
-        input_shape: Coordinate,
-        output_shape: Coordinate,
-        predictor: Predictor | None = None,
+        input_shape: Sequence[int],
+        output_shape: Sequence[int],
+        task: TaskConfig | None = None,
     ):
+        input_shape = Coordinate(input_shape)
+        output_shape = Coordinate(output_shape)
         in_roi = Roi(input_shape * 0, input_shape)
         out_roi = Roi(output_shape * 0, output_shape)
         in_voxel_size = datasets[0].raw.voxel_size

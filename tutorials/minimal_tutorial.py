@@ -437,7 +437,7 @@ for iteration, batch in enumerate(iter(dataloader)):
 
     losses.append(loss_value.item())
 
-    if iteration >= 10:
+    if iteration >= 1000:
         break
 
 # %%

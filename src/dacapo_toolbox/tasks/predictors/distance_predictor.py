@@ -7,7 +7,7 @@ from dacapo_toolbox.tmp import np_to_funlib_array
 from funlib.geometry import Coordinate
 from funlib.persistence import Array
 
-from scipy.ndimage.morphology import distance_transform_edt
+from scipy.ndimage import distance_transform_edt
 import numpy as np
 import torch
 

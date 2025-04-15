@@ -84,6 +84,12 @@ class ArchitectureConfig(ABC):
         Method to scale the input voxel size as required by the architecture.
         """
         return input_voxel_size
+    
+    def inv_scale(self, output_voxel_size: Coordinate) -> Coordinate:
+        """
+        Method to inverse scale the output voxel size as required by the architecture.
+        """
+        return output_voxel_size
 
     def compute_output_shape(self, input_shape: Coordinate) -> Coordinate:
         """
@@ -109,20 +115,17 @@ class ArchitectureConfig(ABC):
         license: str = "MIT",
         input_test_image_path: Path | None = None,
         output_test_image_path: Path | None = None,
-        checkpoint: int | str | None = None,
         in_voxel_size: Coordinate | None = None,
     ):
-        # TODO: can we remove this circular logic?
-        from dacapo.experiments.run_config import RunConfig
-
-        run = RunConfig(name=f"{self.name}-bioimage-io", architecture_config=self)
-        run.save_bioimage_io_model(
-            path,
+        from dacapo_toolbox.bioimageio import save_bioimage_io_model
+        save_bioimage_io_model(
+            path=path,
+            architecture=self,
             authors=authors,
             cite=cite,
             license=license,
             input_test_image_path=input_test_image_path,
             output_test_image_path=output_test_image_path,
-            checkpoint=checkpoint,
             in_voxel_size=in_voxel_size,
+            weights=self.module().state_dict()
         )

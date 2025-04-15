@@ -6,7 +6,7 @@ from dacapo_toolbox.utils.balance_weights import balance_weights
 
 from funlib.geometry import Coordinate
 
-from scipy.ndimage.morphology import distance_transform_edt
+from scipy.ndimage import distance_transform_edt
 import numpy as np
 import torch
 

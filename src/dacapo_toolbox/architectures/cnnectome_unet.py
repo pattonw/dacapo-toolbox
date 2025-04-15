@@ -130,6 +130,12 @@ class CNNectomeUNetConfig(ArchitectureConfig):
         default=False,
         metadata={"help_text": "Whether to use batch normalization."},
     )
+    activation: str = attr.ib(
+        default="ReLU",
+        metadata={
+            "help_text": "The activation function to use."
+        },
+    )
 
     @property
     def input_shape(self) -> Coordinate:
@@ -171,6 +177,7 @@ class CNNectomeUNetConfig(ArchitectureConfig):
             use_attention=self.use_attention,
             batch_norm=self.batch_norm,
             dims=self.dims,
+            activation=self.activation,
         )
         if self.upsample_factors is not None and len(self.upsample_factors) > 0:
             layers = [unet]
@@ -181,14 +188,14 @@ class CNNectomeUNetConfig(ArchitectureConfig):
                     mode="nearest",
                     in_channels=self.fmaps_out,
                     out_channels=self.fmaps_out,
-                    activation="ReLU",
+                    activation=self.activation,
                 )
                 layers.append(up)
                 conv = ConvPass(
                     self.fmaps_out,
                     self.fmaps_out,
                     kernel_size_down[-1],
-                    activation="ReLU",
+                    activation=self.activation,
                     batch_norm=self.batch_norm,
                 )
                 layers.append(conv)
@@ -211,4 +218,13 @@ class CNNectomeUNetConfig(ArchitectureConfig):
         if self.upsample_factors is not None:
             for upsample_factor in self.upsample_factors:
                 voxel_size = voxel_size / Coordinate(upsample_factor)
+        return voxel_size
+
+    def inv_scale(self, voxel_size):
+        """
+        Inverse scale the voxel size according to the upsampling factors.
+        """
+        if self.upsample_factors is not None:
+            for upsample_factor in reversed(self.upsample_factors):
+                voxel_size = voxel_size * Coordinate(upsample_factor)
         return voxel_size

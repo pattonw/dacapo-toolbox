@@ -1,6 +1,6 @@
 import attr
 
-from typing import Tuple
+from typing import Any
 
 
 @attr.s
@@ -14,7 +14,7 @@ class TaskConfig:
             others can find and reuse this task. Keep it short and avoid
             special characters.
     Methods:
-        verify(self) -> Tuple[bool, str]: This method verifies the TaskConfig object.
+        verify(self) -> tuple[bool, str]: This method verifies the TaskConfig object.
     Notes:
         This is a base class for all task configurations. It is not meant to be
         used directly.
@@ -28,12 +28,14 @@ class TaskConfig:
         }
     )
 
-    def verify(self) -> Tuple[bool, str]:
+    task_type: Any
+
+    def verify(self) -> tuple[bool, str]:
         """
         Check whether this is a valid Task
 
         Returns:
-            Tuple[bool, str]: A tuple containing a boolean value indicating whether the TaskConfig object is valid
+            tuple[bool, str]: A tuple containing a boolean value indicating whether the TaskConfig object is valid
                 and a string containing the reason why the object is invalid.
         Raises:
             NotImplementedError: This method is not implemented.
