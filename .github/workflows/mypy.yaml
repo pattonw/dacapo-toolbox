@@ -19,4 +19,4 @@ jobs:
         uses: astral-sh/setup-uv@v5
       - name: mypy
         run: |
-          uv run --extra dev mypy
+          uv run --pre --extra dev mypy

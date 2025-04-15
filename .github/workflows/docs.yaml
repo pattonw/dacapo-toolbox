@@ -15,7 +15,7 @@ jobs:
       uses: astral-sh/setup-uv@main
     - name: execute notebooks
       run: |
-        uv run --extra docs --pre --python 3.10 --pre python -m ipykernel install --name dacapo_env --user
+        uv run --extra docs --pre --python 3.10 python -m ipykernel install --name dacapo_env --user
         uv run --extra docs --pre --python 3.10 jupytext --to notebook --execute tutorials/minimal_tutorial.py
         mv tutorials/minimal_tutorial.ipynb docs/source/notebooks/
     - name: Build documentation
