@@ -30,7 +30,7 @@ jobs:
         uses: astral-sh/setup-uv@v5
 
       - name: Test
-        run: uv run --pre --extra test --python ${{ matrix.python-version }} pytest --color=yes --cov --cov-report=xml --cov-report=term-missing
+        run: uv run --pre --extra dev --python ${{ matrix.python-version }} pytest --color=yes --cov --cov-report=xml --cov-report=term-missing
       
       - name: Coverage
         uses: codecov/codecov-action@v3
