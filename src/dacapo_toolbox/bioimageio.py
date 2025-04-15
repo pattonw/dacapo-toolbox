@@ -26,7 +26,6 @@ from bioimageio.spec.model.v0_5 import (
     Version,
 )
 
-from collections.abc import Sequence
 
 from dacapo_toolbox.architectures import ArchitectureConfig
 from dacapo_toolbox.tasks import TaskConfig
@@ -36,7 +35,6 @@ import torch
 
 import logging
 import sys
-import hashlib
 import tempfile
 from pathlib import Path
 

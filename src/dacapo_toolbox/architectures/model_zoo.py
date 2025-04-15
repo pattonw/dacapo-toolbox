@@ -15,8 +15,6 @@ from bioimageio.spec.model.v0_5 import (
     InputTensorDescr,
 )
 
-from pathlib import Path
-import zipfile
 import numpy as np
 
 

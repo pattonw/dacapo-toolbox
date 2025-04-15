@@ -8,6 +8,7 @@ from upath import UPath as Path
 import numpy as np
 import numpy_indexed as npi
 
+
 @attr.s
 class LocalArrayIdentifier:
     """

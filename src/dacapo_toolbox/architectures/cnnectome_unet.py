@@ -132,9 +132,7 @@ class CNNectomeUNetConfig(ArchitectureConfig):
     )
     activation: str = attr.ib(
         default="ReLU",
-        metadata={
-            "help_text": "The activation function to use."
-        },
+        metadata={"help_text": "The activation function to use."},
     )
 
     @property

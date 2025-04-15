@@ -4,7 +4,6 @@ from collections.abc import Sequence
 from .affinities_task import AffinitiesTask
 from .task_config import TaskConfig
 
-from funlib.geometry import Coordinate
 
 from typing import List
 

@@ -33,6 +33,7 @@ dev = [
     "pytest-cov>=6.0.0",
     "mypy>=1.15.0",
     "ruff>=0.9.6",
+    "pytest-xdist>=3.6.1",
 ]
 docs = [
     "ipykernel>=6.29.5",
@@ -91,3 +92,6 @@ ignore_missing_imports = true
 
 [tool.setuptools.package-data]
 "dacapo_toolbox" = ["py.typed"]
+
+[tool.ruff.lint]
+per-file-ignores = { "tutorials/*.py" = ["E402"] }
