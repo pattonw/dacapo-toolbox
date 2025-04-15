@@ -1,6 +1,7 @@
 import attr
 import random
 import logging
+from collections.abc import Sequence
 
 from .gp_augments import AugmentConfig
 from .trainer_config import TrainerConfig
@@ -13,6 +14,7 @@ import numpy as np
 from funlib.geometry import Coordinate
 from funlib.persistence import Array
 from dacapo_toolbox.datasplits.datasets import DatasetConfig
+from dacapo_toolbox.tasks import TaskConfig
 from dacapo_toolbox.tasks.predictors import Predictor
 
 import torch
@@ -31,25 +33,24 @@ def pipeline_generator(
     predictor: Predictor | None = None,
 ):
     while True:
-        with gp.build(pipeline) as pipeline:
-            batch_request = request.copy()
-            batch_request._random_seed = random.randint(0, 2**32 - 1)
-            batch = pipeline.request_batch(batch_request)
-            yield (
-                {
-                    "raw": torch.from_numpy(batch[raw_key].data),
-                    "gt": torch.from_numpy(batch[gt_key].data),
-                    "mask": torch.from_numpy(batch[mask_key].data),
-                    **(
-                        {
-                            "target": torch.from_numpy(batch[target_key].data),
-                            "weight": torch.from_numpy(batch[weight_key].data),
-                        }
-                        if predictor is not None
-                        else {}
-                    ),
-                }
-            )
+        batch_request = request.copy()
+        batch_request._random_seed = random.randint(0, 2**32 - 1)
+        batch = pipeline.request_batch(batch_request)
+        yield (
+            {
+                "raw": torch.from_numpy(batch[raw_key].data),
+                "gt": torch.from_numpy(batch[gt_key].data),
+                "mask": torch.from_numpy(batch[mask_key].data),
+                **(
+                    {
+                        "target": torch.from_numpy(batch[target_key].data),
+                        "weight": torch.from_numpy(batch[weight_key].data),
+                    }
+                    if predictor is not None
+                    else {}
+                ),
+            }
+        )
 
 
 class GeneratorDataset(torch.utils.data.IterableDataset):
@@ -98,9 +99,9 @@ class GunpowderTrainerConfig(TrainerConfig):
     def iterable_dataset(
         self,
         datasets: List[DatasetConfig],
-        input_shape: Coordinate,
-        output_shape: Coordinate,
-        predictor: Predictor | None = None,
+        input_shape: Sequence[int],
+        output_shape: Sequence[int],
+        task: TaskConfig | None = None,
     ) -> torch.utils.data.IterableDataset:
         """
         Returns an pytorch compatible IterableDataset.
@@ -109,6 +110,8 @@ class GunpowderTrainerConfig(TrainerConfig):
         assert len(datasets) >= 1, "Expected at least one dataset, got an empty list"
 
         assert datasets[0].gt is not None, "Trainer without GT is not yet implemented"
+
+        input_shape, output_shape = Coordinate(input_shape), Coordinate(output_shape)
 
         # get voxel sizes
         raw_voxel_size = datasets[0].raw.voxel_size
@@ -224,6 +227,11 @@ class GunpowderTrainerConfig(TrainerConfig):
             dataset_sources.append(dataset_source)
         pipeline = tuple(dataset_sources) + gp.RandomProvider(weights)
 
+        if task is not None:
+            predictor = task.task_type(task).predictor
+        else:
+            predictor = None
+
         if predictor is not None:
             # Add predictor nodes to pipeline
             pipeline += DaCapoTargetFilter(
@@ -262,6 +270,8 @@ class GunpowderTrainerConfig(TrainerConfig):
         # We also use random seeds to ensure that each worker is fetching different
         # data.
 
+        # Build the pipeline
+        gp.build(pipeline).__enter__()
         return GeneratorDataset(
             pipeline_generator,
             pipeline,

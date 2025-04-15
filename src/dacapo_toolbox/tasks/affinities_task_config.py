@@ -1,4 +1,5 @@
 import attr
+from collections.abc import Sequence
 
 from .affinities_task import AffinitiesTask
 from .task_config import TaskConfig
@@ -33,7 +34,7 @@ class AffinitiesTaskConfig(TaskConfig):
 
     task_type = AffinitiesTask
 
-    neighborhood: List[Coordinate] = attr.ib(
+    neighborhood: List[Sequence[int]] = attr.ib(
         metadata={
             "help_text": "The neighborhood upon which to calculate affinities. "
             "This is provided as a list of offsets, where each offset is a list of "

@@ -1,6 +1,5 @@
 from funlib.persistence import Array, open_ds
 
-
 import attr
 
 from pathlib import Path

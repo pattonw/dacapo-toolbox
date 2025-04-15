@@ -4,6 +4,8 @@ from .post_processors import WatershedPostProcessor
 from .predictors import AffinitiesPredictor
 from .task import Task
 
+from funlib.geometry import Coordinate
+
 
 class AffinitiesTask(Task):
     """
@@ -33,8 +35,10 @@ class AffinitiesTask(Task):
             >>> task = AffinitiesTask(task_config)
         """
 
+        neighborhood = [Coordinate(offset) for offset in task_config.neighborhood]
+
         self.predictor = AffinitiesPredictor(
-            neighborhood=task_config.neighborhood,
+            neighborhood=neighborhood,
             lsds=task_config.lsds,
             num_voxels=task_config.num_lsd_voxels,
             downsample_lsds=task_config.downsample_lsds,
@@ -45,14 +49,12 @@ class AffinitiesTask(Task):
             background_as_object=task_config.background_as_object,
         )
         self.loss = AffinitiesLoss(
-            len(task_config.neighborhood), task_config.lsds_to_affs_weight_ratio
+            len(neighborhood), task_config.lsds_to_affs_weight_ratio
         )
-        self.post_processor = WatershedPostProcessor(offsets=task_config.neighborhood)
+        self.post_processor = WatershedPostProcessor(offsets=neighborhood)
         self.evaluator = InstanceEvaluator()
 
-        self._channels = [
-            f"aff_{'.'.join(map(str, n))}" for n in task_config.neighborhood
-        ]
+        self._channels = [f"aff_{'.'.join(map(str, n))}" for n in neighborhood]
 
     @property
     def channels(self) -> list[str]:

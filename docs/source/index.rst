@@ -5,11 +5,12 @@
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: DaCapo Toolbox API:
+   :caption: DaCapo Toolbox:
 
    overview
    install
-   .. notebooks/minimal_tutorial
+   api
+   notebooks/minimal_tutorial
 
 .. include:: ../../README.md
    :parser: myst_parser.sphinx_

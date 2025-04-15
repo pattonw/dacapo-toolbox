@@ -4,6 +4,7 @@ Installation
 ============
 
 For the most recent release:
+
 .. code-block:: bash
 
    pip install dacapo-toolbox

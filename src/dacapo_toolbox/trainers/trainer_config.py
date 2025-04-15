@@ -1,10 +1,10 @@
 import attr
 
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 
-from funlib.geometry import Coordinate
 from dacapo_toolbox.datasplits.datasets import DatasetConfig
-from dacapo_toolbox.tasks.predictors import Predictor
+from dacapo_toolbox.tasks import TaskConfig
 
 import torch
 
@@ -33,9 +33,9 @@ class TrainerConfig(ABC):
     def iterable_dataset(
         self,
         datasets: list[DatasetConfig],
-        input_size: Coordinate,
-        output_size: Coordinate,
-        predictor: Predictor | None = None,
+        input_size: Sequence[int],
+        output_size: Sequence[int],
+        task: TaskConfig | None = None,
     ) -> torch.utils.data.IterableDataset:
         """
         Returns an pytorch compatible IterableDataset.
