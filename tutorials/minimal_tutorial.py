@@ -149,8 +149,14 @@ for i, (x, y) in enumerate(zip(train_raw.data, train_labels.data)):
         )
     ims.append([im, im2])
 
-ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
-HTML(ani.to_html5_video())
+ims = ims + ims[::-1]
+ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
+ani.save("static/train_data.gif", writer="pillow", fps=15)
+
+# %%
+from IPython.display import Image
+
+Image(filename="static/train_data.gif")
 
 # %% [markdown]
 # ### Testing data
@@ -179,8 +185,14 @@ for i, (x, y) in enumerate(zip(test_raw.data, test_labels.data)):
         )
     ims.append([im, im2])
 
-ani = animation.ArtistAnimation(fig, ims, interval=50, blit=True, repeat_delay=1000)
-HTML(ani.to_html5_video())
+ims = ims + ims[::-1]
+ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
+ani.save("static/test_data.gif", writer="pillow", fps=15)
+
+# %%
+from IPython.display import Image
+
+Image(filename="static/test_data.gif")
 
 # %% [markdown]
 # ### DaCapo
@@ -277,8 +289,14 @@ for zz in range(z_slices):
         b_ims.extend([im, im2])
     ims.append(b_ims)
 
-ani = animation.ArtistAnimation(fig, ims, interval=150, blit=True, repeat_delay=1000)
-HTML(ani.to_html5_video())
+ims = ims + ims[::-1]
+ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
+ani.save("static/simple_batch.gif", writer="pillow", fps=10)
+
+# %%
+from IPython.display import Image
+
+Image(filename="static/simple_batch.gif")
 
 # %% [markdown]
 # ### Tasks
@@ -352,8 +370,14 @@ for zz in range(z_slices):
         b_ims.extend([im, im2, im3])
     ims.append(b_ims)
 
-ani = animation.ArtistAnimation(fig, ims, interval=150, blit=True, repeat_delay=1000)
-HTML(ani.to_html5_video())
+ims = ims + ims[::-1]
+ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
+ani.save("static/affs_batch.gif", writer="pillow", fps=10)
+
+# %%
+from IPython.display import Image
+
+Image(filename="static/affs_batch.gif")
 
 # %% [markdown]
 # ### Models
