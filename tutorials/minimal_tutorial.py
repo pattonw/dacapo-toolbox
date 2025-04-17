@@ -156,7 +156,7 @@ for i, (x, y) in enumerate(zip(train_raw.data, train_labels.data)):
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
 video_html = ani.to_html5_video()
-video_html = re.sub(r"<video ", '<video width="800" ', video_html)
+video_html = re.sub(r"<video ", '<video width="600" height="600" ', video_html)
 HTML(video_html)
 
 # %% [markdown]
@@ -189,7 +189,7 @@ for i, (x, y) in enumerate(zip(test_raw.data, test_labels.data)):
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
 video_html = ani.to_html5_video()
-video_html = re.sub(r"<video ", '<video width="800" ', video_html)
+video_html = re.sub(r"<video ", '<video width="600" height="600" ', video_html)
 HTML(video_html)
 
 # %% [markdown]
@@ -290,7 +290,7 @@ for zz in range(z_slices):
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
 video_html = ani.to_html5_video()
-video_html = re.sub(r"<video ", '<video width="800" ', video_html)
+video_html = re.sub(r"<video ", '<video width="600" height="600" ', video_html)
 HTML(video_html)
 # %% [markdown]
 # ### Tasks
@@ -367,7 +367,7 @@ for zz in range(z_slices):
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
 video_html = ani.to_html5_video()
-video_html = re.sub(r"<video ", '<video width="800" ', video_html)
+video_html = re.sub(r"<video ", '<video width="600" height="600" ', video_html)
 HTML(video_html)
 
 # %% [markdown]
