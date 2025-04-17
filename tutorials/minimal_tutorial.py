@@ -56,6 +56,7 @@ import numpy as np
 from funlib.persistence import prepare_ds, open_ds
 import h5py
 from pathlib import Path
+import re
 
 # %%
 if not Path("cremi.zarr/train/raw").exists():
@@ -115,6 +116,9 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import matplotlib.animation as animation
 from IPython.display import HTML
+import matplotlib as mpl
+
+mpl.rcParams["animation.embed_limit"] = 50_000_000  # 50 MB, for example
 
 # Create a custom label color map for showing instances
 np.random.seed(1)
@@ -151,12 +155,9 @@ for i, (x, y) in enumerate(zip(train_raw.data, train_labels.data)):
 
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
-ani.save("train_data.gif", writer="pillow", fps=15)
-
-# %%
-from IPython.display import Image
-
-Image(filename="train_data.gif")
+video_html = ani.to_html5_video()
+video_html = re.sub(r"<video ", '<video width="800" ', video_html)
+HTML(video_html)
 
 # %% [markdown]
 # ### Testing data
@@ -187,12 +188,9 @@ for i, (x, y) in enumerate(zip(test_raw.data, test_labels.data)):
 
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
-ani.save("test_data.gif", writer="pillow", fps=15)
-
-# %%
-from IPython.display import Image
-
-Image(filename="test_data.gif")
+video_html = ani.to_html5_video()
+video_html = re.sub(r"<video ", '<video width="800" ', video_html)
+HTML(video_html)
 
 # %% [markdown]
 # ### DaCapo
@@ -291,13 +289,9 @@ for zz in range(z_slices):
 
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
-ani.save("simple_batch.gif", writer="pillow", fps=10)
-
-# %%
-from IPython.display import Image
-
-Image(filename="simple_batch.gif")
-
+video_html = ani.to_html5_video()
+video_html = re.sub(r"<video ", '<video width="800" ', video_html)
+HTML(video_html)
 # %% [markdown]
 # ### Tasks
 # When training for instance segmentation, it is not possible to directly predict label ids since the ids have to be unique accross the full volume which is not possible to do with the local context that a UNet operates on. So instead we need to transform our labels into some intermediate representation that is both easy to predict and easy to post process. The most common method we use is a combination of [affinities](https://arxiv.org/pdf/1706.00120) with optional [lsds](https://github.com/funkelab/lsd) for prediction plus [mutex watershed](https://arxiv.org/abs/1904.12654) for post processing.
@@ -372,12 +366,9 @@ for zz in range(z_slices):
 
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
-ani.save("affs_batch.gif", writer="pillow", fps=10)
-
-# %%
-from IPython.display import Image
-
-Image(filename="affs_batch.gif")
+video_html = ani.to_html5_video()
+video_html = re.sub(r"<video ", '<video width="800" ', video_html)
+HTML(video_html)
 
 # %% [markdown]
 # ### Models
@@ -445,7 +436,7 @@ optimizer = torch.optim.Adam(module.parameters(), lr=1e-4)
 
 losses = []
 
-print("Training on {device}")
+print(f"Training on {device}")
 for iteration, batch in enumerate(iter(dataloader)):
     raw, target, weight = (
         batch["raw"].to(device),
@@ -461,7 +452,7 @@ for iteration, batch in enumerate(iter(dataloader)):
 
     losses.append(loss_value.item())
 
-    if iteration >= 1000:
+    if iteration >= 300:
         break
 
 # %%
