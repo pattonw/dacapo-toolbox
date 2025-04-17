@@ -471,12 +471,12 @@ val_raw, val_gt = datasplit.validate[0].raw, datasplit.validate[0].gt
 # We snap to grid to a multiple of the max downsampling factor of
 # the unet (1, 8, 8) to ensure downsampling is always possible
 roi = val_raw.roi
-roi = roi.snap_to_grid(val_raw.voxel_size * Coordinate(1, 8, 8))
 z_coord = Coordinate(1, 0, 0)
 xy_coord = Coordinate(0, 1, 1)
 center_offset = roi.center * z_coord + roi.offset * xy_coord
 center_size = val_raw.voxel_size * z_coord + (roi.shape * xy_coord) // 2
 center_slice = Roi(center_offset, center_size)
+center_slice = center_slice.snap_to_grid(val_raw.voxel_size * Coordinate(1, 8, 8))
 context = (input_shape - output_shape) // 2 * val_raw.voxel_size
 
 # Read the raw data
