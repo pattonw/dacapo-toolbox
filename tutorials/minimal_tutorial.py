@@ -155,7 +155,7 @@ for i, (x, y) in enumerate(zip(train_raw.data, train_labels.data)):
 
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
-video_html = ani.to_html5_video()
+video_html = ani.to_html5_video(fps=10)
 video_html = re.sub(r"<video ", '<video width="600" height="600" ', video_html)
 HTML(video_html)
 
@@ -188,7 +188,7 @@ for i, (x, y) in enumerate(zip(test_raw.data, test_labels.data)):
 
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
-video_html = ani.to_html5_video()
+video_html = ani.to_html5_video(fps=10)
 video_html = re.sub(r"<video ", '<video width="600" height="600" ', video_html)
 HTML(video_html)
 
@@ -289,7 +289,7 @@ for zz in range(z_slices):
 
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
-video_html = ani.to_html5_video()
+video_html = ani.to_html5_video(fps=10)
 video_html = re.sub(r"<video ", '<video width="600" height="600" ', video_html)
 HTML(video_html)
 # %% [markdown]
@@ -366,7 +366,7 @@ for zz in range(z_slices):
 
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
-video_html = ani.to_html5_video()
+video_html = ani.to_html5_video(fps=10)
 video_html = re.sub(r"<video ", '<video width="600" height="600" ', video_html)
 HTML(video_html)
 
@@ -436,7 +436,6 @@ optimizer = torch.optim.Adam(module.parameters(), lr=1e-4)
 
 losses = []
 
-print(f"Training on {device}")
 for iteration, batch in enumerate(iter(dataloader)):
     raw, target, weight = (
         batch["raw"].to(device),
@@ -448,11 +447,10 @@ for iteration, batch in enumerate(iter(dataloader)):
     loss_value = loss.compute(output, target, weight)
     loss_value.backward()
     optimizer.step()
-    print(f"Loss ({iteration}): {loss_value.item():.3f}")
 
     losses.append(loss_value.item())
 
-    if iteration >= 400:
+    if iteration >= 1000:
         break
 
 # %%
