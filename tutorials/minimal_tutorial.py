@@ -475,7 +475,7 @@ roi = roi.snap_to_grid(val_raw.voxel_size * Coordinate(1, 8, 8))
 z_coord = Coordinate(1, 0, 0)
 xy_coord = Coordinate(0, 1, 1)
 center_offset = roi.center * z_coord + roi.offset * xy_coord
-center_size = val_raw.voxel_size * z_coord + roi.shape * xy_coord
+center_size = val_raw.voxel_size * z_coord + (roi.shape * xy_coord) // 2
 center_slice = Roi(center_offset, center_size)
 context = (input_shape - output_shape) // 2 * val_raw.voxel_size
 
