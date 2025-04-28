@@ -28,7 +28,7 @@ jobs:
     - name: execute notebooks
       run: |
         uv run --extra docs --pre --python 3.10 python -m ipykernel install --name dacapo_env --user
-        uv run --extra docs --pre --python 3.10 jupytext --to notebook tutorials/minimal_tutorial.py
+        uv run --extra docs --pre --python 3.10 jupytext --to notebook tutorials/minimal_tutorial/minimal_tutorial.py
         cp -r tutorials docs/source
     - name: Build documentation
       run: uv run --extra docs --pre --python 3.10 sphinx-build docs/source docs/build/html -b html

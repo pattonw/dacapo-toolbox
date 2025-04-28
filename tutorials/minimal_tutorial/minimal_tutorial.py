@@ -160,7 +160,6 @@ ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
 ani.save("_static/minimal_tutorial/training-data.gif", writer="pillow", fps=10)
 plt.close()
 
-
 # %% [markdown]
 # Here we visualize the training data:
 # ![training-data](_static/minimal_tutorial/training-data.gif)
@@ -195,6 +194,7 @@ for i, (x, y) in enumerate(zip(test_raw.data, test_labels.data)):
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
 ani.save("_static/minimal_tutorial/test-data.gif", writer="pillow", fps=10)
+plt.close()
 
 # %% [markdown]
 # Here we visualize the test data:
@@ -298,6 +298,7 @@ for zz in range(z_slices):
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
 ani.save("_static/minimal_tutorial/simple-batch.gif", writer="pillow", fps=10)
+plt.close()
 
 # %% [markdown]
 # Here we visualize the training data:
@@ -378,6 +379,7 @@ for zz in range(z_slices):
 ims = ims + ims[::-1]
 ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
 ani.save("_static/minimal_tutorial/affs-batch.gif", writer="pillow", fps=10)
+plt.close()
 
 # %% [markdown]
 # Here we visualize a batch with (raw, gt, target) triplets for the affinities task:
@@ -463,7 +465,7 @@ for iteration, batch in enumerate(iter(dataloader)):
 
     losses.append(loss_value.item())
 
-    if iteration >= 1000:
+    if iteration >= 800:
         break
 
 # %%
