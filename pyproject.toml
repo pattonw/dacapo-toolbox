@@ -39,7 +39,6 @@ docs = [
     "ipykernel>=6.29.5",
     "jupytext>=1.16.7",
     "matplotlib>=3.10.0",
-    "myst-nb>=1.2.0",
     "myst-parser>=4.0.1",
     "nbsphinx>=0.9.7",
     "pooch>=1.8.2",
