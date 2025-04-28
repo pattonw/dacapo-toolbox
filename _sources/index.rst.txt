@@ -10,7 +10,7 @@
    overview
    install
    api
-   notebooks/minimal_tutorial
+   tutorials/minimal_tutorial/minimal_tutorial
 
 .. include:: ../../README.md
    :parser: myst_parser.sphinx_

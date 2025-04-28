@@ -34,8 +34,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
     "sphinx_click",  # auto document cli
-    # "myst_parser",  # include md files in rst files
-    "myst_nb",  # integrate ipynb
+    "myst_parser",  # include md files in rst files
 ]
 
 nbsphinx_custom_formats = {
