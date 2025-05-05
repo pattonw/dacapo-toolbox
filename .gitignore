@@ -5,3 +5,7 @@ docs/source/tutorials
 tutorials/**/*.zarr
 *.hdf
 *.gif
+.coverage
+coverage.xml
+uv.lock
+.vscode
