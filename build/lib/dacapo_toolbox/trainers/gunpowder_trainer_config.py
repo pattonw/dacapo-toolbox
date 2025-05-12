@@ -142,7 +142,6 @@ class GunpowderTrainerConfig(TrainerConfig):
         weights = []
         for dataset in datasets:
             weights.append(dataset.weight)
-            assert isinstance(dataset.weight, int), dataset
 
             assert dataset.gt is not None, "Trainer without GT is not yet implemented"
             raw = dataset.raw

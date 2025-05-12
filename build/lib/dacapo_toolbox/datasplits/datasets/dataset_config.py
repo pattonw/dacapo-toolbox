@@ -16,7 +16,7 @@ class DatasetConfig:
             It aids in easy identification and reusability of this dataset.
             Advised to keep it short and refrain from using special characters.
 
-        weight: int (default=1).
+        weight: float (default=1.0).
             A numeric value that indicates how frequently this dataset should be
             sampled in comparison to others. Higher the weight, more frequently it
             gets sampled.
@@ -36,7 +36,7 @@ class DatasetConfig:
         }
     )
 
-    weight: int
+    weight: float
     raw: Array
     gt: Array | None
     mask: Array | None

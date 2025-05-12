@@ -19,7 +19,7 @@ class DummyDatasetConfig(DatasetConfig):
     """
 
     raw_config: ArrayConfig = attr.ib(DummyArrayConfig(name="dummy_array"))
-    weight: int = attr.ib(default=1)
+    weight: float = attr.ib(default=1.0)
 
     @property
     def raw(self) -> ArrayConfig:

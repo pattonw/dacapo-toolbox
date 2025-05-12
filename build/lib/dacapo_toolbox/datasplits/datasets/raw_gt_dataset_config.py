@@ -28,9 +28,9 @@ class RawGTDatasetConfig(DatasetConfig):
         metadata={"help_text": "The list of sample points in the dataset."},
         default=None,
     )
-    weight: int = attr.ib(
+    weight: float = attr.ib(
         metadata={"help_text": "The weight of the dataset."},
-        default=1,
+        default=1.0,
     )
 
 

@@ -11,7 +11,7 @@ import numpy as np
 class SimpleDataset:
     name: str = attr.ib()
     path: Path = attr.ib()
-    weight: int = attr.ib(default=1)
+    weight: float = attr.ib(default=1.0)
     raw_name: str = attr.ib(default="raw")
     gt_name: str = attr.ib(default="labels")
     mask_name: str = attr.ib(default="mask")
