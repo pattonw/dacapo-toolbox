@@ -218,7 +218,7 @@ datasplit = SimpleDataSplitConfig(
     path="cremi.zarr",
 )
 print(f"Train datasets: {datasplit.train}")
-print(f"Validation datasets: {datasplit.validate}")
+print(f"Test datasets: {datasplit.test}")
 
 # %% [markdown]
 # ### Augmentation
@@ -479,7 +479,7 @@ plt.show()
 import mwatershed as mws
 
 # Lets predict on some validation data:
-val_raw, val_gt = datasplit.validate[0].raw, datasplit.validate[0].gt
+val_raw, val_gt = datasplit.test[0].raw, datasplit.test[0].gt
 # fetch a xy slice from the center of our validation volume
 # We snap to grid to a multiple of the max downsampling factor of
 # the unet (1, 8, 8) to ensure downsampling is always possible

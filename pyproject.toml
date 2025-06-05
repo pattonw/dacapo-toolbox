@@ -1,26 +1,14 @@
 [project]
 name = "dacapo-toolbox"
 version = "0.1.0"
-description = "A suite of tools and convenience functions to help start training with DaCapo."
+description = "A suite of tools for large scale ND training."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
-    "attrs>=25.1.0",
-    "bioimageio-core[pytorch]>=0.8.0",
-    "cattrs>=24.1.2",
-    "cellmap-schemas>=0.8.1",
-    "daisy>=1.2.2",
+    "edt>=3.0.0",
     "funlib-persistence>=0.6",
     "gunpowder>=1.4.0",
-    "lazy-property>=0.0.1",
-    "lsds>=0.1.3",
-    "mwatershed>=0.5.2",
-    "neuroglancer>=2.40.1",
-    "numpy-indexed>=0.3.7",
-    "simpleitk>=2.4.1",
     "torch>=2.6.0",
-    "universal-pathlib>=0.2.6",
-    "xarray-multiscale>=2.1.0",
 ]
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
@@ -35,21 +23,6 @@ dev = [
     "ruff>=0.9.6",
     "pytest-xdist>=3.6.1",
 ]
-docs = [
-    "ipykernel>=6.29.5",
-    "jupytext>=1.16.7",
-    "matplotlib>=3.10.0",
-    "myst-parser>=4.0.1",
-    "nbsphinx>=0.9.7",
-    "pooch>=1.8.2",
-    "sphinx-autoapi>=3.6.0",
-    "sphinx-autodoc-typehints",
-    "sphinx-click>=3.0.2",
-    "sphinx-rtd-theme>=3.0.0",
-    "sphinx>=8.1.3",
-    "wget>=3.2",
-    "PyQt5>=5.15.0",
-]
 
 [tool.mypy]
 files = "src/dacapo_toolbox"
@@ -62,30 +35,7 @@ exclude = ["docs/*"]
 
 [[tool.mypy.overrides]]
 module = [
-    "xarray_multiscale.*",
-    "cellmap_models.*",
-    "funlib.*",
-    "toml.*",
-    "gunpowder.*",
-    "scipy.*",
-    "augment.*",
-    "tifffile.*",
-    "daisy.*",
-    "lazy_property.*",
-    "skimage.*",
-    "cellmap_schemas.*",
-    "neuroglancer.*",
-    "tqdm.*",
-    "zarr.*",
-    "SimpleITK.*",
-    "lsd.*",
-    "yaml.*",
-    "mwatershed.*",
-    "numpy_indexed.*",
-    "cellmap_schemas.*",
-    "IPython.*",
-    "dacapo.*",
-    "numcodecs.*",
+    "edt.*",
 ]
 ignore_missing_imports = true
 

@@ -9,3 +9,4 @@ tutorials/**/*.zarr
 coverage.xml
 uv.lock
 .vscode
+build
