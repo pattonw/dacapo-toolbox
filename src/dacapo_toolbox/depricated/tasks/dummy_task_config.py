@@ -6,8 +6,6 @@ from .losses import DummyLoss
 from .post_processors import DummyPostProcessor
 from .evaluators import DummyEvaluator
 
-from typing import Tuple
-
 
 @attr.s
 class DummyTaskConfig(TaskConfig):

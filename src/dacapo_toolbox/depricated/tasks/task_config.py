@@ -1,7 +1,5 @@
 import attr
 
-from typing import Any
-
 
 @attr.s
 class TaskConfig:

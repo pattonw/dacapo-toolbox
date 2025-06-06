@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+
 def batch_to_gif(batch):
     batch_size = len(batch["raw"])
     fig, axes = plt.subplots(batch_size, 3, figsize=(18, 18))
@@ -15,7 +16,9 @@ def batch_to_gif(batch):
                 im2 = axes[bb, 1].imshow(
                     b_labels, cmap=label_cmap, vmin=0, vmax=255, interpolation="none"
                 )
-                im3 = axes[bb, 2].imshow(b_target.transpose(1, 2, 0), interpolation="none")
+                im3 = axes[bb, 2].imshow(
+                    b_target.transpose(1, 2, 0), interpolation="none"
+                )
                 if bb == 0:
                     axes[bb, 0].set_title("Sample Raw")
                     axes[bb, 1].set_title("Sample Labels")

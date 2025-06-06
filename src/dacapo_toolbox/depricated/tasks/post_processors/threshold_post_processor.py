@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 "array > threshold"
 
+
 class ThresholdPostProcessor(PostProcessor):
     """
     A post-processor that applies a threshold to the prediction.

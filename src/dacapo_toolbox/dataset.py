@@ -50,7 +50,7 @@ class PipelineDataset(torch.utils.data.IterableDataset):
                 in_tensor = torch_batch[in_key]
                 out_tensor = transform_func(in_tensor)
                 assert tuple(in_tensor.shape) == tuple(
-                    out_tensor.shape[-len(in_tensor.shape):]
+                    out_tensor.shape[-len(in_tensor.shape) :]
                 ), (
                     f"Transform {transform_signature} changed the shape of the "
                     f"tensor: {in_tensor.shape} -> {out_tensor.shape}"

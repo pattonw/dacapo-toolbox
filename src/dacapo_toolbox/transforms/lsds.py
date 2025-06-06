@@ -252,10 +252,10 @@ def upsample(array, f):
 
     view = as_strided(array, sh, st)
 
-    l = [shape[0]]
-    [l.append(shape[i + 1] * f) for i, j in enumerate(shape[1:])]
+    ll = [shape[0]]
+    [ll.append(shape[i + 1] * f) for i, j in enumerate(shape[1:])]
 
-    return view.reshape(l)
+    return view.reshape(ll)
 
 
 def deriv_based_covariance(sub_voxel_size, mass, sub_sigma_voxel):
@@ -289,5 +289,5 @@ def deriv_based_covariance(sub_voxel_size, mass, sub_sigma_voxel):
     d_xx *= norm * sub_sigma_voxel[1] ** 2
     d_yx *= norm * sub_sigma_voxel[0] * sub_sigma_voxel[1]
 
-    mean_offset = np.stack([d_y, d_x]) * 0.5 + 0.5
-    covariance = np.stack([d_yy, d_xx, d_yx]) * 0.5 + 0.5
+    _mean_offset = np.stack([d_y, d_x]) * 0.5 + 0.5
+    _covariance = np.stack([d_yy, d_xx, d_yx]) * 0.5 + 0.5
