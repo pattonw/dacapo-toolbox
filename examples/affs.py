@@ -76,7 +76,7 @@ iter_ds = iterable_dataset(
 
 import matplotlib.pyplot as plt
 
-fig, axs = plt.subplots(2, 5, figsize=(15, 8))
+fig, axs = plt.subplots(2, 4, figsize=(15, 8))
 for i, batch in enumerate(iter_ds):
     if i >= 8:  # Limit to 4 batches for demonstration
         break
@@ -89,7 +89,7 @@ for i, batch in enumerate(iter_ds):
     axs[0, 2].imshow(batch["affs_s0"].permute(1, 2, 0).float())
     axs[0, 3].imshow(batch["affs_mask_s0"].permute(1, 2, 0).float())
     axs[1, 0].imshow(batch["noisy_s1"], cmap="gray")
-    axs[0, 1].imshow(batch["gt_s0"], cmap="magma")
+    axs[1, 1].imshow(batch["gt_s0"], cmap="magma")
     axs[1, 2].imshow(batch["affs_s1"].permute(1, 2, 0).float())
     axs[1, 3].imshow(batch["affs_mask_s1"].permute(1, 2, 0).float())
 
