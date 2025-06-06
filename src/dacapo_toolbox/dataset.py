@@ -45,14 +45,19 @@ class PipelineDataset(torch.utils.data.IterableDataset):
             for transform_signature, transform_func in self.transforms.items():
                 if isinstance(transform_signature, tuple):
                     in_key, out_key = transform_signature
-                    torch_batch[out_key] = transform_func(torch_batch[in_key])
                 else:
-                    torch_batch[transform_signature] = transform_func(
-                        torch_batch[transform_signature]
-                    )
+                    in_key, out_key = transform_signature, transform_signature
+                in_tensor = torch_batch[in_key]
+                out_tensor = transform_func(in_tensor)
+                assert tuple(in_tensor.shape) == tuple(
+                    out_tensor.shape[-len(in_tensor.shape):]
+                ), (
+                    f"Transform {transform_signature} changed the shape of the "
+                    f"tensor: {in_tensor.shape} -> {out_tensor.shape}"
+                )
+                torch_batch[out_key] = transform_func(torch_batch[in_key])
             t2 = time.time()
-            logger.warn(
-                f"Batch generated in {t2 - t1:.4f} seconds, ")
+            logger.warn(f"Batch generated in {t2 - t1:.4f} seconds, ")
             yield torch_batch
 
 
@@ -346,7 +351,9 @@ def iterable_dataset(
 
     if deform_augment_config is not None:
         pipeline += gp.DeformAugment(
-            control_point_spacing=Coordinate(deform_augment_config.control_point_spacing),
+            control_point_spacing=Coordinate(
+                deform_augment_config.control_point_spacing
+            ),
             jitter_sigma=deform_augment_config.jitter_sigma,
             scale_interval=deform_augment_config.scale_interval,
             rotate=deform_augment_config.rotate,
