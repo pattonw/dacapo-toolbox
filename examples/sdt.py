@@ -3,7 +3,6 @@ from dacapo_toolbox.dataset import (
     SimpleAugmentConfig,
     DeformAugmentConfig,
 )
-from dacapo_toolbox.transforms.affs import Affs, AffsMask
 from dacapo_toolbox.transforms.distances import SignedDistanceTransform, SDTBoundaryMask
 from funlib.persistence import Array
 from skimage import data
@@ -52,10 +51,6 @@ iter_ds = iterable_dataset(
         ("raw_s1", "noisy_s1"): transforms.Compose(
             [transforms.ConvertImageDtype(), transforms.GaussianNoise(sigma=0.3)]
         ),
-        ("gt_s0", "affs_s0"): Affs([[4, 0], [0, 4], [4, 4]]),
-        ("gt_s0", "affs_mask_s0"): AffsMask([[4, 0], [0, 4], [4, 4]]),
-        ("gt_s1", "affs_s1"): Affs([[4, 0], [0, 4], [4, 4]]),
-        ("gt_s1", "affs_mask_s1"): AffsMask([[4, 0], [0, 4], [4, 4]]),
         ("gt_s0", "dist_s0"): SignedDistanceTransform(sigma=20.0),
         ("gt_s0", "bmask_s0"): SDTBoundaryMask(sigma=20.0),
         ("gt_s1", "dist_s1"): SignedDistanceTransform(sigma=20.0),
@@ -76,27 +71,23 @@ iter_ds = iterable_dataset(
 
 import matplotlib.pyplot as plt
 
-fig, axs = plt.subplots(2, 5, figsize=(15, 8))
+fig, axs = plt.subplots(2, 4, figsize=(15, 8))
 for i, batch in enumerate(iter_ds):
     if i >= 8:  # Limit to 4 batches for demonstration
         break
-    assert batch["gt_s0"].shape == batch["affs_s0"][0].shape, (
-        batch["gt_s0"].shape,
-        batch["affs_s0"][0].shape,
-    )
     axs[0, 0].imshow(batch["noisy_s0"], cmap="gray")
     axs[0, 1].imshow(batch["gt_s0"], cmap="magma")
-    axs[0, 2].imshow(batch["affs_s0"].permute(1, 2, 0).float())
-    axs[0, 3].imshow(batch["affs_mask_s0"].permute(1, 2, 0).float())
+    axs[0, 2].imshow(batch["dist_s0"], cmap="gray")
+    axs[0, 3].imshow(batch["bmask_s0"], cmap="gray")
     axs[1, 0].imshow(batch["noisy_s1"], cmap="gray")
-    axs[0, 1].imshow(batch["gt_s0"], cmap="magma")
-    axs[1, 2].imshow(batch["affs_s1"].permute(1, 2, 0).float())
-    axs[1, 3].imshow(batch["affs_mask_s1"].permute(1, 2, 0).float())
+    axs[1, 1].imshow(batch["gt_s1"], cmap="magma")
+    axs[1, 2].imshow(batch["dist_s1"], cmap="gray")
+    axs[1, 3].imshow(batch["bmask_s1"], cmap="gray")
 
     axs[0, 0].set_title("Raw")
     axs[0, 1].set_title("GT")
-    axs[0, 2].set_title("Affs")
-    axs[0, 3].set_title("Affs Mask")
+    axs[0, 2].set_title("SDT")
+    axs[0, 3].set_title("Boundary Mask")
 
     plt.pause(0.1)
     input("Press Enter to continue...")  # Pause after each batch
