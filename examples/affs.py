@@ -4,7 +4,6 @@ from dacapo_toolbox.dataset import (
     DeformAugmentConfig,
 )
 from dacapo_toolbox.transforms.affs import Affs, AffsMask
-from dacapo_toolbox.transforms.distances import SignedDistanceTransform, SDTBoundaryMask
 from funlib.persistence import Array
 from skimage import data
 from torchvision.transforms import v2 as transforms
@@ -56,10 +55,6 @@ iter_ds = iterable_dataset(
         ("gt_s0", "affs_mask_s0"): AffsMask([[4, 0], [0, 4], [4, 4]]),
         ("gt_s1", "affs_s1"): Affs([[4, 0], [0, 4], [4, 4]]),
         ("gt_s1", "affs_mask_s1"): AffsMask([[4, 0], [0, 4], [4, 4]]),
-        ("gt_s0", "dist_s0"): SignedDistanceTransform(sigma=20.0),
-        ("gt_s0", "bmask_s0"): SDTBoundaryMask(sigma=20.0),
-        ("gt_s1", "dist_s1"): SignedDistanceTransform(sigma=20.0),
-        ("gt_s1", "bmask_s1"): SDTBoundaryMask(sigma=20.0),
     },
     sample_points=[np.array([(0, 0)]), np.array([(512, 512), (0, 512), (512, 0)])],
     simple_augment_config=SimpleAugmentConfig(
