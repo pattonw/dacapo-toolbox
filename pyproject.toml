@@ -23,6 +23,10 @@ dev = [
     "ruff>=0.9.6",
     "pytest-xdist>=3.6.1",
 ]
+examples = [
+    "matplotlib>=3.10.3",
+    "torchvision>=0.22.0",
+]
 
 [tool.mypy]
 files = "src/dacapo_toolbox"
