@@ -41,12 +41,23 @@ class PipelineDataset(torch.utils.data.IterableDataset):
             torch_batch = {
                 str(key): torch.from_numpy(batch[key].data.copy()) for key in self.keys
             }
+            torch_batch["metadata"] = {
+                str(key): (batch[key].spec.roi.offset, batch[key].spec.voxel_size)
+                for key in self.keys
+            }
 
             for transform_signature, transform_func in self.transforms.items():
                 if isinstance(transform_signature, tuple):
                     in_key, out_key = transform_signature
                 else:
                     in_key, out_key = transform_signature, transform_signature
+
+                assert in_key in torch_batch, (
+                    f"Can only process keys that are in the batch. Please ensure that {in_key} "
+                    f"is either provided as a dataset or created as the result of a transform "
+                    f"of the form ({{in_key}}, {in_key})) *before* the transform ({in_key})."
+                )
+
                 in_tensor = torch_batch[in_key]
                 out_tensor = transform_func(in_tensor)
                 assert tuple(in_tensor.shape) == tuple(
@@ -56,6 +67,7 @@ class PipelineDataset(torch.utils.data.IterableDataset):
                     f"tensor: {in_tensor.shape} -> {out_tensor.shape}"
                 )
                 torch_batch[out_key] = transform_func(torch_batch[in_key])
+
             t2 = time.time()
             logger.warn(f"Batch generated in {t2 - t1:.4f} seconds, ")
             yield torch_batch
