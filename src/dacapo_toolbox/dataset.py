@@ -16,6 +16,7 @@ from typing import Any
 import functools
 from dataclasses import dataclass
 from .tmp import gcd
+from typing import Callable
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,13 @@ class PipelineDataset(torch.utils.data.IterableDataset):
     It has support for applying torchvision style transforms to the resulting batches.
     """
 
-    def __init__(self, pipeline, request, keys, transforms=None):
+    def __init__(
+        self,
+        pipeline: gp.Pipeline,
+        request: gp.BatchRequest,
+        keys: list[gp.ArrayKey],
+        transforms: dict[str | tuple[str, str], Callable] = None,
+    ):
         self.pipeline = pipeline
         self.request = request
         self.keys = keys
@@ -106,64 +113,6 @@ class DeformAugmentConfig:
     subsample: int = 4
     spatial_dims: int = 3
     rotation_axes: Sequence[int] | None = None
-
-
-# # predictor acting on the batch
-# # or predictor in the dataset already
-# dataloader = torch.utils.data.DataLoader(dataset, num_workers=10)
-# for batch in dataloader:
-#     gt, raw = batch["gt"], batch["raw"]
-#     gt_metadata = batch["metadata"]["gt"]
-#     target = predictor(gt, gt_metadata)
-
-# # Most transform the gt into the target
-# # affs_transform(gt) -> affs
-# # weights_transform(labels) -> weights
-# # lsd_transform(gt) -> lsds
-# # distance_transform(gt) -> distances
-
-# # Transforms the target into the input
-# # n2v_transform(raw) -> masked_raw
-
-# "Array | nplike"
-# arrays = {
-#     "raw": [np.ones(10, 10, 10), np.random(10, 10, 10)],
-#     "gt": [np.zeros(10, 10, 10), np.ones(10, 10, 10)],
-# }
-# shapes = {"raw": (12, 12, 12), "gt": (10, 10, 10)}
-# transforms = {"raw": Normalize()}
-
-# input_arrays ["raw", "gold_standard", "mask", "em", "liconn", "weights", "distances"]
-# computed_arrays ["affs", "weights", "lsds", "distances"]
-# "affs" = AffsTransform("gt")
-
-# transforms = {
-#     "raw": Compose([Normalize(), GaussianNoise()]),  # 1
-#     ("gt","affs"): AffsTransform(neighborhood=[(1, 0, 0), (0, 1, 0), (0, 0, 1)]),  # 2
-#     ("gt", "lsd"): LsdTransform(),  # 2
-#     ("gt", "weights"): WeightsTransform(),  # 2
-#     "gt": BinaryErosion(),  # 1
-#     "weights": GaussianNoise(),  # 3
-#     ("weights", "weights2"): GaussianNoise(),  # 4
-# }  # errors
-
-# transforms = {
-#     "raw": Compose([Normalize(), GaussianNoise()]),  # 1
-#     "gt": BinaryErosion(),  # 1
-#     ("gt","affs"): AffsTransform(neighborhood=[(1, 0, 0), (0, 1, 0), (0, 0, 1)]),  # 2
-#     ("gt", "lsd"): LsdTransform(),  # 2
-#     ("gt", "weights"): WeightsTransform(),  # 2
-#     "weights": GaussianNoise(),  # 3
-#     ("weights", "weights2"): GaussianNoise(),  # 4
-# }  # fine
-
-# transforms = {
-#     "raw_s0": Normalize(),
-#     "raw_s1": Normalize(),
-#     ("gt_s0", "affs_s0"): AffsTransform(neighborhood=[(1, 0, 0), (0, 1, 0), (0, 0, 1)])
-# }
-
-# # assert count(key) <= 1, "Cannot do multiple transforms on the same key"
 
 
 def iterable_dataset(
