@@ -103,8 +103,8 @@ def get_local_shape_descriptors(
         labels = np.unique(segmentation)
 
     # prepare full-res descriptor volumes for roi
-    channels = 10 if dims == 3 else 6
-    descriptors = np.zeros((channels,) + segmentation.shape, dtype=np.float32)
+    # channels = 10 if dims == 3 else 6
+    # descriptors = np.zeros((channels,) + segmentation.shape, dtype=np.float32)
 
     # get sub-sampled shape, roi, voxel size and sigma
     df = downsample
@@ -132,6 +132,7 @@ def get_local_shape_descriptors(
     max_distance = np.array([s for s in sigma], dtype=np.float32)
 
     # for all labels
+    label_descriptors = []
     for label in labels:
         if label == 0:
             continue
@@ -195,9 +196,12 @@ def get_local_shape_descriptors(
 
         descriptor = np.concatenate((mean_offset, covariance, mass[None, :]))
 
-        mask = mask[None][[0] * channels]
-        descriptors[mask] += descriptor[mask]
+        mask = mask[None][[0] * descriptor.shape[0], ...]
+        masked_descriptor = np.zeros_like(descriptor)
+        masked_descriptor[mask] = descriptor[mask]
+        label_descriptors.append(masked_descriptor)
 
+    descriptors = np.sum(np.array(label_descriptors), axis=0)
     # clip outliers
     np.clip(descriptors, 0.0, 1.0, out=descriptors)
 
