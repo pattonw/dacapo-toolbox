@@ -204,14 +204,6 @@ def get_local_shape_descriptors(
     return upsample(descriptors, df)
 
 
-def make_sphere(radius):
-    logger.debug("Creating sphere with radius %d...", radius)
-
-    r2 = np.arange(-radius, radius) ** 2
-    dist2 = r2[:, None, None] + r2[:, None] + r2
-    return (dist2 <= radius**2).astype(np.float32)
-
-
 def outer_product(array):
     """Computes the unique values of the outer products of the first dimension
     of ``array``. If ``array`` has shape ``(k, d, h, w)``, for example, the
