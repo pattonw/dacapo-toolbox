@@ -6,6 +6,7 @@ from numpy.lib.stride_tricks import as_strided
 
 from collections.abc import Sequence
 import torch
+import functools
 
 logger = logging.getLogger(__name__)
 
@@ -27,13 +28,13 @@ class LSD(torch.nn.Module):
         self.downsample = downsample
 
     def forward(self, segmentation: torch.Tensor) -> torch.Tensor:
+        # TODO: refactor get_local_shape_descriptors to accept/return torch.Tensor
         return torch.from_numpy(
             get_local_shape_descriptors(
                 segmentation.numpy(),
                 self.sigma,
                 voxel_size=self.voxel_size,
                 labels=self.labels,
-                mode=self.mode,
                 downsample=self.downsample,
             )
         )
@@ -42,10 +43,9 @@ class LSD(torch.nn.Module):
 def get_local_shape_descriptors(
     segmentation: np.ndarray,
     sigma: float | Sequence[float],
-    voxel_size=None,
-    labels=None,
-    mode="gaussian",
-    downsample=1,
+    voxel_size: Sequence[int] | None = None,
+    labels: Sequence[int] | None = None,
+    downsample: int = 1,
 ):
     """
     Compute local shape descriptors for the given segmentation.
@@ -69,19 +69,16 @@ def get_local_shape_descriptors(
             Restrict the computation to the given labels. Defaults to all
             labels inside the ``roi`` of ``segmentation``.
 
-        mode (``string``, optional):
-
-            Either ``gaussian`` or ``sphere``. Determines over what region
-            the local shape descriptor is computed. For ``gaussian``, a
-            Gaussian with the given ``sigma`` is used, and statistics are
-            averaged with corresponding weights. For ``sphere``, a sphere
-            with radius ``sigma`` is used. Defaults to 'gaussian'.
-
         downsample (``int``, optional):
 
             Compute the local shape descriptor on a downsampled volume for
             faster processing. Defaults to 1 (no downsampling).
     """
+
+    assert all([(s // downsample) * downsample == s for s in segmentation.shape]), (
+        f"Segmentation shape {segmentation.shape} must be divisible by "
+        f"downsample factor {downsample}."
+    )
 
     dims = len(segmentation.shape)
     if isinstance(sigma, (int, float)):
@@ -130,14 +127,9 @@ def get_local_shape_descriptors(
 
     # normalize stats
     # get max possible mean offset for normalization
-    if mode == "gaussian":
-        # farthest voxel in context is 3*sigma away, but due to Gaussian
-        # weighting, sigma itself is probably a better upper bound
-        max_distance = np.array([s for s in sigma], dtype=np.float32)
-    elif mode == "sphere":
-        # farthest voxel in context is sigma away, but this is almost
-        # impossible to reach as offset -- let's take half sigma
-        max_distance = np.array([0.5 * s for s in sigma], dtype=np.float32)
+    # farthest voxel in context is 3*sigma away, but due to Gaussian
+    # weighting, sigma itself is probably a better upper bound
+    max_distance = np.array([s for s in sigma], dtype=np.float32)
 
     # for all labels
     for label in labels:
@@ -147,13 +139,27 @@ def get_local_shape_descriptors(
         mask: np.ndarray = segmentation == label
         masked_coords = coords * mask
 
-        mass = aggregate(mask.astype(np.float32), sub_sigma_voxel, mode)
+        aggregate = functools.partial(
+            gaussian_filter,
+            mode="constant",
+            cval=0.0,
+            truncate=3.0,
+        )
 
-        # offsets
+        # simply a mask convolved with a Gaussian
+        mass = aggregate(
+            mask.astype(np.float32),
+            sigma=sub_sigma_voxel,
+        )
+
+        # offsets (meshgrid convolved with Gaussian, divided by mass, minus meshgrid)
         center_of_mass = (
             np.array(
                 [
-                    aggregate(masked_coords[d], sub_sigma_voxel, mode)
+                    aggregate(
+                        masked_coords[d],
+                        sigma=sub_sigma_voxel,
+                    )
                     for d in range(dims)
                 ]
             )
@@ -178,9 +184,7 @@ def get_local_shape_descriptors(
             entries, key=lambda x: x % (dims + 1) * (dims + 1) + x // (dims + 1)
         )
         covariance = (
-            np.array(
-                [aggregate(coords_outer[d], sub_sigma_voxel, mode) for d in entries]
-            )
+            np.array([aggregate(coords_outer[d], sub_sigma_voxel) for d in entries])
             / mass
         )
         covariance -= center_of_mass_outer[entries]
@@ -206,26 +210,6 @@ def make_sphere(radius):
     r2 = np.arange(-radius, radius) ** 2
     dist2 = r2[:, None, None] + r2[:, None] + r2
     return (dist2 <= radius**2).astype(np.float32)
-
-
-def aggregate(array, sigma, mode="gaussian"):
-    if mode == "gaussian":
-        return gaussian_filter(
-            array, sigma=sigma, mode="constant", cval=0.0, truncate=3.0
-        )
-
-    elif mode == "sphere":
-        radius = sigma[0]
-        for d in range(len(sigma)):
-            assert radius == sigma[d], (
-                "For mode 'sphere', only isotropic sigma is allowed."
-            )
-
-        sphere = make_sphere(radius)
-        return convolve(array, sphere, mode="constant", cval=0.0)
-
-    else:
-        raise RuntimeError("Unknown mode %s" % mode)
 
 
 def outer_product(array):
