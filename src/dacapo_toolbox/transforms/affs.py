@@ -54,6 +54,14 @@ def compute_affs(
         arr[slice_ops_upper],
     )
 
+def equality_dist_func(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+    return x == y
+
+def equality_no_bg_dist_func(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+    return (x == y) * (x > 0) * (y > 0)
+
+def no_bg_dist_func(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+    return (x > 0) * (y > 0)
 
 class Affs(torch.nn.Module):
     def __init__(
@@ -68,9 +76,9 @@ class Affs(torch.nn.Module):
             "All offsets in the neighborhood must have the same dimensionality."
         )
         if dist_func == "equality":
-            self.dist_func = lambda x, y: (x == y)
+            self.dist_func = equality_dist_func
         elif dist_func == "equality-no-bg":
-            self.dist_func = lambda x, y: ((x == y) * (x > 0) * (y > 0))
+            self.dist_func = equality_no_bg_dist_func
         elif callable(dist_func):
             self.dist_func = dist_func
         else:
@@ -90,7 +98,7 @@ class AffsMask(torch.nn.Module):
     def __init__(self, neighborhood: Sequence[Sequence[int]]):
         super(AffsMask, self).__init__()
         self.neighborhood = neighborhood
-        self.dist_func = lambda x, y: ((x > 0) * (y > 0))
+        self.dist_func = no_bg_dist_func
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         y = torch.ones_like(x, dtype=torch.bool)

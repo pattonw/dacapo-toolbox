@@ -27,6 +27,15 @@ examples = [
     "matplotlib>=3.10.3",
     "torchvision>=0.22.0",
 ]
+docs = [
+    "h5py>=3.13.0",
+    "ipykernel>=6.29.5",
+    "matplotlib>=3.10.3",
+    "mwatershed>=0.5.3",
+    "tems>=1.0.3",
+    "torchvision>=0.22.0",
+    "wget>=3.2",
+]
 
 [tool.mypy]
 files = "src/dacapo_toolbox"

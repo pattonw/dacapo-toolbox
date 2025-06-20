@@ -11,6 +11,7 @@ from funlib.geometry import Coordinate, Roi
 from funlib.persistence import Array
 
 import torch
+
 import time
 from typing import Any
 import functools
@@ -53,30 +54,31 @@ class PipelineDataset(torch.utils.data.IterableDataset):
                 for key in self.keys
             }
 
-            for transform_signature, transform_func in self.transforms.items():
-                if isinstance(transform_signature, tuple):
-                    in_key, out_key = transform_signature
-                else:
-                    in_key, out_key = transform_signature, transform_signature
+            if self.transforms is not None:
+                for transform_signature, transform_func in self.transforms.items():
+                    if isinstance(transform_signature, tuple):
+                        in_key, out_key = transform_signature
+                    else:
+                        in_key, out_key = transform_signature, transform_signature
 
-                assert in_key in torch_batch, (
-                    f"Can only process keys that are in the batch. Please ensure that {in_key} "
-                    f"is either provided as a dataset or created as the result of a transform "
-                    f"of the form ({{in_key}}, {in_key})) *before* the transform ({in_key})."
-                )
+                    assert in_key in torch_batch, (
+                        f"Can only process keys that are in the batch. Please ensure that {in_key} "
+                        f"is either provided as a dataset or created as the result of a transform "
+                        f"of the form ({{in_key}}, {in_key})) *before* the transform ({in_key})."
+                    )
 
-                in_tensor = torch_batch[in_key]
-                out_tensor = transform_func(in_tensor)
-                assert tuple(in_tensor.shape) == tuple(
-                    out_tensor.shape[-len(in_tensor.shape) :]
-                ), (
-                    f"Transform {transform_signature} changed the shape of the "
-                    f"tensor: {in_tensor.shape} -> {out_tensor.shape}"
-                )
-                torch_batch[out_key] = transform_func(torch_batch[in_key])
+                    in_tensor = torch_batch[in_key]
+                    out_tensor = transform_func(in_tensor)
+                    assert tuple(in_tensor.shape) == tuple(
+                        out_tensor.shape[-len(in_tensor.shape) :]
+                    ), (
+                        f"Transform {transform_signature} changed the shape of the "
+                        f"tensor: {in_tensor.shape} -> {out_tensor.shape}"
+                    )
+                    torch_batch[out_key] = transform_func(torch_batch[in_key])
 
             t2 = time.time()
-            logger.warn(f"Batch generated in {t2 - t1:.4f} seconds, ")
+            logger.warn(f"Batch generated in {t2 - t1:.4f} seconds")
             yield torch_batch
 
 
