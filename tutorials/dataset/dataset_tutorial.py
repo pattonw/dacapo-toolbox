@@ -116,13 +116,13 @@ labels_test = open_ds(
 from dacapo_toolbox.vis.preview import gif_2d
 
 # create a 2D gif of the training data
-gif_2d(
-    arrays={"Train Raw": raw_train, "Train Labels": labels_train},
-    array_types={"Train Raw": "raw", "Train Labels": "labels"},
-    filename="_static/dataset_tutorial/training-data.gif",
-    title="Training Data",
-    fps=10,
-)
+# gif_2d(
+#     arrays={"Train Raw": raw_train, "Train Labels": labels_train},
+#     array_types={"Train Raw": "raw", "Train Labels": "labels"},
+#     filename="_static/dataset_tutorial/training-data.gif",
+#     title="Training Data",
+#     fps=10,
+# )
 
 # %% [markdown]
 # Here we visualize the training data:
@@ -132,13 +132,13 @@ gif_2d(
 # ### Testing data
 
 # %%
-gif_2d(
-    arrays={"Test Raw": raw_test, "Test Labels": labels_test},
-    array_types={"Test Raw": "raw", "Test Labels": "labels"},
-    filename="_static/dataset_tutorial/testing-data.gif",
-    title="Testing Data",
-    fps=10,
-)
+# gif_2d(
+#     arrays={"Test Raw": raw_test, "Test Labels": labels_test},
+#     array_types={"Test Raw": "raw", "Test Labels": "labels"},
+#     filename="_static/dataset_tutorial/testing-data.gif",
+#     title="Testing Data",
+#     fps=10,
+# )
 
 # %% [markdown]
 # Here we visualize the test data:
@@ -182,16 +182,16 @@ batch_gen = iter(train_dataset)
 
 # %%
 batch = next(batch_gen)
-gif_2d(
-    arrays={
-        "Raw": Array(batch["raw"].numpy()),
-        "Labels": Array(batch["gt"].numpy() % 256),
-    },
-    array_types={"Raw": "raw", "Labels": "labels"},
-    filename="_static/dataset_tutorial/simple-batch.gif",
-    title="Simple Batch",
-    fps=10,
-)
+# gif_2d(
+#     arrays={
+#         "Raw": Array(batch["raw"].numpy()),
+#         "Labels": Array(batch["gt"].numpy() % 256),
+#     },
+#     array_types={"Raw": "raw", "Labels": "labels"},
+#     filename="_static/dataset_tutorial/simple-batch.gif",
+#     title="Simple Batch",
+#     fps=10,
+# )
 
 # %% [markdown]
 # Here we visualize the training data:
@@ -326,28 +326,28 @@ def gif_2d(
 
 # %%
 batch = next(batch_gen)
-gif_2d(
-    arrays={
-        "Raw": Array(batch["raw"].numpy(), voxel_size=raw_train.voxel_size),
-        "GT": Array(batch["gt"].numpy() % 256, voxel_size=raw_train.voxel_size),
-        "Affs": Array(
-            batch["affs"].float().numpy()[[0, 3, 4]], voxel_size=raw_train.voxel_size
-        ),
-        "Affs Mask": Array(
-            batch["affs_mask"].float().numpy()[[0, 3, 4]],
-            voxel_size=raw_train.voxel_size,
-        ),
-    },
-    array_types={
-        "Raw": "raw",
-        "GT": "labels",
-        "Affs": "affs",
-        "Affs Mask": "affs",
-    },
-    filename="_static/dataset_tutorial/affs-batch.gif",
-    title="Affinities Batch",
-    fps=10,
-)
+# gif_2d(
+#     arrays={
+#         "Raw": Array(batch["raw"].numpy(), voxel_size=raw_train.voxel_size),
+#         "GT": Array(batch["gt"].numpy() % 256, voxel_size=raw_train.voxel_size),
+#         "Affs": Array(
+#             batch["affs"].float().numpy()[[0, 3, 4]], voxel_size=raw_train.voxel_size
+#         ),
+#         "Affs Mask": Array(
+#             batch["affs_mask"].float().numpy()[[0, 3, 4]],
+#             voxel_size=raw_train.voxel_size,
+#         ),
+#     },
+#     array_types={
+#         "Raw": "raw",
+#         "GT": "labels",
+#         "Affs": "affs",
+#         "Affs Mask": "affs",
+#     },
+#     filename="_static/dataset_tutorial/affs-batch.gif",
+#     title="Affinities Batch",
+#     fps=10,
+# )
 
 # %% [markdown]
 # Here we visualize a batch with (raw, gt, target) triplets for the affinities task:
