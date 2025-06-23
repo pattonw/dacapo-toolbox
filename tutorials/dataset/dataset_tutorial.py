@@ -84,7 +84,6 @@ if not Path("cremi.zarr").exists():
 # We will use the [funlib.persistence](github.com/funkelab/funlib.persistence) library to interface with zarr. This library adds support for units, voxel size, and axis names along with the ability to query our data based on a `Roi` object describing a specific rectangular piece of data. This is especially useful in a microscopy context where you regularly need to chunk your data for processing.
 
 # %%
-import numpy as np
 from funlib.persistence import open_ds, Array
 from pathlib import Path
 
@@ -233,7 +232,6 @@ train_dataset = iterable_dataset(
 batch_gen = iter(train_dataset)
 
 # %%
-from funlib.persistence import Array
 import matplotlib.pyplot as plt
 from funlib.geometry import Coordinate
 from matplotlib import animation
@@ -392,6 +390,7 @@ print(
 # %%
 from tqdm import tqdm
 import time
+
 # %%
 import torch
 
@@ -439,8 +438,8 @@ for iteration, batch in tqdm(enumerate(iter(dataloader))):
         batch["affs_mask"].to(device),
     )
     optimizer.zero_grad()
-    
-    t1 =time.time()
+
+    t1 = time.time()
     output = module(raw)
     print("processing:", time.time() - t1)
 
@@ -453,7 +452,7 @@ for iteration, batch in tqdm(enumerate(iter(dataloader))):
 
     losses.append(loss.item())
 
-    if iteration >= 800:
+    if iteration >= 300:
         break
 
 # %%
@@ -461,7 +460,8 @@ plt.plot(losses)
 plt.xlabel("Iteration")
 plt.ylabel("Loss")
 plt.title("Loss Curve")
-plt.show()
+plt.savefig("_static/dataset_tutorial/affs-loss-curve.png")
+plt.close()
 
 # %%
 import mwatershed as mws
@@ -508,23 +508,194 @@ with torch.no_grad():
         .numpy()
     )
 # %%
-pred_labels = (
-    mws.agglom(pred[0].astype(np.float64) - 0.5, offsets=neighborhood)
-)
+pred_labels = mws.agglom(pred[0].astype(np.float64) - 0.5, offsets=neighborhood)
 # %%
 # Plot the results
 gif_2d(
     arrays={
         "Raw": Array(raw_output, voxel_size=raw_test.voxel_size),
         "GT": Array(gt % 256, voxel_size=raw_test.voxel_size),
-        "Pred Affs": Array(
-            pred[0][[0,3,4]], voxel_size=raw_test.voxel_size
-        ),
+        "Pred Affs": Array(pred[0][[0, 3, 4]], voxel_size=raw_test.voxel_size),
         "Pred": Array(pred_labels % 256, voxel_size=raw_test.voxel_size),
     },
     array_types={"Raw": "raw", "GT": "labels", "Pred Affs": "affs", "Pred": "labels"},
-    filename="_static/dataset_tutorial/prediction.gif",
+    filename="_static/dataset_tutorial/affs-prediction.gif",
     title="Prediction",
     fps=10,
 )
+
 # %%
+
+extra = torch.tensor((2, 64, 64))
+train_dataset = iterable_dataset(
+    datasets={"raw": raw_train, "gt": labels_train},
+    shapes={"raw": unet.min_input_shape + extra, "gt": unet.min_output_shape + extra},
+    transforms={
+        "raw": torchvision.transforms.Lambda(lambda x: x[None].float() / 255.0),
+        ("gt", "affs"): Affs(neighborhood=neighborhood),
+        ("gt", "affs_mask"): AffsMask(neighborhood=neighborhood),
+    },
+    simple_augment_config=SimpleAugmentConfig(
+        p=1.0,
+        mirror_only=(1, 2),
+        transpose_only=(1, 2),
+    ),
+)
+
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+elif torch.backends.mps.is_available():
+    device = torch.device("cpu")
+else:
+    device = torch.device("cpu")
+
+unet = tems.UNet.funlib_api(
+    dims=3,
+    in_channels=1,
+    num_fmaps=32,
+    fmap_inc_factor=4,
+    downsample_factors=[(1, 2, 2), (1, 2, 2), (1, 2, 2)],
+    kernel_size_down=[
+        [(1, 3, 3), (1, 3, 3)],
+        [(1, 3, 3), (1, 3, 3)],
+        [(1, 3, 3), (1, 3, 3)],
+        [(1, 3, 3), (1, 3, 3)],
+    ],
+    kernel_size_up=[
+        [(1, 3, 3), (1, 3, 3)],
+        [(1, 3, 3), (1, 3, 3)],
+        [(3, 3, 3), (3, 3, 3)],
+    ],
+)
+
+# this ensures we output the appropriate number of channels,
+# use the appropriate final activation etc.
+module = torch.nn.Sequential(unet, torch.nn.Conv3d(32, 12, kernel_size=1)).to(device)
+
+
+class DistanceHead(torch.nn.Module):
+    def __init__(self, in_channels: int = 12):
+        super().__init__()
+        self.conv1 = torch.nn.Conv3d(in_channels, in_channels**2, kernel_size=1)
+        self.relu = torch.nn.ReLU()
+        self.conv2 = torch.nn.Conv3d(in_channels**2, 1, kernel_size=1)
+        self.sigmoid = torch.nn.Sigmoid()
+
+    def forward(self, x: torch.Tensor, y: torch.tensor) -> torch.Tensor:
+        return self.sigmoid(self.conv2(self.relu(self.conv1(x - y)))).squeeze(1)
+
+
+dist_head = DistanceHead(in_channels=12).to(device)
+learned_affs = Affs(neighborhood=neighborhood, dist_func=dist_head)
+
+loss_func = torch.nn.BCELoss(reduction="none")
+mse_loss = torch.nn.MSELoss()
+optimizer = torch.optim.Adam(
+    list(module.parameters()) + list(learned_affs.parameters()), lr=1e-4
+)
+dataloader = torch.utils.data.DataLoader(
+    train_dataset,
+    batch_size=3,
+    num_workers=2,
+)
+losses = []
+
+for iteration, batch in tqdm(enumerate(iter(dataloader))):
+    raw, target, weight = (
+        batch["raw"].to(device),
+        batch["affs"].to(device),
+        batch["affs_mask"].to(device),
+    )
+
+    optimizer.zero_grad()
+
+    t1 = time.time()
+    emb = module(raw)
+    pred_affs = learned_affs(emb, concat_dim=1)
+    print(raw.shape, emb.shape, pred_affs.shape)
+    print("processing:", time.time() - t1)
+
+    t2 = time.time()
+    voxel_loss = loss_func(pred_affs, target.float())
+    loss = (voxel_loss * weight).mean() + 0.001 * mse_loss(
+        emb, emb / torch.norm(emb, dim=1, keepdim=True)
+    )
+    loss.backward()
+    optimizer.step()
+    print("Optimizing:", time.time() - t2)
+
+    losses.append(loss.item())
+
+    if iteration >= 300:
+        break
+
+# %%
+plt.plot(losses)
+plt.xlabel("Iteration")
+plt.ylabel("Loss")
+plt.title("Loss Curve")
+plt.savefig("_static/dataset_tutorial/emb-loss-curve.png")
+plt.close()
+
+# %%
+import mwatershed as mws
+from funlib.geometry import Roi
+
+input_shape = unet.min_input_shape + extra
+output_shape = unet.min_output_shape + extra
+
+# fetch a xy slice from the center of our validation volume
+# We snap to grid to a multiple of the max downsampling factor of
+# the unet (1, 8, 8) to ensure downsampling is always possible
+roi = raw_test.roi
+z_coord = Coordinate(1, 0, 0)
+xy_coord = Coordinate(0, 1, 1)
+center_offset = roi.center * z_coord + roi.offset * xy_coord + roi.shape // 4
+center_size = raw_test.voxel_size * z_coord * 2 + (roi.shape * xy_coord) // 2
+center_slice = Roi(center_offset, center_size)
+center_slice = center_slice.snap_to_grid(raw_test.voxel_size * Coordinate(1, 8, 8))
+center_slice.shape = (
+    center_slice.shape
+    - (Coordinate(unet.min_output_shape) * raw_test.voxel_size) * xy_coord
+)
+context = Coordinate(input_shape - output_shape) // 2 * raw_test.voxel_size
+
+# Read the raw data
+# raise ValueError(center_slice, raw_test.roi)
+raw_input = raw_test.to_ndarray(center_slice.grow(context, context))
+raw_output = raw_test.to_ndarray(center_slice)
+gt = labels_test.to_ndarray(center_slice)
+
+# Predict on the validation data
+with torch.no_grad():
+    device = torch.device("cpu")
+    module = module.to(device)
+    learned_affs = learned_affs.to(device)
+    pred = (
+        learned_affs(
+            module(
+                (torch.from_numpy(raw_input).float() / 255.0).unsqueeze(0).unsqueeze(0)
+            ),
+            concat_dim=1,
+        )
+        .to(device)
+        .cpu()
+        .detach()
+        .numpy()
+    )
+# %%
+pred_labels = mws.agglom(pred[0].astype(np.float64) - 0.5, offsets=neighborhood)
+# %%
+# Plot the results
+gif_2d(
+    arrays={
+        "Raw": Array(raw_output, voxel_size=raw_test.voxel_size),
+        "GT": Array(gt % 256, voxel_size=raw_test.voxel_size),
+        "Pred Affs": Array(pred[0][[0, 3, 4]], voxel_size=raw_test.voxel_size),
+        "Pred": Array(pred_labels % 256, voxel_size=raw_test.voxel_size),
+    },
+    array_types={"Raw": "raw", "GT": "labels", "Pred Affs": "affs", "Pred": "labels"},
+    filename="_static/dataset_tutorial/emb-prediction.gif",
+    title="Prediction",
+    fps=10,
+)
