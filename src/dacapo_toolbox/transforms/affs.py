@@ -54,14 +54,18 @@ def compute_affs(
         arr[slice_ops_upper],
     )
 
+
 def equality_dist_func(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     return x == y
+
 
 def equality_no_bg_dist_func(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     return (x == y) * (x > 0) * (y > 0)
 
+
 def no_bg_dist_func(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     return (x > 0) * (y > 0)
+
 
 class Affs(torch.nn.Module):
     def __init__(
@@ -84,13 +88,13 @@ class Affs(torch.nn.Module):
         else:
             raise ValueError(f"Unknown distance function: {dist_func}")
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, concat_dim: int = 0) -> torch.Tensor:
         return torch.stack(
             [
                 compute_affs(x, offset, self.dist_func, pad=True)
                 for offset in self.neighborhood
             ],
-            dim=0,
+            dim=concat_dim,
         )
 
 
