@@ -207,7 +207,7 @@ def iterable_dataset(
     | PointSampling
     | Sequence[MaskedSampling | PointSampling]
     | None = None,
-    trim: Sequence[int] | None = None,
+    trim: int | Sequence[int] | None = None,
     simple_augment_config: SimpleAugmentConfig | None = None,
     deform_augment_config: DeformAugmentConfig | None = None,
     interpolatable: dict[str, bool] | None = None,
@@ -308,6 +308,9 @@ def iterable_dataset(
         )
         crop_roi.snap_to_grid(crop_voxel_size, mode="grow")
         if trim is not None:
+            if isinstance(trim, int):
+                trim = [trim] * crop_roi.dims()
+            trim = Coordinate(trim)
             crop_roi = crop_roi.grow(-trim * crop_voxel_size, -trim * crop_voxel_size)
 
         crop_graphs = [
