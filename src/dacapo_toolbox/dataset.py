@@ -22,6 +22,46 @@ from typing import Callable
 logger = logging.getLogger(__name__)
 
 
+def interpolatable_dtypes(dtype) -> bool:
+    return dtype in [np.float32, np.float64, np.uint8, np.uint16]
+
+
+def nx_to_gp_graph(
+    graph: nx.Graph,
+    scale: Sequence[float],
+) -> gp.gp_graph_source.GraphSource:
+    """
+    Convert a NetworkX graph to a gunpowder Graph.
+    """
+    graph = gp.Graph(
+        [
+            gp.Node(
+                node,
+                np.array(attrs.pop("position")) / np.array(scale),
+                attrs=attrs,
+            )
+            for node, attrs in graph.nodes(data=True)
+        ],
+        [gp.Edge(u, v, attrs) for u, v, attrs in graph.edges(data=True)],
+        gp.GraphSpec(Roi((None,) * len(scale), (None,) * len(scale))),
+    )
+    return graph
+
+
+def gp_to_nx_graph(
+    graph: gp.Graph,
+) -> nx.Graph:
+    """
+    Convert a gunpowder Graph to a NetworkX graph.
+    """
+    g = nx.Graph()
+    for node in graph.nodes:
+        g.add_node(node.id, position=node.location, **node.attrs)
+    for edge in graph.edges:
+        g.add_edge(edge.u, edge.v, **edge.attrs)
+    return g
+
+
 class PipelineDataset(torch.utils.data.IterableDataset):
     """
     A torch dataset that wraps a gunpowder pipeline and provides batches of data.
@@ -47,11 +87,15 @@ class PipelineDataset(torch.utils.data.IterableDataset):
             batch_request._random_seed = random.randint(0, 2**32 - 1)
             batch = self.pipeline.request_batch(batch_request)
             torch_batch = {
-                str(key): torch.from_numpy(batch[key].data.copy()) for key in self.keys
+                str(key): torch.from_numpy(batch[key].data.copy())
+                if isinstance(key, gp.ArrayKey)
+                else gp_to_nx_graph(batch[key])
+                for key in self.keys
             }
             torch_batch["metadata"] = {
                 str(key): (batch[key].spec.roi.offset, batch[key].spec.voxel_size)
                 for key in self.keys
+                if isinstance(key, gp.ArrayKey)
             }
 
             if self.transforms is not None:
@@ -61,24 +105,29 @@ class PipelineDataset(torch.utils.data.IterableDataset):
                     else:
                         in_key, out_key = transform_signature, transform_signature
 
-                    assert in_key in torch_batch, (
-                        f"Can only process keys that are in the batch. Please ensure that {in_key} "
-                        f"is either provided as a dataset or created as the result of a transform "
-                        f"of the form ({{in_key}}, {in_key})) *before* the transform ({in_key})."
-                    )
+                    if isinstance(in_key, str):
+                        in_keys = [in_key]
+                    elif isinstance(in_key, tuple):
+                        in_keys = list(in_key)
 
-                    in_tensor = torch_batch[in_key]
-                    out_tensor = transform_func(in_tensor)
-                    assert tuple(in_tensor.shape) == tuple(
-                        out_tensor.shape[-len(in_tensor.shape) :]
-                    ), (
-                        f"Transform {transform_signature} changed the shape of the "
-                        f"tensor: {in_tensor.shape} -> {out_tensor.shape}"
-                    )
-                    torch_batch[out_key] = transform_func(torch_batch[in_key])
+                    for in_key in in_keys:
+                        assert in_key in torch_batch, (
+                            f"Can only process keys that are in the batch. Please ensure that {in_key} "
+                            f"is either provided as a dataset or created as the result of a transform "
+                            f"of the form ({{in_key}}, {in_key})) *before* the transform ({in_key})."
+                        )
+                    in_tensors = [torch_batch[in_key] for in_key in in_keys]
+                    out_tensor = transform_func(*in_tensors)
+                    if isinstance(out_key, str):
+                        torch_batch[out_key] = out_tensor
+                    else:
+                        out_keys = out_key
+                        out_tensors = out_tensor
+                        for out_key, out_tensor in zip(out_keys, out_tensors):
+                            torch_batch[out_key] = out_tensor
 
             t2 = time.time()
-            logger.warn(f"Batch generated in {t2 - t1:.4f} seconds")
+            logger.debug(f"Batch generated in {t2 - t1:.4f} seconds")
             yield torch_batch
 
 
@@ -117,16 +166,51 @@ class DeformAugmentConfig:
     rotation_axes: Sequence[int] | None = None
 
 
+@dataclass
+class MaskedSampling:
+    """
+    Sampling strategy that uses a mask to determine which samples to include.
+
+    :param mask_key: The key of the mask array in the dataset.
+    :param min_masked: Minimum fraction of samples that must be masked in to include the
+        sample. If less than this fraction is masked in, the sample is skipped.
+    :param strategy: Optional strategy to apply to the mask. by default generates an integral
+        mask for quick sampling at the cost of extra memory usage. If your dataset is large, you
+        may want to use "reject".
+    """
+
+    mask_key: str
+    min_masked: float = 1.0
+    strategy: str = "integral_mask"
+
+
+@dataclass
+class PointSampling:
+    """
+    Sampling strategy that uses a set of points to determine which samples to include.
+
+    :param sample_points_key: The key of the sample points array in the dataset.
+    """
+
+    sample_points_key: str
+
+
 def iterable_dataset(
-    datasets: dict[str, Array | Sequence[Array]],
+    datasets: dict[str, Array | nx.Graph | Sequence[Array] | Sequence[nx.Graph]],
     shapes: dict[str, Sequence[int]],
-    sample_points: np.ndarray | Sequence[np.ndarray | None] | None = None,
     weights: Sequence[float] | None = None,
-    transforms: dict[str, Any | Sequence[Any]] | None = None,
-    sampling_strategy: str | Sequence[str] = "random",
+    transforms: dict[
+        str | tuple[str | tuple[str, ...], str | tuple[str, ...]], Any | Sequence[Any]
+    ]
+    | None = None,
+    sampling_strategies: MaskedSampling
+    | PointSampling
+    | Sequence[MaskedSampling | PointSampling]
+    | None = None,
     trim: Sequence[int] | None = None,
     simple_augment_config: SimpleAugmentConfig | None = None,
     deform_augment_config: DeformAugmentConfig | None = None,
+    interpolatable: dict[str, bool] | None = None,
 ) -> torch.utils.data.IterableDataset:
     """
     Builds a gunpowder pipeline and wraps it in a torch IterableDataset.
@@ -140,49 +224,33 @@ def iterable_dataset(
         "Please use a different key for your dataset."
     )
 
+    if interpolatable is None:
+        interpolatable = {}
+
     # convert single arrays to lists
-    datasets: dict[str, list[Array]] = {
-        name: [arrays] if isinstance(arrays, Array) else list(arrays)
-        for name, arrays in datasets.items()
+    datasets: dict[str, list[Array] | list[nx.Graph]] = {
+        name: [ds] if isinstance(ds, (Array, nx.Graph)) else list(ds)
+        for name, ds in datasets.items()
     }
 
     # define keys:
-    names = list(datasets.keys())
-    keys = [gp.ArrayKey(name) for name in names]
-
-    sample_points_key = gp.GraphKey("SAMPLE_POINTS")
-    if sample_points is None:
-        # no sample points for any crop
-        sample_points = [None] * len(datasets[names[0]])
-    elif isinstance(sample_points, nx.Graph):
-        # sample points for a single crop
-        sample_points = [sample_points]
-    else:
-        # sample points should be provided for each crop
-        assert len(sample_points) == len(datasets[names[0]]), (
-            "Sample points must be provided for each crop (group of datasets). "
-            f"Got {len(sample_points)} sample points for {len(datasets[names[0]])} crops."
-        )
-
-    if isinstance(sampling_strategy, str):
-        # single sampling strategy for all crops
-        sampling_strategy = [sampling_strategy] * len(datasets[names[0]])
-    else:
-        # sampling strategy should be provided for each crop
-        assert len(sampling_strategy) == len(datasets[names[0]]), (
-            "Sampling strategy must be provided for each crop (group of datasets). "
-            f"Got {len(sampling_strategy)} strategies for {len(datasets[names[0]])} crops."
-        )
+    keys = [
+        gp.ArrayKey(name) if isinstance(dataset[0], Array) else gp.GraphKey(name)
+        for name, dataset in datasets.items()
+    ]
+    array_keys = [key for key in keys if isinstance(key, gp.ArrayKey)]
+    graph_keys = [key for key in keys if isinstance(key, gp.GraphKey)]
 
     roi_mask_key = gp.ArrayKey("ROI_MASK")
 
     # reorganize from raw: [a,b,c], gt: [a,b,c] to (raw,gt): [(a,a), (b,b), (c,c)]
-    crop_datasets: list[tuple[Array, ...]] = list(zip(*datasets.values()))
-    crop_scales = [
+    crops_datasets: list[tuple[Array | nx.Graph, ...]] = list(zip(*datasets.values()))
+    crops_scale = [
         functools.reduce(
-            lambda x, y: gcd(x, y), [array.voxel_size for array in crop_arrays]
+            lambda x, y: gcd(x, y),
+            [array.voxel_size for array in crop_datasets if isinstance(array, Array)],
         )
-        for crop_arrays in crop_datasets
+        for crop_datasets in crops_datasets
     ]
 
     # check that for each key, all arrays have the same voxel size when scaled
@@ -192,23 +260,37 @@ def iterable_dataset(
             lambda x, y: x * 0 if x != y else x,
             [
                 array.voxel_size / scale
-                for array, scale in zip(datasets[key], crop_scales)
+                for array, scale in zip(datasets[key], crops_scale)
+                if isinstance(array, Array)
             ],
         )
-        == datasets[key][0].voxel_size / crop_scales[0]
+        == datasets[key][0].voxel_size / crops_scale[0]
         for key in datasets
+        if isinstance(datasets[key][0], Array)
     )
+
+    if isinstance(sampling_strategies, (MaskedSampling, PointSampling)):
+        sampling_strategies = [sampling_strategies] * len(crops_datasets)
+    elif sampling_strategies is None:
+        sampling_strategies = [None] * len(crops_datasets)
 
     # Get source nodes
     dataset_sources = []
-    for crop_arrays, crop_scale, points, sampling_strat in zip(
-        crop_datasets, crop_scales, sample_points, sampling_strategy
+    for crop_datasets, crop_scale, sampling_strategy in zip(
+        crops_datasets, crops_scale, sampling_strategies
     ):
         # type hints since zip seems to get rid of the type info
-        crop_arrays: list[Array]
+        crop_datasets: list[Array | nx.Graph]
         crop_scale: Coordinate
-        points: np.ndarray | None
-        sampling_strat: str
+        sampling_strategy: MaskedSampling | PointSampling | None
+
+        crop_arrays = [array for array in crop_datasets if isinstance(array, Array)]
+
+        for dataset in crop_datasets:
+            assert dataset is None or isinstance(dataset, (Array, nx.Graph)), (
+                f"Dataset {dataset} is not an Array or a NetworkX graph. "
+                f"{type(dataset)} is not supported. Please provide a valid dataset."
+            )
 
         # smallest roi
         crop_roi = (
@@ -228,7 +310,15 @@ def iterable_dataset(
         if trim is not None:
             crop_roi = crop_roi.grow(-trim * crop_voxel_size, -trim * crop_voxel_size)
 
-        array_sources = tuple(
+        crop_graphs = [
+            nx_to_gp_graph(graph, crop_scale)
+            if graph is not None
+            else nx_to_gp_graph(nx.Graph(), crop_scale)
+            for graph in crop_datasets
+            if isinstance(graph, nx.Graph) or graph is None
+        ]
+
+        crop_sources = tuple(
             gp.ArraySource(
                 key,
                 Array(
@@ -239,74 +329,70 @@ def iterable_dataset(
                     axis_names=array.axis_names,
                     types=array.types,
                 ),
+                interpolatable=interpolatable.get(
+                    str(key), interpolatable_dtypes(array.dtype)
+                ),
             )
-            + gp.Pad(key, None)
-            for key, array in zip(keys, crop_arrays)
+            + gp.Pad(
+                key,
+                None
+                if not (
+                    isinstance(sampling_strategy, MaskedSampling)
+                    and sampling_strategy.mask_key == str(key)
+                )
+                else Coordinate((0,) * len(crop_scale)),
+            )
+            for key, array in zip(array_keys, crop_arrays)
+        ) + tuple(
+            gp.gp_graph_source.GraphSource(key, graph)
+            for key, graph in zip(graph_keys, crop_graphs)
         )
 
-        if points is not None:
-            graph = gp.Graph(
-                [gp.Node(i, loc) for i, loc in enumerate(points)],
-                [],
-                gp.GraphSpec(
-                    Roi((None,) * len(crop_voxel_size), (None,) * len(crop_voxel_size))
+        crop_sources += (
+            gp.ArraySource(  # a dummy array for consisntency
+                roi_mask_key,
+                Array(
+                    da.ones(crop_roi.shape),
+                    offset=crop_roi.offset,
+                    voxel_size=crop_voxel_size,
                 ),
-            )
-            crop_sources = (
-                *array_sources,
-                gp.gp_graph_source.GraphSource(sample_points_key, graph),
-                gp.ArraySource(  # a dummy array for consisntency
-                    roi_mask_key,
-                    Array(
-                        da.ones(crop_roi.shape + (crop_voxel_size * 100)),
-                        offset=crop_roi.offset - (crop_voxel_size * 50),
-                        voxel_size=crop_voxel_size,
-                    ),
-                ),
-            )
-        else:
-            crop_sources = (
-                *array_sources,
-                gp.gp_graph_source.GraphSource(
-                    sample_points_key,
-                    gp.Graph(  # A dummy graph for consistency
-                        [],
-                        [],
-                        gp.GraphSpec(
-                            Roi(
-                                (None,) * len(crop_voxel_size),
-                                (None,) * len(crop_voxel_size),
-                            )
-                        ),
-                    ),
-                ),
-                gp.ArraySource(
-                    roi_mask_key,
-                    Array(
-                        da.ones(crop_roi.shape),
-                        offset=crop_roi.offset,
-                        voxel_size=crop_voxel_size,
-                    ),
-                ),
-            )
+            ),
+        )
 
         dataset_source = crop_sources + gp.MergeProvider()
 
-        if points is not None:
-            dataset_source += gp.RandomLocation(
-                ensure_nonempty=sample_points_key,
-                ensure_centered=sample_points_key,
+        if sampling_strategy is None:
+            # If no sampling strategy is provided, use random sampling
+            dataset_source += gp.RandomLocation()
+        elif isinstance(sampling_strategy, PointSampling):
+            assert gp.GraphKey(sampling_strategy.sample_points_key) in keys, (
+                f"Sample points key {sampling_strategy.sample_points_key} must be one of the dataset keys: {keys}. "
+                "Please ensure that the sample points are provided as part of the dataset."
             )
-        elif sampling_strat == "integral_mask":
             dataset_source += gp.RandomLocation(
-                min_masked=1,
-                mask=roi_mask_key,
+                ensure_nonempty=gp.GraphKey(sampling_strategy.sample_points_key),
+                ensure_centered=True,
             )
-        elif sampling_strat == "reject":
+        elif (
+            isinstance(sampling_strategy, MaskedSampling)
+            and sampling_strategy.strategy == "integral_mask"
+        ):
+            assert gp.ArrayKey(sampling_strategy.mask_key) in keys, (
+                f"Mask key {sampling_strategy.mask_key} must be one of the dataset keys: {keys}. "
+                "Please ensure that the mask is provided as part of the dataset."
+            )
+            dataset_source += gp.RandomLocation(
+                min_masked=sampling_strategy.min_masked,
+                mask=gp.ArrayKey(sampling_strategy.mask_key),
+            )
+        elif sampling_strategy == "reject":
             dataset_source += gp.RandomLocation()
             dataset_source += gp.Reject(roi_mask_key, 1.0)
-        elif sampling_strat is None or sampling_strat == "random":
-            dataset_source += gp.RandomLocation()
+        else:
+            raise ValueError(
+                f"Unsupported sampling strategy: {sampling_strategy}. "
+                "Please use either `None`, or provide a PointSampling/MaskSampling instance."
+            )
 
         dataset_sources.append(dataset_source)
 
@@ -323,6 +409,7 @@ def iterable_dataset(
             subsample=deform_augment_config.subsample,
             spatial_dims=deform_augment_config.spatial_dims,
             rotation_axes=deform_augment_config.rotation_axes,
+            use_fast_points_transform=True,
             p=deform_augment_config.p,
         )
     if simple_augment_config is not None:
@@ -336,11 +423,21 @@ def iterable_dataset(
 
     # generate request for all necessary inputs to training
     request = gp.BatchRequest()
-    for key, array_shape in zip(keys, shapes.values()):
-        crop_scale = crop_scales[0]
-        request.add(
-            key, Coordinate(array_shape) * datasets[str(key)][0].voxel_size / crop_scale
+    for key in array_keys:
+        crop_scale = crops_scale[0]
+        data_shape = shapes.get(str(key), None)
+        assert data_shape is not None, (
+            f"Shape for key {key} not provided. Please provide a shape for all keys."
         )
+        request.add(
+            key, Coordinate(data_shape) * datasets[str(key)][0].voxel_size / crop_scale
+        )
+    for key in graph_keys:
+        data_shape = shapes.get(str(key), None)
+        assert data_shape is not None, (
+            f"Shape for key {key} not provided. Please provide a shape for all keys."
+        )
+        request.add(key, Coordinate(data_shape))
 
     # Add mask placeholder to guarantee center voxel is contained in
     # the mask, and to be used for some sampling strategies.
