@@ -576,18 +576,27 @@ with torch.no_grad():
     device = torch.device("cpu")
     module = module.to(device)
     learned_affs = learned_affs.to(device)
-    pred = (
-        learned_affs(
-            module(
-                (torch.from_numpy(raw_input).float() / 255.0).unsqueeze(0).unsqueeze(0)
-            ),
-            concat_dim=1,
-        )
-        .to(device)
-        .cpu()
-        .detach()
-        .numpy()
+    emb = module(
+        (torch.from_numpy(raw_input).float() / 255.0).unsqueeze(0).unsqueeze(0)
     )
+    pred = learned_affs(emb, concat_dim=1).cpu().detach().numpy()
+
+# %%
+# PCA
+from sklearn.decomposition import PCA
+# select the long range affinity channels for visualization
+emb = emb.cpu().detach().numpy()[0, :]
+emb -= emb.mean()
+emb /= emb.std()
+
+# Apply PCA
+pca = PCA(n_components=3)
+principal_components = pca.fit_transform(emb).T.reshape(3, *prediction.shape[1:])
+
+principal_components = principal_components[:, 0]
+
+principal_components -= principal_components.min()
+principal_components /= principal_components.max()
 # %%
 pred_labels = mws.agglom(pred[0].astype(np.float64) - 0.5, offsets=neighborhood)
 # %%
