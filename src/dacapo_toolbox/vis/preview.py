@@ -1,9 +1,9 @@
-from funlib.persistence import Array
 import matplotlib.pyplot as plt
 from funlib.geometry import Coordinate
 from matplotlib import animation
 from matplotlib.colors import ListedColormap
 import numpy as np
+from funlib.persistence import Array
 
 
 def get_cmap(seed: int = 1) -> ListedColormap:
@@ -37,7 +37,7 @@ def gif_2d(
                 f"got {z_slices} and {arr_z_slices}"
             )
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+    fig, axes = plt.subplots(1, len(arrays), figsize=(2 + 5 * len(arrays), 6))
 
     label_cmap = get_cmap()
 
@@ -49,7 +49,7 @@ def gif_2d(
             roi.offset += Coordinate((ii,) + (0,) * (roi.dims - 1)) * arr.voxel_size
             roi.shape = Coordinate((arr.voxel_size[0], *roi.shape[1:]))
             # Show the raw data
-            x = arr[roi][0]
+            x = arr[roi].squeeze(-arr.voxel_size.dims)  # squeeze out z dim
             shape = x.shape
             scale_factor = shape[0] // 256 if shape[0] > 256 else 1
             # only show 256x256 pixels, more resolution not needed for gif
@@ -67,6 +67,15 @@ def gif_2d(
                 im = axes[jj].imshow(
                     x,
                     cmap="grey",
+                    animated=ii != 0,
+                )
+            elif array_types[key] == "affs":
+                # Show the affinities
+                im = axes[jj].imshow(
+                    x.transpose(1, 2, 0),
+                    vmin=0.0,
+                    vmax=1.0,
+                    interpolation="none",
                     animated=ii != 0,
                 )
             axes[jj].set_title(key)
