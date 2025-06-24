@@ -86,6 +86,7 @@ if not Path("cremi.zarr").exists():
 # %%
 from funlib.persistence import open_ds, Array
 from pathlib import Path
+from funlib.geometry import Coordinate
 
 voxel_size = (40, 4, 4)  # in nm
 axis_names = ["z", "y", "x"]
@@ -162,35 +163,38 @@ from dacapo_toolbox.dataset import (
 train_dataset = iterable_dataset(
     datasets={"raw": raw_train, "gt": labels_train},
     shapes={"raw": (13, 256, 256), "gt": (13, 256, 256)},
-    # deform_augment_config=DeformAugmentConfig(
-    #     p=0.5,
-    #     control_point_spacing=(40, 40, 40),
-    #     jitter_sigma=(10, 10, 10),
-    #     rotate=True,
-    #     subsample=4,
-    #     rotation_axes=(0, 1, 2),
-    #     scale_interval=(0.8, 1.2),
-    # ),  # TODO: Fix this!
+    deform_augment_config=DeformAugmentConfig(
+        p=1.0,
+        control_point_spacing=(2, 10, 10),
+        jitter_sigma=(0.5, 2, 2),
+        rotate=True,
+        subsample=4,
+        rotation_axes=(1, 2),
+        scale_interval=(1.0, 1.0),
+    ),  # TODO: Fix this!
     simple_augment_config=SimpleAugmentConfig(
         p=1.0,
         mirror_only=(1, 2),
         transpose_only=(1, 2),
     ),
+    trim=Coordinate(5, 5, 5),
 )
 batch_gen = iter(train_dataset)
 
 # %%
-batch = next(batch_gen)
-# gif_2d(
-#     arrays={
-#         "Raw": Array(batch["raw"].numpy()),
-#         "Labels": Array(batch["gt"].numpy() % 256),
-#     },
-#     array_types={"Raw": "raw", "Labels": "labels"},
-#     filename="_static/dataset_tutorial/simple-batch.gif",
-#     title="Simple Batch",
-#     fps=10,
-# )
+for i in range(10):
+    batch = next(batch_gen)
+    gif_2d(
+        arrays={
+            "Raw": Array(batch["raw"].numpy()),
+            "Labels": Array(batch["gt"].numpy() % 256),
+        },
+        array_types={"Raw": "raw", "Labels": "labels"},
+        filename=f"_static/dataset_tutorial/simple-batch_{i}.gif",
+        title="Simple Batch",
+        fps=10,
+    )
+exit()
 
 # %% [markdown]
 # Here we visualize the training data:
@@ -232,120 +236,29 @@ train_dataset = iterable_dataset(
 batch_gen = iter(train_dataset)
 
 # %%
-import matplotlib.pyplot as plt
-from funlib.geometry import Coordinate
-from matplotlib import animation
-from matplotlib.colors import ListedColormap
-import numpy as np
-
-
-def get_cmap(seed: int = 1) -> ListedColormap:
-    np.random.seed(seed)
-    colors = [[0, 0, 0]] + [
-        list(np.random.choice(range(256), size=3)) for _ in range(255)
-    ]
-    return ListedColormap(colors)
-
-
-def gif_2d(
-    arrays: dict[str, Array],
-    array_types: dict[str, str],
-    filename: str,
-    title: str,
-    fps: int = 10,
-):
-    for key, arr in arrays.items():
-        assert arr.voxel_size.dims == 3, (
-            f"Array {key} must be 3D, got {arr.voxel_size.dims}D"
-        )
-
-    z_slices = None
-    for arr in arrays.values():
-        arr_z_slices = arr.roi.shape[0] // arr.voxel_size[0]
-        if z_slices is None:
-            z_slices = arr_z_slices
-        else:
-            assert z_slices == arr_z_slices, (
-                f"All arrays must have the same number of z slices, "
-                f"got {z_slices} and {arr_z_slices}"
-            )
-
-    fig, axes = plt.subplots(1, len(arrays), figsize=(2 + 5 * len(arrays), 6))
-
-    label_cmap = get_cmap()
-
-    ims = []
-    for ii in range(z_slices):
-        slice_ims = []
-        for jj, (key, arr) in enumerate(arrays.items()):
-            roi = arr.roi.copy()
-            roi.offset += Coordinate((ii,) + (0,) * (roi.dims - 1)) * arr.voxel_size
-            roi.shape = Coordinate((arr.voxel_size[0], *roi.shape[1:]))
-            # Show the raw data
-            x = arr[roi].squeeze(-arr.voxel_size.dims)  # squeeze out z dim
-            shape = x.shape
-            scale_factor = shape[0] // 256 if shape[0] > 256 else 1
-            # only show 256x256 pixels, more resolution not needed for gif
-            x = x[::scale_factor, ::scale_factor]
-            if array_types[key] == "labels":
-                im = axes[jj].imshow(
-                    x % 256,
-                    vmin=0,
-                    vmax=255,
-                    cmap=label_cmap,
-                    interpolation="none",
-                    animated=ii != 0,
-                )
-            elif array_types[key] == "raw":
-                im = axes[jj].imshow(
-                    x,
-                    cmap="grey",
-                    animated=ii != 0,
-                )
-            elif array_types[key] == "affs":
-                # Show the affinities
-                im = axes[jj].imshow(
-                    x.transpose(1, 2, 0),
-                    vmin=0.0,
-                    vmax=1.0,
-                    interpolation="none",
-                    animated=ii != 0,
-                )
-            axes[jj].set_title(key)
-            slice_ims.append(im)
-        ims.append(slice_ims)
-
-    ims = ims + ims[::-1]
-    ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
-    fig.suptitle(title, fontsize=16)
-    ani.save(filename, writer="pillow", fps=fps)
-    plt.close()
-
-
-# %%
 batch = next(batch_gen)
-# gif_2d(
-#     arrays={
-#         "Raw": Array(batch["raw"].numpy(), voxel_size=raw_train.voxel_size),
-#         "GT": Array(batch["gt"].numpy() % 256, voxel_size=raw_train.voxel_size),
-#         "Affs": Array(
-#             batch["affs"].float().numpy()[[0, 3, 4]], voxel_size=raw_train.voxel_size
-#         ),
-#         "Affs Mask": Array(
-#             batch["affs_mask"].float().numpy()[[0, 3, 4]],
-#             voxel_size=raw_train.voxel_size,
-#         ),
-#     },
-#     array_types={
-#         "Raw": "raw",
-#         "GT": "labels",
-#         "Affs": "affs",
-#         "Affs Mask": "affs",
-#     },
-#     filename="_static/dataset_tutorial/affs-batch.gif",
-#     title="Affinities Batch",
-#     fps=10,
-# )
+gif_2d(
+    arrays={
+        "Raw": Array(batch["raw"].numpy(), voxel_size=raw_train.voxel_size),
+        "GT": Array(batch["gt"].numpy() % 256, voxel_size=raw_train.voxel_size),
+        "Affs": Array(
+            batch["affs"].float().numpy()[[0, 3, 4]], voxel_size=raw_train.voxel_size
+        ),
+        "Affs Mask": Array(
+            batch["affs_mask"].float().numpy()[[0, 3, 4]],
+            voxel_size=raw_train.voxel_size,
+        ),
+    },
+    array_types={
+        "Raw": "raw",
+        "GT": "labels",
+        "Affs": "affs",
+        "Affs Mask": "affs",
+    },
+    filename="_static/dataset_tutorial/affs-batch.gif",
+    title="Affinities Batch",
+    fps=10,
+)
 
 # %% [markdown]
 # Here we visualize a batch with (raw, gt, target) triplets for the affinities task:
@@ -357,8 +270,15 @@ batch = next(batch_gen)
 
 # %%
 import tems
+import torch
 
-input_shape = Coordinate((5, 156, 156))
+
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+elif torch.backends.mps.is_available():
+    device = torch.device("cpu")
+else:
+    device = torch.device("cpu")
 
 unet = tems.UNet.funlib_api(
     dims=3,
@@ -379,9 +299,9 @@ unet = tems.UNet.funlib_api(
     ],
 )
 
-print(
-    f"Given input shape: {unet.min_input_shape}, the output shape will be: {unet.min_output_shape}"
-)
+module = torch.nn.Sequential(
+    unet, torch.nn.Conv3d(32, len(neighborhood), kernel_size=1), torch.nn.Sigmoid()
+).to(device)
 
 # %% [markdown]
 # ### Training loop
@@ -389,7 +309,6 @@ print(
 
 # %%
 from tqdm import tqdm
-import time
 
 # %%
 import torch
@@ -410,18 +329,6 @@ train_dataset = iterable_dataset(
     ),
 )
 
-if torch.cuda.is_available():
-    device = torch.device("cuda")
-elif torch.backends.mps.is_available():
-    device = torch.device("cpu")
-else:
-    device = torch.device("cpu")
-
-# this ensures we output the appropriate number of channels,
-# use the appropriate final activation etc.
-module = torch.nn.Sequential(
-    unet, torch.nn.Conv3d(32, 7, kernel_size=1), torch.nn.Sigmoid()
-).to(device)
 loss_func = torch.nn.BCELoss(reduction="none")
 optimizer = torch.optim.Adam(module.parameters(), lr=1e-4)
 dataloader = torch.utils.data.DataLoader(
@@ -439,23 +346,22 @@ for iteration, batch in tqdm(enumerate(iter(dataloader))):
     )
     optimizer.zero_grad()
 
-    t1 = time.time()
     output = module(raw)
-    print("processing:", time.time() - t1)
 
-    t2 = time.time()
     voxel_loss = loss_func(output, target.float())
     loss = (voxel_loss * weight).mean()
     loss.backward()
     optimizer.step()
-    print("Optimizing:", time.time() - t2)
 
     losses.append(loss.item())
 
-    if iteration >= 300:
+    if iteration >= 10000:
         break
 
 # %%
+import matplotlib.pyplot as plt
+from funlib.geometry import Coordinate
+
 plt.plot(losses)
 plt.xlabel("Iteration")
 plt.ylabel("Loss")
@@ -466,6 +372,7 @@ plt.close()
 # %%
 import mwatershed as mws
 from funlib.geometry import Roi
+import numpy as np
 
 input_shape = unet.min_input_shape + extra
 output_shape = unet.min_output_shape + extra
@@ -549,6 +456,7 @@ elif torch.backends.mps.is_available():
 else:
     device = torch.device("cpu")
 
+emb_dim = 12
 unet = tems.UNet.funlib_api(
     dims=3,
     in_channels=1,
@@ -570,7 +478,9 @@ unet = tems.UNet.funlib_api(
 
 # this ensures we output the appropriate number of channels,
 # use the appropriate final activation etc.
-module = torch.nn.Sequential(unet, torch.nn.Conv3d(32, 12, kernel_size=1)).to(device)
+module = torch.nn.Sequential(unet, torch.nn.Conv3d(32, emb_dim, kernel_size=1)).to(
+    device
+)
 
 
 class DistanceHead(torch.nn.Module):
@@ -585,7 +495,7 @@ class DistanceHead(torch.nn.Module):
         return self.sigmoid(self.conv2(self.relu(self.conv1(x - y)))).squeeze(1)
 
 
-dist_head = DistanceHead(in_channels=12).to(device)
+dist_head = DistanceHead(in_channels=emb_dim).to(device)
 learned_affs = Affs(neighborhood=neighborhood, dist_func=dist_head)
 
 loss_func = torch.nn.BCELoss(reduction="none")
@@ -609,24 +519,19 @@ for iteration, batch in tqdm(enumerate(iter(dataloader))):
 
     optimizer.zero_grad()
 
-    t1 = time.time()
     emb = module(raw)
     pred_affs = learned_affs(emb, concat_dim=1)
-    print(raw.shape, emb.shape, pred_affs.shape)
-    print("processing:", time.time() - t1)
 
-    t2 = time.time()
     voxel_loss = loss_func(pred_affs, target.float())
     loss = (voxel_loss * weight).mean() + 0.001 * mse_loss(
         emb, emb / torch.norm(emb, dim=1, keepdim=True)
     )
     loss.backward()
     optimizer.step()
-    print("Optimizing:", time.time() - t2)
 
     losses.append(loss.item())
 
-    if iteration >= 300:
+    if iteration >= 10000:
         break
 
 # %%
