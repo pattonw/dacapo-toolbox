@@ -64,11 +64,17 @@ def gif_2d(
                     animated=ii != 0,
                 )
             elif array_types[key] == "raw":
-                im = axes[jj].imshow(
-                    x,
-                    cmap="grey",
-                    animated=ii != 0,
-                )
+                if x.ndim == 2:
+                    im = axes[jj].imshow(
+                        x,
+                        cmap="grey",
+                        animated=ii != 0,
+                    )
+                elif x.ndim == 3:
+                    im = axes[jj].imshow(
+                        x.transpose(1, 2, 0),
+                        animated=ii != 0,
+                    )
             elif array_types[key] == "affs":
                 # Show the affinities
                 im = axes[jj].imshow(
