@@ -55,7 +55,7 @@ def balance_weights(
         )
         classes = classes.long()  # ensure classes are long for indexing
         fracs = (
-            counts.float() / masked_in if masked_in > 0 else torch.zeros(counts.size)
+            counts.float() / masked_in if masked_in > 0 else torch.zeros(counts.shape)
         )
         if clipmin is not None or clipmax is not None:
             fracs = torch.clip(fracs, clipmin, clipmax)
@@ -64,7 +64,7 @@ def balance_weights(
         total_frac = 1.0
         w_sparse = total_frac / float(num_classes) / fracs
         w = torch.zeros(num_classes)
-        w[classes] = w_sparse[classes]
+        w[classes] = w_sparse
 
         # scale_slab the masked-in scale_slab with the class weights
         scale_slab *= torch.take(w, labels_slab.long())

@@ -71,7 +71,7 @@ class Affs(torch.nn.Module):
     def __init__(
         self,
         neighborhood: Sequence[Sequence[int]],
-        dist_func: str | Callable = "equality",
+        dist_func: str | Callable | list[Callable] = "equality",
     ):
         super(Affs, self).__init__()
         self.neighborhood = neighborhood
@@ -85,17 +85,30 @@ class Affs(torch.nn.Module):
             self.dist_func = equality_no_bg_dist_func
         elif callable(dist_func):
             self.dist_func = dist_func
+        elif all(isinstance(func, torch.nn.Module) for func in dist_func):
+            self.dist_func = torch.nn.ModuleList(dist_func)
+        elif all(callable(func) for func in dist_func):
+            self.dist_func = dist_func
         else:
             raise ValueError(f"Unknown distance function: {dist_func}")
 
     def forward(self, x: torch.Tensor, concat_dim: int = 0) -> torch.Tensor:
-        return torch.stack(
-            [
-                compute_affs(x, offset, self.dist_func, pad=True)
-                for offset in self.neighborhood
-            ],
-            dim=concat_dim,
-        )
+        if (not isinstance(self.dist_func, torch.nn.ModuleList)) and callable(self.dist_func):
+            return torch.stack(
+                [
+                    compute_affs(x, offset, self.dist_func, pad=True)
+                    for offset in self.neighborhood
+                ],
+                dim=concat_dim,
+            )
+        else:
+            return torch.stack(
+                [
+                    compute_affs(x, offset, dist_func, pad=True)
+                    for offset, dist_func in zip(self.neighborhood, self.dist_func)
+                ],
+                dim=concat_dim,
+            )
 
 
 class AffsMask(torch.nn.Module):
@@ -104,8 +117,8 @@ class AffsMask(torch.nn.Module):
         self.neighborhood = neighborhood
         self.dist_func = no_bg_dist_func
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        y = torch.ones_like(x, dtype=torch.bool)
+    def forward(self, mask: torch.Tensor) -> torch.Tensor:
+        y = mask.int() > 0
         return torch.stack(
             [
                 compute_affs(y, offset, self.dist_func, pad=True)

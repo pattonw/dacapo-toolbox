@@ -306,7 +306,7 @@ dataset = iterable_dataset(
         ("image", "mask"): lambda d: d[0] > d[1] + d[2],  # mask in red regions
         (("mask", "image"), "masked_image"): lambda mask, image: mask * image,
     },
-    shapes={"image": (256, 256), "mask": (256, 256), "masked_image": (256, 256)},
+    shapes={"image": (256, 256)},
 )
 batch_gen = iter(dataset)
 

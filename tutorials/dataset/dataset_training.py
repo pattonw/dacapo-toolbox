@@ -92,6 +92,8 @@ voxel_size = (40, 4, 4)  # in nm
 axis_names = ["z", "y", "x"]
 units = ["nm", "nm", "nm"]
 
+NUM_ITERATIONS = 300
+
 raw_train = open_ds(
     "cremi.zarr/train/raw", voxel_size=voxel_size, axis_names=axis_names, units=units
 )
@@ -116,13 +118,13 @@ labels_test = open_ds(
 from dacapo_toolbox.vis.preview import gif_2d
 
 # create a 2D gif of the training data
-# gif_2d(
-#     arrays={"Train Raw": raw_train, "Train Labels": labels_train},
-#     array_types={"Train Raw": "raw", "Train Labels": "labels"},
-#     filename="_static/dataset_tutorial/training-data.gif",
-#     title="Training Data",
-#     fps=10,
-# )
+gif_2d(
+    arrays={"Train Raw": raw_train, "Train Labels": labels_train},
+    array_types={"Train Raw": "raw", "Train Labels": "labels"},
+    filename="_static/dataset_tutorial/training-data.gif",
+    title="Training Data",
+    fps=10,
+)
 
 # %% [markdown]
 # Here we visualize the training data:
@@ -132,13 +134,13 @@ from dacapo_toolbox.vis.preview import gif_2d
 # ### Testing data
 
 # %%
-# gif_2d(
-#     arrays={"Test Raw": raw_test, "Test Labels": labels_test},
-#     array_types={"Test Raw": "raw", "Test Labels": "labels"},
-#     filename="_static/dataset_tutorial/testing-data.gif",
-#     title="Testing Data",
-#     fps=10,
-# )
+gif_2d(
+    arrays={"Test Raw": raw_test, "Test Labels": labels_test},
+    array_types={"Test Raw": "raw", "Test Labels": "labels"},
+    filename="_static/dataset_tutorial/testing-data.gif",
+    title="Testing Data",
+    fps=10,
+)
 
 # %% [markdown]
 # Here we visualize the test data:
@@ -164,14 +166,14 @@ train_dataset = iterable_dataset(
     datasets={"raw": raw_train, "gt": labels_train},
     shapes={"raw": (13, 256, 256), "gt": (13, 256, 256)},
     deform_augment_config=DeformAugmentConfig(
-        p=1.0,
+        p=0.1,
         control_point_spacing=(2, 10, 10),
         jitter_sigma=(0.5, 2, 2),
         rotate=True,
         subsample=4,
         rotation_axes=(1, 2),
         scale_interval=(1.0, 1.0),
-    ),  # TODO: Fix this!
+    ),
     simple_augment_config=SimpleAugmentConfig(
         p=1.0,
         mirror_only=(1, 2),
@@ -182,19 +184,17 @@ train_dataset = iterable_dataset(
 batch_gen = iter(train_dataset)
 
 # %%
-for i in range(10):
-    batch = next(batch_gen)
-    gif_2d(
-        arrays={
-            "Raw": Array(batch["raw"].numpy()),
-            "Labels": Array(batch["gt"].numpy() % 256),
-        },
-        array_types={"Raw": "raw", "Labels": "labels"},
-        filename=f"_static/dataset_tutorial/simple-batch_{i}.gif",
-        title="Simple Batch",
-        fps=10,
-    )
-exit()
+batch = next(batch_gen)
+gif_2d(
+    arrays={
+        "Raw": Array(batch["raw"].numpy()),
+        "Labels": Array(batch["gt"].numpy() % 256),
+    },
+    array_types={"Raw": "raw", "Labels": "labels"},
+    filename="_static/dataset_tutorial/simple-batch.gif",
+    title="Simple Batch",
+    fps=10,
+)
 
 # %% [markdown]
 # Here we visualize the training data:
@@ -208,6 +208,7 @@ exit()
 
 # %%
 from dacapo_toolbox.transforms.affs import Affs, AffsMask
+from dacapo_toolbox.transforms.weight_balancing import BalanceLabels
 import torchvision
 
 neighborhood = [
@@ -225,7 +226,17 @@ train_dataset = iterable_dataset(
     transforms={
         ("gt", "affs"): Affs(neighborhood=neighborhood),
         ("gt", "affs_mask"): AffsMask(neighborhood=neighborhood),
+        (("affs", "affs_mask"), "weights"): BalanceLabels((1, -1, -1, -1)),
     },
+    deform_augment_config=DeformAugmentConfig(
+        p=0.1,
+        control_point_spacing=(2, 10, 10),
+        jitter_sigma=(0.5, 2, 2),
+        rotate=True,
+        subsample=4,
+        rotation_axes=(1, 2),
+        scale_interval=(1.0, 1.0),
+    ),
     simple_augment_config=SimpleAugmentConfig(
         p=1.0,
         mirror_only=(1, 2),
@@ -242,7 +253,8 @@ gif_2d(
         "Raw": Array(batch["raw"].numpy(), voxel_size=raw_train.voxel_size),
         "GT": Array(batch["gt"].numpy() % 256, voxel_size=raw_train.voxel_size),
         "Affs": Array(
-            batch["affs"].float().numpy()[[0, 3, 4]], voxel_size=raw_train.voxel_size
+            batch["affs"].float().numpy()[[0, 3, 4]],
+            voxel_size=raw_train.voxel_size,
         ),
         "Affs Mask": Array(
             batch["affs_mask"].float().numpy()[[0, 3, 4]],
@@ -297,6 +309,7 @@ unet = tems.UNet.funlib_api(
         [(1, 3, 3), (1, 3, 3)],
         [(3, 3, 3), (3, 3, 3)],
     ],
+    activation="LeakyReLU",
 )
 
 module = torch.nn.Sequential(
@@ -316,12 +329,25 @@ import torch
 extra = torch.tensor((2, 64, 64))
 train_dataset = iterable_dataset(
     datasets={"raw": raw_train, "gt": labels_train},
-    shapes={"raw": unet.min_input_shape + extra, "gt": unet.min_output_shape + extra},
+    shapes={
+        "raw": unet.min_input_shape + extra,
+        "gt": unet.min_output_shape + extra,
+    },
     transforms={
         "raw": torchvision.transforms.Lambda(lambda x: x[None].float() / 255.0),
         ("gt", "affs"): Affs(neighborhood=neighborhood),
         ("gt", "affs_mask"): AffsMask(neighborhood=neighborhood),
+        (("affs", "affs_mask"), "weights"): BalanceLabels((1, -1, -1, -1)),
     },
+    deform_augment_config=DeformAugmentConfig(
+        p=0.1,
+        control_point_spacing=(2, 10, 10),
+        jitter_sigma=(0.5, 2, 2),
+        rotate=True,
+        subsample=4,
+        rotation_axes=(1, 2),
+        scale_interval=(1.0, 1.0),
+    ),
     simple_augment_config=SimpleAugmentConfig(
         p=1.0,
         mirror_only=(1, 2),
@@ -334,7 +360,7 @@ optimizer = torch.optim.Adam(module.parameters(), lr=1e-4)
 dataloader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size=3,
-    num_workers=2,
+    num_workers=4,
 )
 losses = []
 
@@ -342,7 +368,7 @@ for iteration, batch in tqdm(enumerate(iter(dataloader))):
     raw, target, weight = (
         batch["raw"].to(device),
         batch["affs"].to(device),
-        batch["affs_mask"].to(device),
+        batch["weights"].to(device),
     )
     optimizer.zero_grad()
 
@@ -355,7 +381,7 @@ for iteration, batch in tqdm(enumerate(iter(dataloader))):
 
     losses.append(loss.item())
 
-    if iteration >= 10000:
+    if iteration >= NUM_ITERATIONS:
         break
 
 # %%
@@ -425,7 +451,12 @@ gif_2d(
         "Pred Affs": Array(pred[0][[0, 3, 4]], voxel_size=raw_test.voxel_size),
         "Pred": Array(pred_labels % 256, voxel_size=raw_test.voxel_size),
     },
-    array_types={"Raw": "raw", "GT": "labels", "Pred Affs": "affs", "Pred": "labels"},
+    array_types={
+        "Raw": "raw",
+        "GT": "labels",
+        "Pred Affs": "affs",
+        "Pred": "labels",
+    },
     filename="_static/dataset_tutorial/affs-prediction.gif",
     title="Prediction",
     fps=10,
@@ -434,6 +465,18 @@ gif_2d(
 # %%
 
 extra = torch.tensor((2, 64, 64))
+neighborhood = [
+    (1, 0, 0),
+    (0, 1, 0),
+    (0, 0, 1),
+    (0, 7, 0),
+    (0, 0, 7),
+    (0, 23, 0),
+    (0, 0, 23),
+    (0, 59, 0),
+    (0, 0, 59),
+]
+
 train_dataset = iterable_dataset(
     datasets={"raw": raw_train, "gt": labels_train},
     shapes={"raw": unet.min_input_shape + extra, "gt": unet.min_output_shape + extra},
@@ -441,7 +484,17 @@ train_dataset = iterable_dataset(
         "raw": torchvision.transforms.Lambda(lambda x: x[None].float() / 255.0),
         ("gt", "affs"): Affs(neighborhood=neighborhood),
         ("gt", "affs_mask"): AffsMask(neighborhood=neighborhood),
+        (("affs", "affs_mask"), "weights"): BalanceLabels((1, -1, -1, -1)),
     },
+    deform_augment_config=DeformAugmentConfig(
+        p=0.1,
+        control_point_spacing=(2, 10, 10),
+        jitter_sigma=(0.5, 2, 2),
+        rotate=True,
+        subsample=4,
+        rotation_axes=(1, 2),
+        scale_interval=(1.0, 1.0),
+    ),
     simple_augment_config=SimpleAugmentConfig(
         p=1.0,
         mirror_only=(1, 2),
@@ -456,7 +509,7 @@ elif torch.backends.mps.is_available():
 else:
     device = torch.device("cpu")
 
-emb_dim = 12
+emb_dim = 36
 unet = tems.UNet.funlib_api(
     dims=3,
     in_channels=1,
@@ -474,6 +527,7 @@ unet = tems.UNet.funlib_api(
         [(1, 3, 3), (1, 3, 3)],
         [(3, 3, 3), (3, 3, 3)],
     ],
+    activation="LeakyReLU",
 )
 
 # this ensures we output the appropriate number of channels,
@@ -481,32 +535,49 @@ unet = tems.UNet.funlib_api(
 module = torch.nn.Sequential(unet, torch.nn.Conv3d(32, emb_dim, kernel_size=1)).to(
     device
 )
+# torch.nn.init.kaiming_normal_(module[1].weight, mode="fan_out", nonlinearity="sigmoid")
 
 
 class DistanceHead(torch.nn.Module):
-    def __init__(self, in_channels: int = 12):
+    def __init__(self, in_channels: int = 12, incr_factor: int = 12):
         super().__init__()
-        self.conv1 = torch.nn.Conv3d(in_channels, in_channels**2, kernel_size=1)
+        self.conv1 = torch.nn.Conv3d(
+            in_channels, in_channels * incr_factor, kernel_size=1
+        )
         self.relu = torch.nn.ReLU()
-        self.conv2 = torch.nn.Conv3d(in_channels**2, 1, kernel_size=1)
+        self.conv2 = torch.nn.Conv3d(in_channels * incr_factor, 1, kernel_size=1)
         self.sigmoid = torch.nn.Sigmoid()
 
-    def forward(self, x: torch.Tensor, y: torch.tensor) -> torch.Tensor:
+        torch.nn.init.kaiming_normal_(
+            self.conv1.weight, mode="fan_out", nonlinearity="relu"
+        )
+        torch.nn.init.kaiming_normal_(
+            self.conv2.weight, mode="fan_out", nonlinearity="sigmoid"
+        )
+
+    def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
         return self.sigmoid(self.conv2(self.relu(self.conv1(x - y)))).squeeze(1)
 
 
-dist_head = DistanceHead(in_channels=emb_dim).to(device)
-learned_affs = Affs(neighborhood=neighborhood, dist_func=dist_head)
+dist_heads = [
+    DistanceHead(in_channels=emb_dim).to(device) for _ in range(len(neighborhood))
+]
+learned_affs = Affs(neighborhood=neighborhood, dist_func=dist_heads)
 
 loss_func = torch.nn.BCELoss(reduction="none")
 mse_loss = torch.nn.MSELoss()
+
+import itertools
+
 optimizer = torch.optim.Adam(
-    list(module.parameters()) + list(learned_affs.parameters()), lr=1e-4
+    list(module.parameters())
+    + list(itertools.chain(*[dist_head.parameters() for dist_head in dist_heads])),
+    lr=1e-4,
 )
 dataloader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size=3,
-    num_workers=2,
+    num_workers=4,
 )
 losses = []
 
@@ -514,7 +585,7 @@ for iteration, batch in tqdm(enumerate(iter(dataloader))):
     raw, target, weight = (
         batch["raw"].to(device),
         batch["affs"].to(device),
-        batch["affs_mask"].to(device),
+        batch["weights"].to(device),
     )
 
     optimizer.zero_grad()
@@ -522,8 +593,8 @@ for iteration, batch in tqdm(enumerate(iter(dataloader))):
     emb = module(raw)
     pred_affs = learned_affs(emb, concat_dim=1)
 
-    voxel_loss = loss_func(pred_affs, target.float())
-    loss = (voxel_loss * weight).mean() + 0.001 * mse_loss(
+    voxel_loss = loss_func(pred_affs, target.float()) * weight
+    loss = voxel_loss.mean() + 0.001 * mse_loss(
         emb, emb / torch.norm(emb, dim=1, keepdim=True)
     )
     loss.backward()
@@ -531,7 +602,7 @@ for iteration, batch in tqdm(enumerate(iter(dataloader))):
 
     losses.append(loss.item())
 
-    if iteration >= 10000:
+    if iteration >= NUM_ITERATIONS:
         break
 
 # %%
@@ -584,16 +655,18 @@ with torch.no_grad():
 # %%
 # PCA
 from sklearn.decomposition import PCA
+
 # select the long range affinity channels for visualization
-emb = emb.cpu().detach().numpy()[0, :]
+emb = emb.cpu().detach().numpy()[0]
 emb -= emb.mean()
 emb /= emb.std()
 
+spatial_shape = emb.shape[1:]
+emb = emb.reshape(emb.shape[0], -1)  # flatten the spatial dimensions
 # Apply PCA
 pca = PCA(n_components=3)
-principal_components = pca.fit_transform(emb).T.reshape(3, *prediction.shape[1:])
-
-principal_components = principal_components[:, 0]
+principal_components = pca.fit_transform(emb.T)
+principal_components = principal_components.T.reshape(3, *spatial_shape)
 
 principal_components -= principal_components.min()
 principal_components /= principal_components.max()
@@ -605,10 +678,17 @@ gif_2d(
     arrays={
         "Raw": Array(raw_output, voxel_size=raw_test.voxel_size),
         "GT": Array(gt % 256, voxel_size=raw_test.voxel_size),
+        "Pred Emb": Array(principal_components, voxel_size=raw_test.voxel_size),
         "Pred Affs": Array(pred[0][[0, 3, 4]], voxel_size=raw_test.voxel_size),
         "Pred": Array(pred_labels % 256, voxel_size=raw_test.voxel_size),
     },
-    array_types={"Raw": "raw", "GT": "labels", "Pred Affs": "affs", "Pred": "labels"},
+    array_types={
+        "Raw": "raw",
+        "GT": "labels",
+        "Pred Emb": "raw",
+        "Pred Affs": "affs",
+        "Pred": "labels",
+    },
     filename="_static/dataset_tutorial/emb-prediction.gif",
     title="Prediction",
     fps=10,
