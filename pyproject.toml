@@ -35,6 +35,8 @@ docs = [
     "scikit-learn>=1.7.0",
     "tems>=1.0.3",
     "torchvision>=0.22.0",
+    "volara>=1.0.1",
+    "volara-torch>=1.0.0",
     "wget>=3.2",
 ]
 

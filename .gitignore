@@ -6,6 +6,7 @@ tutorials/**/*.zarr
 *.hdf
 *.gif
 *.png
+*.jpg
 .coverage
 coverage.xml
 uv.lock
