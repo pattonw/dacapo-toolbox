@@ -387,6 +387,7 @@ plt.xlabel("Iteration")
 plt.ylabel("Loss")
 plt.title("Loss Curve")
 plt.savefig("_static/dataset_tutorial/affs-loss-curve.png")
+plt.show()
 plt.close()
 
 # %%
@@ -461,6 +462,120 @@ cube(
     title="Prediction",
 )
 
+# %%
+
+from volara.datasets import (
+    Raw as RawDataset,
+    Affs as AffsDataset,
+    Labels as LabelsDataset,
+)
+from volara.dbs import SQLite
+from volara.lut import LUT
+from volara.blockwise import ExtractFrags, AffAgglom, GraphMWS, Relabel
+from volara_torch.blockwise import Predict
+from volara_torch.models import TorchModel
+
+raw_dataset = RawDataset(store="cremi.zarr/test/raw", scale_shift=(1.0 / 255.0, 0.0))
+affs_dataset = AffsDataset(store="cremi.zarr/test/affs", neighborhood=neighborhood)
+frags_dataset = LabelsDataset(store="cremi.zarr/test/frags")
+labels_dataset = LabelsDataset(store="cremi.zarr/test/pred_labels")
+
+frag_db = SQLite(
+    path="cremi.zarr/frags.db",
+    edge_attrs={"affs_xy": "float", "affs_z": "float", "affs_long_xy": "float"},
+)
+segment_lut = LUT(
+    path="cremi.zarr/frag-lut",
+)
+
+unet = unet.eval()
+scripted_unet = torch.jit.script(module)
+torch.jit.save(scripted_unet, "cremi.zarr/affs_unet.pt")
+torch.save(scripted_unet.state_dict(), "cremi.zarr/affs_unet_state.pt")
+
+pred_size_growth = Coordinate(32, 256, 256)
+blocksize = Coordinate(unet.min_output_shape) + pred_size_growth
+affs_model = TorchModel(
+    in_channels=1,
+    min_input_shape=unet.min_input_shape,
+    min_output_shape=unet.min_output_shape,
+    min_step_shape=unet.equivariant_step,
+    out_channels=len(neighborhood),
+    out_range=(0.0, 1.0),
+    save_path="cremi.zarr/affs_unet.pt",
+    checkpoint_file="cremi.zarr/affs_unet_state.pt",
+    pred_size_growth=pred_size_growth,
+)
+
+predict_affs = Predict(
+    checkpoint=affs_model,
+    in_data=raw_dataset,
+    out_data=[affs_dataset],
+    num_workers=1,
+)
+
+extract_frags = ExtractFrags(
+    db=frag_db,
+    affs_data=affs_dataset,
+    frags_data=frags_dataset,
+    block_size=blocksize,
+    context=Coordinate(16, 16, 16),
+    bias=[-0.5, -0.2, -0.2, -0.5, -0.5, -0.8, -0.8],
+    remove_debris=32,
+    num_workers=4,
+)
+aff_agglom = AffAgglom(
+    db=frag_db,
+    affs_data=affs_dataset,
+    frags_data=frags_dataset,
+    block_size=blocksize,
+    context=Coordinate(16, 16, 16),
+    scores={
+        "affs_z": [Coordinate(1, 0, 0)],
+        "affs_xy": [Coordinate(0, 1, 0), Coordinate(0, 0, 1)],
+        "affs_long_xy": [
+            Coordinate(0, 7, 0),
+            Coordinate(0, 0, 7),
+            Coordinate(0, 23, 0),
+            Coordinate(0, 0, 23),
+        ],
+    },
+    num_workers=4,
+)
+graph_mws = GraphMWS(
+    db=frag_db,
+    lut=segment_lut,
+    weights={
+        "affs_z": (1.0, -0.5),
+        "affs_xy": (1.0, -0.2),
+        "affs_long_xy": (1.0, -0.8),
+    },
+    roi=(raw_test.roi.offset, raw_test.roi.shape),
+)
+
+relabel = Relabel(
+    frags_data=frags_dataset,
+    seg_data=labels_dataset,
+    lut=segment_lut,
+    block_size=blocksize,
+    num_workers=4,
+)
+
+# pipeline = predict_affs + extract_frags + aff_agglom + graph_mws + relabel
+predict_affs.drop()
+predict_affs.run_blockwise(multiprocessing=False)
+# %%
+extract_frags.drop()
+extract_frags.run_blockwise(multiprocessing=True)
+# %%
+aff_agglom.drop()
+aff_agglom.run_blockwise(multiprocessing=True)
+# %%
+graph_mws.drop()
+graph_mws.run_blockwise(multiprocessing=False)
+# %%
+relabel.drop()
+relabel.run_blockwise(multiprocessing=True)
 
 # %%
 
@@ -500,15 +615,6 @@ module = torch.nn.Sequential(unet, torch.nn.Conv3d(32, emb_dim, kernel_size=1)).
 
 
 extra = torch.tensor((2, 64, 64))
-neighborhood = [
-    (1, 0, 0),
-    (0, 1, 0),
-    (0, 0, 1),
-    (0, 7, 0),
-    (0, 0, 7),
-    (0, 23, 0),
-    (0, 0, 23),
-]
 
 train_dataset = iterable_dataset(
     datasets={"raw": raw_train, "gt": labels_train},
@@ -609,6 +715,7 @@ plt.xlabel("Iteration")
 plt.ylabel("Loss")
 plt.title("Loss Curve")
 plt.savefig("_static/dataset_tutorial/emb-loss-curve.png")
+plt.show()
 plt.close()
 
 # %%
@@ -677,3 +784,132 @@ cube(
     filename="_static/dataset_tutorial/emb-prediction.jpg",
     title="Prediction",
 )
+
+# %%
+from volara.datasets import (
+    Raw as RawDataset,
+    Affs as AffsDataset,
+    Labels as LabelsDataset,
+)
+from volara.dbs import SQLite
+from volara.lut import LUT
+from volara.blockwise import ExtractFrags, AffAgglom, GraphMWS, Relabel
+from volara_torch.blockwise import Predict
+from volara_torch.models import TorchModel
+
+raw_dataset = RawDataset(store="cremi.zarr/test/raw", scale_shift=(1.0 / 255.0, 0.0))
+emb_dataset = RawDataset(store="cremi.zarr/test/emb")
+affs_dataset = AffsDataset(store="cremi.zarr/test/emb_affs", neighborhood=neighborhood)
+frags_dataset = LabelsDataset(store="cremi.zarr/test/emb_frags")
+labels_dataset = LabelsDataset(store="cremi.zarr/test/emb_pred_labels")
+
+emb_db = SQLite(
+    path="cremi.zarr/emb.db",
+    edge_attrs={"affs_xy": "float", "affs_z": "float", "affs_long_xy": "float"},
+)
+emb_lut = LUT(
+    path="cremi.zarr/emb-lut",
+)
+
+unet = unet.eval()
+scripted_unet = torch.jit.script(module)
+torch.jit.save(scripted_unet, "cremi.zarr/emb_unet.pt")
+torch.save(scripted_unet.state_dict(), "cremi.zarr/emb_unet_state.pt")
+min_output_shape = Coordinate(unet.min_output_shape)
+emb_model = TorchModel(
+    in_channels=1,
+    min_input_shape=unet.min_input_shape,
+    min_output_shape=unet.min_output_shape,
+    min_step_shape=unet.equivariant_step,
+    out_channels=emb_dim,
+    out_range=(0.0, 1.0),
+    save_path="cremi.zarr/emb_unet.pt",
+    checkpoint_file="cremi.zarr/emb_unet_state.pt",
+    pred_size_growth=pred_size_growth,
+)
+
+min_output_shape = Coordinate(1, 1, 1)
+min_input_shape = min_output_shape + Coordinate(1, 23, 23) * 2
+torch.save(learned_affs, "cremi.zarr/learned_affs.pt")
+affs_model = TorchModel(
+    in_channels=emb_dim,
+    min_input_shape=min_output_shape + Coordinate(1, 23, 23) * 2,
+    min_output_shape=min_output_shape,
+    min_step_shape=Coordinate(1, 1, 1),
+    out_channels=len(neighborhood),
+    out_range=(0.0, 1.0),
+    save_path="cremi.zarr/learned_affs.pt",
+    pred_size_growth=pred_size_growth,
+)
+
+predict_emb = Predict(
+    checkpoint=emb_model,
+    in_data=raw_dataset,
+    out_data=[emb_dataset],
+)
+predict_affs = Predict(
+    checkpoint=affs_model,
+    in_data=emb_dataset,
+    out_data=[affs_dataset],
+)
+
+extract_frags = ExtractFrags(
+    db=emb_db,
+    affs_data=affs_dataset,
+    frags_data=frags_dataset,
+    block_size=blocksize,
+    context=Coordinate(16, 16, 16),
+    bias=[-0.5, -0.2, -0.2, -0.5, -0.5, -0.8, -0.8],
+    remove_debris=32,
+)
+aff_agglom = AffAgglom(
+    db=emb_db,
+    affs_data=affs_dataset,
+    frags_data=frags_dataset,
+    block_size=blocksize,
+    context=Coordinate(16, 16, 16),
+    scores={
+        "affs_z": [Coordinate(1, 0, 0)],
+        "affs_xy": [Coordinate(0, 1, 0), Coordinate(0, 0, 1)],
+        "affs_long_xy": [Coordinate(0, 7, 0), Coordinate(0, 0, 7)],
+    },
+)
+graph_mws = GraphMWS(
+    db=emb_db,
+    lut=emb_lut,
+    weights={
+        "affs_z": (1.0, -0.5),
+        "affs_xy": (1.0, -0.2),
+        "affs_long_xy": (1.0, -0.8),
+    },
+    roi=(raw_test.roi.offset, raw_test.roi.shape),
+)
+
+relabel = Relabel(
+    frags_data=frags_dataset,
+    seg_data=labels_dataset,
+    lut=emb_lut,
+    block_size=blocksize,
+)
+
+# pipeline = predict_emb + predict_affs + extract_frags + aff_agglom + graph_mws + relabel
+predict_emb.drop()
+predict_emb.run_blockwise(multiprocessing=False)
+# %%
+predict_affs.drop()
+predict_affs.run_blockwise(multiprocessing=False)
+# %%
+extract_frags.drop()
+extract_frags.run_blockwise(multiprocessing=False)
+# %%
+aff_agglom.drop()
+aff_agglom.run_blockwise(multiprocessing=False)
+# %%
+graph_mws.drop()
+graph_mws.run_blockwise(multiprocessing=False)
+# %%
+relabel.drop()
+relabel.run_blockwise(multiprocessing=False)
+
+
+
