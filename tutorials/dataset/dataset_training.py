@@ -63,6 +63,8 @@ raw_train, labels_train, raw_test, labels_test = cremi(Path("cremi.zarr"))
 # %%
 from dacapo_toolbox.vis.preview import gif_2d, cube
 
+# %%
+
 # create a 2D gif of the training data
 gif_2d(
     arrays={"Train Raw": raw_train, "Train Labels": labels_train},
@@ -170,6 +172,7 @@ cube(
 # ![simple-batch](_static/dataset_tutorial/simple-batch.gif)
 # ![simple-batch-cube](_static/dataset_tutorial/simple-batch.jpg)
 
+
 # %% [markdown]
 # ### Tasks
 # When training for instance segmentation, it is not possible to directly predict label ids since the ids have to be unique accross the full volume which is not possible to do with the local context that a UNet operates on. So instead we need to transform our labels into some intermediate representation that is both easy to predict and easy to post process. The most common method we use is a combination of [affinities](https://arxiv.org/pdf/1706.00120) with optional [lsds](https://github.com/funkelab/lsd) for prediction plus [mutex watershed](https://arxiv.org/abs/1904.12654) for post processing.
@@ -263,7 +266,6 @@ cube(
     filename="_static/dataset_tutorial/affs-batch.jpg",
     title="Affinities Batch",
 )
-
 
 # %% [markdown]
 # Here we visualize a batch with (raw, gt, target) triplets for the affinities task:
