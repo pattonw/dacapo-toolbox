@@ -72,10 +72,14 @@ class Affs(torch.nn.Module):
         self,
         neighborhood: Sequence[Sequence[int]],
         dist_func: str | Callable | list[Callable] = "equality",
+        pad: bool = True,
+        concat_dim: int = 0,
     ):
         super(Affs, self).__init__()
         self.neighborhood = neighborhood
         self.ndim = len(neighborhood[0])
+        self.pad = pad
+        self.concat_dim = concat_dim
         assert all(len(offset) == self.ndim for offset in neighborhood), (
             "All offsets in the neighborhood must have the same dimensionality."
         )
@@ -92,37 +96,58 @@ class Affs(torch.nn.Module):
         else:
             raise ValueError(f"Unknown distance function: {dist_func}")
 
-    def forward(self, x: torch.Tensor, concat_dim: int = 0) -> torch.Tensor:
-        if (not isinstance(self.dist_func, torch.nn.ModuleList)) and callable(self.dist_func):
-            return torch.stack(
-                [
-                    compute_affs(x, offset, self.dist_func, pad=True)
-                    for offset in self.neighborhood
-                ],
-                dim=concat_dim,
-            )
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if (not isinstance(self.dist_func, torch.nn.ModuleList)) and callable(
+            self.dist_func
+        ):
+            dist_funcs = [self.dist_func] * len(self.neighborhood)
         else:
-            return torch.stack(
-                [
-                    compute_affs(x, offset, dist_func, pad=True)
-                    for offset, dist_func in zip(self.neighborhood, self.dist_func)
-                ],
-                dim=concat_dim,
-            )
+            dist_funcs = self.dist_func
+
+        affs = [
+            compute_affs(x, offset, dist_func, pad=self.pad)
+            for offset, dist_func in zip(self.neighborhood, dist_funcs)
+        ]
+        if self.pad:
+            out = torch.stack(affs, dim=self.concat_dim)
+        else:
+            # Find minimum shape along each axis
+            shapes = [torch.tensor(aff.shape) for aff in affs]
+            min_shape = torch.stack(shapes).min(dim=0).values.tolist()
+
+            # Crop all tensors to min_shape
+            affs = [aff[tuple(slice(0, s) for s in min_shape)] for aff in affs]
+            out = torch.stack(affs, dim=self.concat_dim)
+        return out
 
 
 class AffsMask(torch.nn.Module):
-    def __init__(self, neighborhood: Sequence[Sequence[int]]):
+    def __init__(
+        self,
+        neighborhood: Sequence[Sequence[int]],
+        pad=True,
+    ):
         super(AffsMask, self).__init__()
         self.neighborhood = neighborhood
         self.dist_func = no_bg_dist_func
+        self.pad = pad
 
     def forward(self, mask: torch.Tensor) -> torch.Tensor:
         y = mask.int() > 0
-        return torch.stack(
-            [
-                compute_affs(y, offset, self.dist_func, pad=True)
-                for offset in self.neighborhood
-            ],
-            dim=0,
-        )
+        affs = [
+            compute_affs(y, offset, self.dist_func, pad=self.pad)
+            for offset in self.neighborhood
+        ]
+        if self.pad:
+            return torch.stack(affs, dim=0)
+        else:
+            # Find minimum shape along each axis
+            min_shape = (
+                torch.stack([torch.tensor(aff.shape) for aff in affs])
+                .min(dim=0)
+                .values.tolist()
+            )
+
+            # Crop all tensors to min_shape
+            affs = [aff[tuple(slice(0, s) for s in min_shape)] for aff in affs]
+            return torch.stack(affs)
