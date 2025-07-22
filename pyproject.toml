@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "edt>=3.0.0",
+    "funlib-geometry",
     "funlib-persistence>=0.6",
     "gunpowder>=1.4.0",
     "scikit-learn>=1.7.1",
@@ -65,3 +66,4 @@ per-file-ignores = { "tutorials/*.py" = ["E402"] }
 gunpowder = { git = "https://github.com/funkelab/gunpowder", rev = "patch-1.4.2" }
 volara = { git = "https://github.com/e11bio/volara", rev = "benchmarking" }
 volara-torch = { git = "https://github.com/e11bio/volara-torch", rev = "bugfix" }
+funlib-geometry = { git = "https://github.com/funkelab/funlib.geometry", rev = "float-coords" }

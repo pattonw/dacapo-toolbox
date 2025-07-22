@@ -16,7 +16,7 @@ import time
 from typing import Any
 import functools
 from dataclasses import dataclass
-from .tmp import gcd
+from .tmp import gcd, int_scale
 from typing import Callable
 
 logger = logging.getLogger(__name__)
@@ -163,7 +163,7 @@ class DeformAugmentConfig:
     This includes scaling, rotation, and elastic deformations.
     See https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/deform_augment.py
     for more details.
-    
+
     Parameters:
         :param p: Probability of applying the augmentations.
         :param control_point_spacing: Spacing of the control points for the elastic deformation.
@@ -174,6 +174,7 @@ class DeformAugmentConfig:
         :param spatial_dims: Number of spatial dimensions.
         :param rotation_axes: Axes around which to rotate. If None, rotates around all axes.
     """
+
     p: float = 0.0
     control_point_spacing: Sequence[int] | None = None
     jitter_sigma: Sequence[float] | None = None
@@ -241,6 +242,27 @@ def iterable_dataset(
         "The key 'ROI_MASK' is reserved for internal use. "
         "Please use a different key for your dataset."
     )
+
+    multiple = int_scale(
+        [array.voxel_size for array in datasets.values() if isinstance(array, Array)]
+    )
+    datasets = {
+        name: Array(
+            array.data,
+            voxel_size=(array.voxel_size * multiple).round().astype(int),
+            offset=(
+                (array.offset / array.voxel_size)
+                * (array.voxel_size * multiple).round().astype(int)
+            )
+            .round()
+            .astype(int),
+            units=array.units,
+            axis_names=array.axis_names,
+            types=array.types,
+        )
+        for name, array in datasets.items()
+        if isinstance(array, Array)
+    }
 
     if interpolatable is None:
         interpolatable = {}
@@ -466,6 +488,21 @@ def iterable_dataset(
         roi_mask_key,
         crop_voxel_size,
     )
+
+    for k, v in request.items():
+        if isinstance(v, gp.ArraySpec):
+            v.roi = Roi(v.roi.offset.astype(int), v.roi.shape.astype(int))
+            v.voxel_size = (
+                v.voxel_size.astype(int)
+                if v.voxel_size is not None
+                else Coordinate((1,) * v.roi.dims)
+            )
+        elif isinstance(v, gp.GraphSpec):
+            v.roi = (
+                Roi(v.roi.offset.astype(int), v.roi.shape.astype(int))
+                if v.roi is not None
+                else None
+            )
 
     # Build the pipeline
     gp.build(pipeline).__enter__()
