@@ -39,6 +39,11 @@ docs = [
     "volara-torch>=1.0.0",
     "wget>=3.2",
     "jupytext>=1.17.2",
+    "sphinx-autodoc-typehints>=2.0",
+    "sphinx-material>=0.0.36",
+    "sphinx-click>=6.0",
+    "sphinx-rtd-theme>=2.0",
+    "nbsphinx>=0.9.7",
 ]
 
 [tool.mypy]
