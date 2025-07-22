@@ -1,5 +1,6 @@
 import torch
 
+
 class DistanceHead(torch.nn.Module):
     def __init__(self, in_channels: int = 12, incr_factor: int = 12, dims: int = 3):
         super().__init__()
