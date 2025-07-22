@@ -52,7 +52,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/minimal_tutorial/minimal_tutorial.html">Cremi Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#dataset">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#transforms">Transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#visualizations">Visualizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#sample-data">Sample Data</a></li>
 </ul>
 
         </div>
@@ -83,13 +86,11 @@
 <span id="sec-overview"></span><h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
 <section id="what-is-the-dacapo-toolbox">
 <h2>What is the DaCapo Toolbox?<a class="headerlink" href="#what-is-the-dacapo-toolbox" title="Link to this heading"></a></h2>
-<p>The DaCapo Toolbox contains the building blocks that the DaCapo framework uses to run training
-for large scale volumetric deep learning.</p>
-<p>These include:
-- Architectures: Configurable classes for building common neural networks such as UNets
-- DataSplits: Configurable classes for splitting data into training, validation, and test sets
-- Tasks: Configurable classes for defining transformations between ground truth and differentiable targets and back
-- Trainers: Configurable classes for defining augmentations</p>
+<p>The DaCapo Toolbox contains a set of convenient tools for training neural networks on large microscopy datasets.
+Specifically it focuses on providing a simple interface to many tools and techniques with an emphasis on
+common interfaces such as torch/numpy/dask and other common scientific computing packages.
+The main exception to this is the <cite>funlib.persistence.Array</cite> object. A thin wrapper around a <cite>dask</cite> array with
+added metadata necessary for reliable training on diverse microscopy datasets.</p>
 </section>
 </section>
 

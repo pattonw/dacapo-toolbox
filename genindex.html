@@ -46,7 +46,10 @@
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials/minimal_tutorial/minimal_tutorial.html">Cremi Example</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#dataset">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#transforms">Transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#visualizations">Visualizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#sample-data">Sample Data</a></li>
 </ul>
 
         </div>
@@ -76,52 +79,29 @@
 <h1 id="index">Index</h1>
 
 <div class="genindex-jumpbox">
- <a href="#_"><strong>_</strong></a>
- | <a href="#A"><strong>A</strong></a>
+ <a href="#A"><strong>A</strong></a>
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
- | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
- | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#S"><strong>S</strong></a>
- | <a href="#T"><strong>T</strong></a>
- | <a href="#U"><strong>U</strong></a>
- | <a href="#V"><strong>V</strong></a>
- | <a href="#W"><strong>W</strong></a>
  
 </div>
-<h2 id="_">_</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.datasplits.TrainValidateDataSplitConfig.__init__">__init__() (dacapo_toolbox.datasplits.TrainValidateDataSplitConfig method)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig._eval_shape_increase">_eval_shape_increase (dacapo_toolbox.architectures.CNNectomeUNetConfig attribute)</a>
-</li>
-  </ul></td>
-</tr></table>
-
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.AffinitiesTaskConfig">AffinitiesTaskConfig (class in dacapo_toolbox.tasks)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.tasks.AffinitiesTaskConfig.affs_weight_clipmax">affs_weight_clipmax (dacapo_toolbox.tasks.AffinitiesTaskConfig attribute)</a>
+      <li><a href="api.html#dacapo_toolbox.transforms.affs.Affs">Affs (class in dacapo_toolbox.transforms.affs)</a>, <a href="api.html#id5">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.AffinitiesTaskConfig.affs_weight_clipmin">affs_weight_clipmin (dacapo_toolbox.tasks.AffinitiesTaskConfig attribute)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.architecture_type">architecture_type() (dacapo_toolbox.architectures.CNNectomeUNetConfig method)</a>
+      <li><a href="api.html#dacapo_toolbox.transforms.affs.AffsMask">AffsMask (class in dacapo_toolbox.transforms.affs)</a>, <a href="api.html#id7">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -129,7 +109,11 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.AffinitiesTaskConfig.background_as_object">background_as_object (dacapo_toolbox.tasks.AffinitiesTaskConfig attribute)</a>
+      <li><a href="api.html#dacapo_toolbox.transforms.weight_balancing.balance_weights">balance_weights() (in module dacapo_toolbox.transforms.weight_balancing)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#dacapo_toolbox.transforms.weight_balancing.BalanceLabels">BalanceLabels (class in dacapo_toolbox.transforms.weight_balancing)</a>, <a href="api.html#id16">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -137,33 +121,13 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.DistanceTaskConfig.channels">channels (dacapo_toolbox.tasks.DistanceTaskConfig attribute)</a>
-
-      <ul>
-        <li><a href="api.html#dacapo_toolbox.tasks.HotDistanceTaskConfig.channels">(dacapo_toolbox.tasks.HotDistanceTaskConfig attribute)</a>
+      <li><a href="api.html#dacapo_toolbox.transforms.affs.compute_affs">compute_affs() (in module dacapo_toolbox.transforms.affs)</a>
 </li>
-        <li><a href="api.html#dacapo_toolbox.tasks.InnerDistanceTaskConfig.channels">(dacapo_toolbox.tasks.InnerDistanceTaskConfig attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="api.html#dacapo_toolbox.tasks.OneHotTaskConfig.classes">classes (dacapo_toolbox.tasks.OneHotTaskConfig attribute)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.tasks.DistanceTaskConfig.clip_distance">clip_distance (dacapo_toolbox.tasks.DistanceTaskConfig attribute)</a>
-
-      <ul>
-        <li><a href="api.html#dacapo_toolbox.tasks.HotDistanceTaskConfig.clip_distance">(dacapo_toolbox.tasks.HotDistanceTaskConfig attribute)</a>
-</li>
-        <li><a href="api.html#dacapo_toolbox.tasks.InnerDistanceTaskConfig.clip_distance">(dacapo_toolbox.tasks.InnerDistanceTaskConfig attribute)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.DistanceTaskConfig.clipmax">clipmax (dacapo_toolbox.tasks.DistanceTaskConfig attribute)</a>
+      <li><a href="api.html#dacapo_toolbox.sample_datasets.cremi">cremi() (in module dacapo_toolbox.sample_datasets)</a>, <a href="api.html#id18">[1]</a>
 </li>
-      <li><a href="api.html#dacapo_toolbox.tasks.DistanceTaskConfig.clipmin">clipmin (dacapo_toolbox.tasks.DistanceTaskConfig attribute)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig">CNNectomeUNetConfig (class in dacapo_toolbox.architectures)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.constant_upsample">constant_upsample (dacapo_toolbox.architectures.CNNectomeUNetConfig attribute)</a>
+      <li><a href="api.html#dacapo_toolbox.vis.preview.cube">cube() (in module dacapo_toolbox.vis.preview)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -172,40 +136,66 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    dacapo_toolbox.architectures
+    dacapo_toolbox.dataset
 
       <ul>
-        <li><a href="api.html#module-dacapo_toolbox.architectures">module</a>
+        <li><a href="api.html#module-dacapo_toolbox.dataset">module</a>
 </li>
       </ul></li>
       <li>
-    dacapo_toolbox.datasplits
+    dacapo_toolbox.sample_datasets
 
       <ul>
-        <li><a href="api.html#module-dacapo_toolbox.datasplits">module</a>
+        <li><a href="api.html#module-dacapo_toolbox.sample_datasets">module</a>
 </li>
       </ul></li>
       <li>
-    dacapo_toolbox.tasks
+    dacapo_toolbox.transforms
 
       <ul>
-        <li><a href="api.html#module-dacapo_toolbox.tasks">module</a>
+        <li><a href="api.html#module-dacapo_toolbox.transforms">module</a>
+</li>
+      </ul></li>
+      <li>
+    dacapo_toolbox.transforms.affs
+
+      <ul>
+        <li><a href="api.html#module-dacapo_toolbox.transforms.affs">module</a>
+</li>
+      </ul></li>
+      <li>
+    dacapo_toolbox.transforms.distances
+
+      <ul>
+        <li><a href="api.html#module-dacapo_toolbox.transforms.distances">module</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    dacapo_toolbox.trainers
+    dacapo_toolbox.transforms.lsds
 
       <ul>
-        <li><a href="api.html#module-dacapo_toolbox.trainers">module</a>
+        <li><a href="api.html#module-dacapo_toolbox.transforms.lsds">module</a>
 </li>
       </ul></li>
-      <li><a href="api.html#dacapo_toolbox.tasks.DistanceTaskConfig">DistanceTaskConfig (class in dacapo_toolbox.tasks)</a>
+      <li>
+    dacapo_toolbox.transforms.weight_balancing
+
+      <ul>
+        <li><a href="api.html#module-dacapo_toolbox.transforms.weight_balancing">module</a>
 </li>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.downsample_factors">downsample_factors (dacapo_toolbox.architectures.CNNectomeUNetConfig attribute)</a>
+      </ul></li>
+      <li>
+    dacapo_toolbox.vis.preview
+
+      <ul>
+        <li><a href="api.html#module-dacapo_toolbox.vis.preview">module</a>
 </li>
-      <li><a href="api.html#dacapo_toolbox.tasks.AffinitiesTaskConfig.downsample_lsds">downsample_lsds (dacapo_toolbox.tasks.AffinitiesTaskConfig attribute)</a>
+      </ul></li>
+      <li><a href="api.html#dacapo_toolbox.dataset.DeformAugmentConfig">DeformAugmentConfig (class in dacapo_toolbox.dataset)</a>, <a href="api.html#id2">[1]</a>
+</li>
+      <li><a href="api.html#dacapo_toolbox.transforms.lsds.deriv_based_covariance">deriv_based_covariance() (in module dacapo_toolbox.transforms.lsds)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -213,29 +203,33 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.fmap_inc_factor">fmap_inc_factor (dacapo_toolbox.architectures.CNNectomeUNetConfig attribute)</a>
+      <li><a href="api.html#dacapo_toolbox.transforms.affs.Affs.forward">forward() (dacapo_toolbox.transforms.affs.Affs method)</a>, <a href="api.html#id6">[1]</a>
+
+      <ul>
+        <li><a href="api.html#dacapo_toolbox.transforms.affs.AffsMask.forward">(dacapo_toolbox.transforms.affs.AffsMask method)</a>, <a href="api.html#id8">[1]</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.fmaps_in">fmaps_in (dacapo_toolbox.architectures.CNNectomeUNetConfig attribute)</a>
+        <li><a href="api.html#dacapo_toolbox.transforms.distances.SDTBoundaryMask.forward">(dacapo_toolbox.transforms.distances.SDTBoundaryMask method)</a>, <a href="api.html#id12">[1]</a>
 </li>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.fmaps_out">fmaps_out (dacapo_toolbox.architectures.CNNectomeUNetConfig attribute)</a>
+        <li><a href="api.html#dacapo_toolbox.transforms.distances.SignedDistanceTransform.forward">(dacapo_toolbox.transforms.distances.SignedDistanceTransform method)</a>, <a href="api.html#id10">[1]</a>
 </li>
+        <li><a href="api.html#dacapo_toolbox.transforms.lsds.LSD.forward">(dacapo_toolbox.transforms.lsds.LSD method)</a>, <a href="api.html#id14">[1]</a>
+</li>
+        <li><a href="api.html#dacapo_toolbox.transforms.weight_balancing.BalanceLabels.forward">(dacapo_toolbox.transforms.weight_balancing.BalanceLabels method)</a>, <a href="api.html#id17">[1]</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.trainers.GunpowderTrainerConfig">GunpowderTrainerConfig (class in dacapo_toolbox.trainers)</a>
+      <li><a href="api.html#dacapo_toolbox.transforms.lsds.get_local_shape_descriptors">get_local_shape_descriptors() (in module dacapo_toolbox.transforms.lsds)</a>, <a href="api.html#id15">[1]</a>
 </li>
   </ul></td>
-</tr></table>
-
-<h2 id="H">H</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.HotDistanceTaskConfig">HotDistanceTaskConfig (class in dacapo_toolbox.tasks)</a>
+      <li><a href="api.html#dacapo_toolbox.vis.preview.gif_2d">gif_2d() (in module dacapo_toolbox.vis.preview)</a>
+</li>
+      <li><a href="api.html#dacapo_toolbox.dataset.gp_to_nx_graph">gp_to_nx_graph() (in module dacapo_toolbox.dataset)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -243,35 +237,11 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.InnerDistanceTaskConfig">InnerDistanceTaskConfig (class in dacapo_toolbox.tasks)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.input_shape">input_shape (dacapo_toolbox.architectures.CNNectomeUNetConfig attribute)</a>
-
-      <ul>
-        <li><a href="api.html#id0">(dacapo_toolbox.architectures.CNNectomeUNetConfig property)</a>
-</li>
-        <li><a href="api.html#dacapo_toolbox.architectures.ModelZooConfig.input_shape">(dacapo_toolbox.architectures.ModelZooConfig property)</a>
-</li>
-        <li><a href="api.html#dacapo_toolbox.architectures.WrappedArchitectureConfig.input_shape">(dacapo_toolbox.architectures.WrappedArchitectureConfig property)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.inv_scale">inv_scale() (dacapo_toolbox.architectures.CNNectomeUNetConfig method)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.trainers.GunpowderTrainerConfig.iterable_dataset">iterable_dataset() (dacapo_toolbox.trainers.GunpowderTrainerConfig method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="K">K</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.kernel_size_down">kernel_size_down (dacapo_toolbox.architectures.CNNectomeUNetConfig attribute)</a>
+      <li><a href="api.html#id0">iterable_dataset (class in dacapo_toolbox.dataset)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.kernel_size_up">kernel_size_up (dacapo_toolbox.architectures.CNNectomeUNetConfig attribute)</a>
+      <li><a href="api.html#dacapo_toolbox.dataset.iterable_dataset">iterable_dataset() (in module dacapo_toolbox.dataset)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -279,15 +249,7 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.AffinitiesTaskConfig.lsd_weight_clipmax">lsd_weight_clipmax (dacapo_toolbox.tasks.AffinitiesTaskConfig attribute)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.tasks.AffinitiesTaskConfig.lsd_weight_clipmin">lsd_weight_clipmin (dacapo_toolbox.tasks.AffinitiesTaskConfig attribute)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.AffinitiesTaskConfig.lsds">lsds (dacapo_toolbox.tasks.AffinitiesTaskConfig attribute)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.tasks.AffinitiesTaskConfig.lsds_to_affs_weight_ratio">lsds_to_affs_weight_ratio (dacapo_toolbox.tasks.AffinitiesTaskConfig attribute)</a>
+      <li><a href="api.html#dacapo_toolbox.transforms.lsds.LSD">LSD (class in dacapo_toolbox.transforms.lsds)</a>, <a href="api.html#id13">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -295,35 +257,27 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.DistanceTaskConfig.mask_distances">mask_distances (dacapo_toolbox.tasks.DistanceTaskConfig attribute)</a>
-
-      <ul>
-        <li><a href="api.html#dacapo_toolbox.tasks.HotDistanceTaskConfig.mask_distances">(dacapo_toolbox.tasks.HotDistanceTaskConfig attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="api.html#dacapo_toolbox.architectures.ModelZooConfig">ModelZooConfig (class in dacapo_toolbox.architectures)</a>
+      <li><a href="api.html#dacapo_toolbox.dataset.MaskedSampling">MaskedSampling (class in dacapo_toolbox.dataset)</a>, <a href="api.html#id3">[1]</a>
 </li>
       <li>
     module
 
       <ul>
-        <li><a href="api.html#module-dacapo_toolbox.architectures">dacapo_toolbox.architectures</a>
+        <li><a href="api.html#module-dacapo_toolbox.dataset">dacapo_toolbox.dataset</a>
 </li>
-        <li><a href="api.html#module-dacapo_toolbox.datasplits">dacapo_toolbox.datasplits</a>
+        <li><a href="api.html#module-dacapo_toolbox.sample_datasets">dacapo_toolbox.sample_datasets</a>
 </li>
-        <li><a href="api.html#module-dacapo_toolbox.tasks">dacapo_toolbox.tasks</a>
+        <li><a href="api.html#module-dacapo_toolbox.transforms">dacapo_toolbox.transforms</a>
 </li>
-        <li><a href="api.html#module-dacapo_toolbox.trainers">dacapo_toolbox.trainers</a>
+        <li><a href="api.html#module-dacapo_toolbox.transforms.affs">dacapo_toolbox.transforms.affs</a>
 </li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.module">module() (dacapo_toolbox.architectures.CNNectomeUNetConfig method)</a>
-
-      <ul>
-        <li><a href="api.html#dacapo_toolbox.architectures.ModelZooConfig.module">(dacapo_toolbox.architectures.ModelZooConfig method)</a>
+        <li><a href="api.html#module-dacapo_toolbox.transforms.distances">dacapo_toolbox.transforms.distances</a>
 </li>
-        <li><a href="api.html#dacapo_toolbox.architectures.WrappedArchitectureConfig.module">(dacapo_toolbox.architectures.WrappedArchitectureConfig method)</a>
+        <li><a href="api.html#module-dacapo_toolbox.transforms.lsds">dacapo_toolbox.transforms.lsds</a>
+</li>
+        <li><a href="api.html#module-dacapo_toolbox.transforms.weight_balancing">dacapo_toolbox.transforms.weight_balancing</a>
+</li>
+        <li><a href="api.html#module-dacapo_toolbox.vis.preview">dacapo_toolbox.vis.preview</a>
 </li>
       </ul></li>
   </ul></td>
@@ -332,39 +286,15 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.AffinitiesTaskConfig.neighborhood">neighborhood (dacapo_toolbox.tasks.AffinitiesTaskConfig attribute)</a>
+      <li><a href="api.html#dacapo_toolbox.dataset.nx_to_gp_graph">nx_to_gp_graph() (in module dacapo_toolbox.dataset)</a>
 </li>
-      <li><a href="api.html#dacapo_toolbox.tasks.OneHotTaskConfig.None">None() (dacapo_toolbox.tasks.OneHotTaskConfig method)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.num_fmaps">num_fmaps (dacapo_toolbox.architectures.CNNectomeUNetConfig attribute)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.num_in_channels">num_in_channels (dacapo_toolbox.architectures.CNNectomeUNetConfig property)</a>
-
-      <ul>
-        <li><a href="api.html#dacapo_toolbox.architectures.ModelZooConfig.num_in_channels">(dacapo_toolbox.architectures.ModelZooConfig property)</a>
-</li>
-        <li><a href="api.html#dacapo_toolbox.architectures.WrappedArchitectureConfig.num_in_channels">(dacapo_toolbox.architectures.WrappedArchitectureConfig property)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.AffinitiesTaskConfig.num_lsd_voxels">num_lsd_voxels (dacapo_toolbox.tasks.AffinitiesTaskConfig attribute)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.num_out_channels">num_out_channels (dacapo_toolbox.architectures.CNNectomeUNetConfig property)</a>
-
-      <ul>
-        <li><a href="api.html#dacapo_toolbox.architectures.ModelZooConfig.num_out_channels">(dacapo_toolbox.architectures.ModelZooConfig property)</a>
-</li>
-        <li><a href="api.html#dacapo_toolbox.architectures.WrappedArchitectureConfig.num_out_channels">(dacapo_toolbox.architectures.WrappedArchitectureConfig property)</a>
-</li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.OneHotTaskConfig">OneHotTaskConfig (class in dacapo_toolbox.tasks)</a>
+      <li><a href="api.html#dacapo_toolbox.transforms.lsds.outer_product">outer_product() (in module dacapo_toolbox.transforms.lsds)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -372,7 +302,11 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.padding">padding (dacapo_toolbox.architectures.CNNectomeUNetConfig attribute)</a>
+      <li><a href="api.html#dacapo_toolbox.dataset.PipelineDataset">PipelineDataset (class in dacapo_toolbox.dataset)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#dacapo_toolbox.dataset.PointSampling">PointSampling (class in dacapo_toolbox.dataset)</a>, <a href="api.html#id4">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -380,97 +314,13 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.scale">scale() (dacapo_toolbox.architectures.CNNectomeUNetConfig method)</a>
-
-      <ul>
-        <li><a href="api.html#dacapo_toolbox.architectures.ModelZooConfig.scale">(dacapo_toolbox.architectures.ModelZooConfig method)</a>
-</li>
-        <li><a href="api.html#dacapo_toolbox.architectures.WrappedArchitectureConfig.scale">(dacapo_toolbox.architectures.WrappedArchitectureConfig method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.DistanceTaskConfig.scale_factor">scale_factor (dacapo_toolbox.tasks.DistanceTaskConfig attribute)</a>
-
-      <ul>
-        <li><a href="api.html#dacapo_toolbox.tasks.HotDistanceTaskConfig.scale_factor">(dacapo_toolbox.tasks.HotDistanceTaskConfig attribute)</a>
-</li>
-        <li><a href="api.html#dacapo_toolbox.tasks.InnerDistanceTaskConfig.scale_factor">(dacapo_toolbox.tasks.InnerDistanceTaskConfig attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="api.html#dacapo_toolbox.datasplits.SimpleDataSplitConfig">SimpleDataSplitConfig (class in dacapo_toolbox.datasplits)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="T">T</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.AffinitiesTaskConfig.task_type">task_type (dacapo_toolbox.tasks.AffinitiesTaskConfig attribute)</a>
-
-      <ul>
-        <li><a href="api.html#dacapo_toolbox.tasks.DistanceTaskConfig.task_type">(dacapo_toolbox.tasks.DistanceTaskConfig attribute)</a>
-</li>
-        <li><a href="api.html#dacapo_toolbox.tasks.HotDistanceTaskConfig.task_type">(dacapo_toolbox.tasks.HotDistanceTaskConfig attribute)</a>, <a href="api.html#id1">[1]</a>
-</li>
-        <li><a href="api.html#dacapo_toolbox.tasks.InnerDistanceTaskConfig.task_type">(dacapo_toolbox.tasks.InnerDistanceTaskConfig attribute)</a>
-</li>
-        <li><a href="api.html#dacapo_toolbox.tasks.OneHotTaskConfig.task_type">(dacapo_toolbox.tasks.OneHotTaskConfig attribute)</a>, <a href="api.html#id2">[1]</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.tasks.DistanceTaskConfig.tol_distance">tol_distance (dacapo_toolbox.tasks.DistanceTaskConfig attribute)</a>
-
-      <ul>
-        <li><a href="api.html#dacapo_toolbox.tasks.HotDistanceTaskConfig.tol_distance">(dacapo_toolbox.tasks.HotDistanceTaskConfig attribute)</a>
-</li>
-        <li><a href="api.html#dacapo_toolbox.tasks.InnerDistanceTaskConfig.tol_distance">(dacapo_toolbox.tasks.InnerDistanceTaskConfig attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="api.html#dacapo_toolbox.datasplits.TrainValidateDataSplitConfig.train_configs">train_configs (dacapo_toolbox.datasplits.TrainValidateDataSplitConfig attribute)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.datasplits.TrainValidateDataSplitConfig">TrainValidateDataSplitConfig (class in dacapo_toolbox.datasplits)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="U">U</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.upsample_factors">upsample_factors (dacapo_toolbox.architectures.CNNectomeUNetConfig attribute)</a>
+      <li><a href="api.html#dacapo_toolbox.transforms.distances.SDTBoundaryMask">SDTBoundaryMask (class in dacapo_toolbox.transforms.distances)</a>, <a href="api.html#id11">[1]</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.architectures.CNNectomeUNetConfig.use_attention">use_attention (dacapo_toolbox.architectures.CNNectomeUNetConfig attribute)</a>
+      <li><a href="api.html#dacapo_toolbox.transforms.distances.SignedDistanceTransform">SignedDistanceTransform (class in dacapo_toolbox.transforms.distances)</a>, <a href="api.html#id9">[1]</a>
 </li>
-  </ul></td>
-</tr></table>
-
-<h2 id="V">V</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.datasplits.TrainValidateDataSplitConfig.validate_configs">validate_configs (dacapo_toolbox.datasplits.TrainValidateDataSplitConfig attribute)</a>
-</li>
-      <li><a href="api.html#dacapo_toolbox.tasks.AffinitiesTaskConfig.verify">verify() (dacapo_toolbox.tasks.AffinitiesTaskConfig method)</a>
-
-      <ul>
-        <li><a href="api.html#dacapo_toolbox.tasks.DistanceTaskConfig.verify">(dacapo_toolbox.tasks.DistanceTaskConfig method)</a>
-</li>
-        <li><a href="api.html#dacapo_toolbox.tasks.HotDistanceTaskConfig.verify">(dacapo_toolbox.tasks.HotDistanceTaskConfig method)</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.trainers.GunpowderTrainerConfig.visualize_pipeline">visualize_pipeline() (dacapo_toolbox.trainers.GunpowderTrainerConfig method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="W">W</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api.html#dacapo_toolbox.architectures.WrappedArchitectureConfig">WrappedArchitectureConfig (class in dacapo_toolbox.architectures)</a>
+      <li><a href="api.html#dacapo_toolbox.dataset.SimpleAugmentConfig">SimpleAugmentConfig (class in dacapo_toolbox.dataset)</a>, <a href="api.html#id1">[1]</a>
 </li>
   </ul></td>
 </tr></table>
