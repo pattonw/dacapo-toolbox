@@ -338,8 +338,8 @@ from dacapo_toolbox.dataset import (
     DeformAugmentConfig,
     MaskedSampling,
     PointSampling,
+    nx_to_gp_graph,
 )
-from dacapo_toolbox.utils import points_to_graph
 from dacapo_toolbox.transforms.affs import Affs, AffsMask
 from funlib.persistence import Array
 from skimage import data
@@ -379,7 +379,20 @@ gt_b_s1 = Array(blobs_b_gt[::4, ::4], offset=(0, 0), voxel_size=(8, 8))
 mask_a = Array(mask, offset=(0, 0), voxel_size=(1, 1))
 mask_b = Array(mask, offset=(0, 0), voxel_size=(2, 2))
 
-sample_points = []
+g = nx.Graph()
+g.add_nodes_from(
+    [
+        (i, {"position": position})
+        for i, position in enumerate(
+            [
+                (side_length * 2, side_length * 2),
+                (0, side_length * 2),
+                (side_length * 2, 0),
+                (0, 0),
+            ]
+        )
+    ]
+)
 
 # defining the datasets
 iter_ds = iterable_dataset(
@@ -390,19 +403,7 @@ iter_ds = iterable_dataset(
         "gt_s1": [gt_a_s1, gt_b_s1],
         "mask": [mask_a, mask_b],
         "mask_dummy": [mask_a, mask_b],
-        "sample_points": [
-            None,
-            points_to_graph(
-                np.array(
-                    [
-                        (side_length * 2, side_length * 2),
-                        (0, side_length * 2),
-                        (side_length * 2, 0),
-                        (0, 0),
-                    ]
-                )
-            ),
-        ],
+        "sample_points": [None, g],
     },
     shapes={
         "raw_s0": (128 * 5, 128 * 5),
@@ -445,7 +446,7 @@ import matplotlib.pyplot as plt
 
 for i, batch in enumerate(iter_ds):
     print(f"Batch {i}")
-    if i >= 8:  # Limit to 4 batches for demonstration
+    if i >= 6:  # Limit to 4 batches for demonstration
         break
     points = batch["sample_points"]
     xs = np.array([attrs["position"][0] for attrs in points.nodes.values()])
@@ -473,6 +474,13 @@ for i, batch in enumerate(iter_ds):
     axs[0, 3].set_title("Affs Mask")
     axs[0, 4].set_title("Mask")
 
-    plt.savefig(f"affs_batch_{i}.png")
+    plt.savefig(f"_static/dataset_overview/affs_batch_{i}.png")
 
-# %%
+# %% [markdown]
+# Visualize the batches:
+# ![Affs Batch 0](_static/dataset_overview/affs_batch_0.png)
+# ![Affs Batch 1](_static/dataset_overview/affs_batch_1.png)
+# ![Affs Batch 2](_static/dataset_overview/affs_batch_2.png)
+# ![Affs Batch 3](_static/dataset_overview/affs_batch_3.png)
+# ![Affs Batch 4](_static/dataset_overview/affs_batch_4.png)
+# ![Affs Batch 5](_static/dataset_overview/affs_batch_5.png)
