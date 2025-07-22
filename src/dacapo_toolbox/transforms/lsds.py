@@ -12,19 +12,30 @@ logger = logging.getLogger(__name__)
 
 
 class LSD(torch.nn.Module):
+    """
+    Compute local shape descriptors (LSD) for a segmentation.
+
+    
+    Parameters:
+        :param sigma: The gaussian kernel sigma to consider for the local shape descriptor.
+        :param voxel_size: The voxel size of the segmentation. Defaults to 1 per axis.
+        :param labels: Restrict the computation to the given labels. Defaults to all
+            labels inside the ROI of the segmentation.
+        :param downsample: Compute the local shape descriptor on a downsampled volume for
+            faster processing. Defaults to 1 (no downsampling).
+        
+    """
     def __init__(
         self,
         sigma: float | Sequence[float],
         voxel_size=None,
         labels=None,
-        mode="gaussian",
         downsample=1,
     ):
         super().__init__()
         self.sigma = sigma
         self.voxel_size = voxel_size
         self.labels = labels
-        self.mode = mode
         self.downsample = downsample
 
     def forward(self, segmentation: torch.Tensor) -> torch.Tensor:

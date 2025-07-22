@@ -136,6 +136,8 @@ class SimpleAugmentConfig:
     """
     The simple augment handles non-interpolating geometric transformations.
     This includes mirroring and transposing in n-dimensional space.
+    See https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/simple_augment.py
+    for more details.
 
     Parameters:
         :param p: Probability of applying the augmentations.
@@ -156,6 +158,22 @@ class SimpleAugmentConfig:
 
 @dataclass
 class DeformAugmentConfig:
+    """
+    The deform augment handles interpolating geometric transformations.
+    This includes scaling, rotation, and elastic deformations.
+    See https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/deform_augment.py
+    for more details.
+    
+    Parameters:
+        :param p: Probability of applying the augmentations.
+        :param control_point_spacing: Spacing of the control points for the elastic deformation.
+        :param jitter_sigma: Standard deviation of the Gaussian noise added to the control points.
+        :param scale_interval: Interval for scaling the input data.
+        :param rotate: Whether to apply random rotations.
+        :param subsample: Subsampling factor for the control points.
+        :param spatial_dims: Number of spatial dimensions.
+        :param rotation_axes: Axes around which to rotate. If None, rotates around all axes.
+    """
     p: float = 0.0
     control_point_spacing: Sequence[int] | None = None
     jitter_sigma: Sequence[float] | None = None

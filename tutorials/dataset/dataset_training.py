@@ -601,9 +601,11 @@ from funlib.persistence import open_ds
 
 affs = open_ds("cremi.zarr/test/affs")
 affs.lazy_op(lambda x: x[[0, 3, 4]] / 255.0)
+raw = open_ds("cremi.zarr/test/raw")
+raw.lazy_op(large_eval_roi)
 gif_2d(
     arrays={
-        "Raw": open_ds("cremi.zarr/test/raw"),
+        "Raw": raw,
         "Affs": affs,
         "Frags": open_ds("cremi.zarr/test/frags"),
         "Pred Labels": open_ds("cremi.zarr/test/pred_labels"),
@@ -991,9 +993,11 @@ from funlib.persistence import open_ds
 
 emb_affs = open_ds("cremi.zarr/test/emb_affs")
 emb_affs.lazy_op(lambda x: x[[0, 3, 4]] / 255.0)
+raw = open_ds("cremi.zarr/test/raw")
+raw.lazy_op(large_eval_roi)
 gif_2d(
     arrays={
-        "Raw": open_ds("cremi.zarr/test/raw"),
+        "Raw": raw,
         "Emb": open_ds("cremi.zarr/test/emb"),
         "Affs": emb_affs,
         "Frags": open_ds("cremi.zarr/test/emb_frags"),

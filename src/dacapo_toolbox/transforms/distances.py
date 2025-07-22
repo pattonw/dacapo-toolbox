@@ -4,7 +4,12 @@ from edt import edt
 
 
 class SignedDistanceTransform(torch.nn.Module):
-    def __init__(self, sigma=10.0):
+    """
+    Computes the signed distance transform of a label mask.
+    The output is normalized to the range [-1, 1] using `tanh(dist/sigma)`.
+    """
+
+    def __init__(self, sigma: float = 10.0):
         super(SignedDistanceTransform, self).__init__()
         self.sigma = sigma
 
@@ -16,7 +21,14 @@ class SignedDistanceTransform(torch.nn.Module):
 
 
 class SDTBoundaryMask(torch.nn.Module):
-    def __init__(self, sigma=10.0):
+    """
+    Computes a binary mask of regions where the distance to the nearest boundary
+    is less than the distance to the border of the image. This is useful to avoid
+    training on the ambiguous boundary regions where the true distance to the nearest
+    object is not known.
+    """
+
+    def __init__(self, sigma: float = 10.0):
         super(SDTBoundaryMask, self).__init__()
         self.sigma = sigma
 

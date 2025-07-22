@@ -6,58 +6,95 @@ API Reference
 .. automodule:: dacapo_toolbox
    :no-index:
 
-Architectures
--------------
+Dataset
+=======
 
-    .. automodule:: dacapo_toolbox.architectures
+    .. automodule:: dacapo_toolbox.dataset
         :members:
 
-    .. autoclass:: dacapo_toolbox.architectures.CNNectomeUNetConfig
+    .. autoclass:: dacapo_toolbox.dataset.iterable_dataset
         :members:
 
-    .. autoclass:: dacapo_toolbox.architectures.ModelZooConfig
+    .. autoclass:: dacapo_toolbox.dataset.SimpleAugmentConfig
+        :members:
+
+    .. autoclass:: dacapo_toolbox.dataset.DeformAugmentConfig
         :members:
     
-    .. autoclass:: dacapo_toolbox.architectures.WrappedArchitectureConfig
+    .. autoclass:: dacapo_toolbox.dataset.MaskedSampling
         :members:
 
-DataSplits
+    .. autoclass:: dacapo_toolbox.dataset.PointSampling
+        :members:
+
+Transforms
+==========
+
+    .. automodule:: dacapo_toolbox.transforms
+        :members:
+
+Affinities
 ----------
 
-    .. automodule:: dacapo_toolbox.datasplits
+    .. automodule:: dacapo_toolbox.transforms.affs
         :members:
 
-    .. autoclass:: dacapo_toolbox.datasplits.SimpleDataSplitConfig
+    .. autoclass:: dacapo_toolbox.transforms.affs.Affs
+        :members:
+    
+    .. autoclass:: dacapo_toolbox.transforms.affs.AffsMask
         :members:
 
-    .. autoclass:: dacapo_toolbox.datasplits.TrainValidateDataSplitConfig
-
-Tasks
------
-
-    .. automodule:: dacapo_toolbox.tasks
+    .. autofunction:: dacapo_toolbox.transforms.affs.compute_affs
         :members:
 
-    .. autoclass:: dacapo_toolbox.tasks.AffinitiesTaskConfig
+Distances
+---------
+
+    .. automodule:: dacapo_toolbox.transforms.distances
         :members:
 
-    .. autoclass:: dacapo_toolbox.tasks.DistanceTaskConfig
+    .. autoclass:: dacapo_toolbox.transforms.distances.SignedDistanceTransform
         :members:
 
-    .. autoclass:: dacapo_toolbox.tasks.HotDistanceTaskConfig
+    .. autoclass:: dacapo_toolbox.transforms.distances.SDTBoundaryMask
         :members:
 
-    .. autoclass:: dacapo_toolbox.tasks.InnerDistanceTaskConfig
+LSDS
+----
+    .. automodule:: dacapo_toolbox.transforms.lsds
         :members:
 
-    .. autoclass:: dacapo_toolbox.tasks.OneHotTaskConfig
+    .. autoclass:: dacapo_toolbox.transforms.lsds.LSD
         :members:
 
-Trainers
---------
+    .. autofunction:: dacapo_toolbox.transforms.lsds.get_local_shape_descriptors
+    
+Weight Balancing
+----------------
 
-    .. automodule:: dacapo_toolbox.trainers
+    .. automodule:: dacapo_toolbox.transforms.weight_balancing
         :members:
 
-    .. autoclass:: dacapo_toolbox.trainers.GunpowderTrainerConfig
+    .. autoclass:: dacapo_toolbox.transforms.weight_balancing.BalanceLabels
         :members:
+
+    .. autofunction:: dacapo_toolbox.transforms.weight_balancing.balance_weights
+
+Visualizations
+==============
+
+    .. automodule:: dacapo_toolbox.vis.preview
+        :members:
+
+    .. autofunction:: dacapo_toolbox.vis.preview.gif_2d
+
+    .. autofunction:: dacapo_toolbox.vis.preview.cube
+
+Sample Data
+===========
+
+    .. automodule:: dacapo_toolbox.sample_datasets
+        :members:
+
+    .. autofunction:: dacapo_toolbox.sample_datasets.cremi

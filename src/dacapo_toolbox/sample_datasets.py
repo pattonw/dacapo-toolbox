@@ -2,18 +2,22 @@ from pathlib import Path
 from itertools import product
 
 import wget
-import zarr
 import h5py
 
 from funlib.persistence import open_ds, prepare_ds, Array
-from pathlib import Path
-from funlib.geometry import Coordinate
 
 
 def cremi(zarr_path: Path) -> tuple[Array, Array, Array, Array]:
+    """
+    Downloads a subset of the CREMI data and returns the raw and label
+    arrays for train and testing.
+
+    params:
+        :param zarr_path: The path to the directory where the zarr files will be stored.
+    """
     # Download some cremi data
     # immediately convert it to zarr for convenience
-    if not Path("cremi.zarr").exists():
+    if not Path(zarr_path).exists():
         wget.download(
             "https://cremi.org/static/data/sample_C_20160501.hdf",
             "sample_C_20160501.hdf",
@@ -33,7 +37,7 @@ def cremi(zarr_path: Path) -> tuple[Array, Array, Array, Array]:
         for mode, dataset in product(["train", "test"], ["raw", "labels"]):
             data = h5py.File(hdf_datasets[mode], "r")[hdf_arrays[dataset]][:]
             arr = prepare_ds(
-                f"cremi.zarr/{mode}/{dataset}",
+                zarr_path / f"{mode}/{dataset}",
                 data.shape,
                 voxel_size=(40, 4, 4),
                 units=["nm", "nm", "nm"],
@@ -45,8 +49,8 @@ def cremi(zarr_path: Path) -> tuple[Array, Array, Array, Array]:
         Path("sample_A_20160501.hdf").unlink()
         Path("sample_C_20160501.hdf").unlink()
 
-    raw_train = open_ds("cremi.zarr/train/raw")
-    labels_train = open_ds("cremi.zarr/train/labels")
-    raw_test = open_ds("cremi.zarr/test/raw")
-    labels_test = open_ds("cremi.zarr/test/labels")
+    raw_train = open_ds(zarr_path / "train/raw")
+    labels_train = open_ds(zarr_path / "train/labels")
+    raw_test = open_ds(zarr_path / "test/raw")
+    labels_test = open_ds(zarr_path / "test/labels")
     return raw_train, labels_train, raw_test, labels_test
