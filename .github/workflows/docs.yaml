@@ -27,12 +27,12 @@ jobs:
       run: sudo apt-get install ffmpeg
     - name: execute notebooks
       run: |
-        uv run --extra docs --pre --python 3.10 python -m ipykernel install --name dacapo_env --user
-        uv run --extra docs --pre --python 3.10 jupytext --to notebook tutorials/dataset/dataset_overview.py
-        uv run --extra docs --pre --python 3.10 jupytext --to notebook tutorials/dataset/dataset_training.py
+        uv run --extra docs --pre --python 3.11 python -m ipykernel install --name dacapo_env --user
+        uv run --extra docs --pre --python 3.11 jupytext --to notebook tutorials/dataset/dataset_overview.py
+        uv run --extra docs --pre --python 3.11 jupytext --to notebook tutorials/dataset/dataset_training.py
         cp -r tutorials docs/source
     - name: Build documentation
-      run: uv run --extra docs --pre --python 3.10 sphinx-build docs/source docs/build/html -b html
+      run: uv run --extra docs --pre --python 3.11 sphinx-build docs/source docs/build/html -b html
     - name: Set permissions
       run: chmod -R a+rX ./docs/build/html
     - name: Update gh branch
