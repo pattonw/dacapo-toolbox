@@ -44,14 +44,24 @@ from pathlib import Path
 from tqdm import tqdm
 
 from funlib.persistence import Array
-from funlib.geometry import Coordinate
+from funlib.geometry import Coordinate, Roi
 from dacapo_toolbox.sample_datasets import cremi
 
-NUM_ITERATIONS = 300
 if not Path("_static/dataset_tutorial").exists():
     Path("_static/dataset_tutorial").mkdir(parents=True, exist_ok=True)
 
 raw_train, labels_train, raw_test, labels_test = cremi(Path("cremi.zarr"))
+
+# define some variables that we will use later
+# The number of iterations we will train
+NUM_ITERATIONS = 300
+# A reasonable block size for processing image data with a UNet
+blocksize = Coordinate(32, 256, 256)
+# We choose a small and large eval roi for performance evaluation
+# The small roi will be processed in memory, the large will be processed blockwise
+offset = Coordinate(46, 465, 465)
+small_eval_roi = Roi(offset, blocksize) * raw_test.voxel_size
+large_eval_roi = Roi(offset - blocksize, blocksize * 3) * raw_test.voxel_size
 
 
 # %% [markdown]
@@ -61,6 +71,7 @@ raw_train, labels_train, raw_test, labels_test = cremi(Path("cremi.zarr"))
 # ### Training data
 
 # %%
+
 from dacapo_toolbox.vis.preview import gif_2d, cube
 
 # %%
@@ -197,7 +208,7 @@ train_dataset = iterable_dataset(
     datasets={"raw": raw_train, "gt": labels_train},
     shapes={"raw": (13, 256, 256), "gt": (13, 256, 256)},
     transforms={
-        ("gt", "affs"): Affs(neighborhood=neighborhood),
+        ("gt", "affs"): Affs(neighborhood=neighborhood, concat_dim=0),
         ("gt", "affs_mask"): AffsMask(neighborhood=neighborhood),
         (("affs", "affs_mask"), "weights"): BalanceLabels((1, -1, -1, -1)),
     },
@@ -317,9 +328,6 @@ module = torch.nn.Sequential(
 # Now we can bring everything together and train our model.
 
 # %%
-from tqdm import tqdm
-
-# %%
 import torch
 
 extra = torch.tensor((2, 64, 64))
@@ -331,7 +339,7 @@ train_dataset = iterable_dataset(
     },
     transforms={
         "raw": torchvision.transforms.Lambda(lambda x: x[None].float() / 255.0),
-        ("gt", "affs"): Affs(neighborhood=neighborhood),
+        ("gt", "affs"): Affs(neighborhood=neighborhood, concat_dim=0),
         ("gt", "affs_mask"): AffsMask(neighborhood=neighborhood),
         (("affs", "affs_mask"), "weights"): BalanceLabels((1, -1, -1, -1)),
     },
@@ -399,18 +407,12 @@ import numpy as np
 
 module = module.eval()
 unet = unet.eval()
-test_roi = raw_test.roi
-vs = raw_test.voxel_size
-sf = Coordinate(unet.equivariant_step) * vs
-eval_roi_shape = test_roi.shape // 4
-growth = eval_roi_shape // sf * sf
-eval_roi_shape = Coordinate(unet.min_output_shape) * vs + growth
-eval_roi = Roi(test_roi.center - eval_roi_shape // (vs * 2) * vs, eval_roi_shape)
-context = Coordinate(unet.context // 2) * vs
+context = Coordinate(unet.context // 2) * raw_test.voxel_size
 
-raw_input = raw_test.to_ndarray(eval_roi.grow(context, context))
-raw_output = raw_test.to_ndarray(eval_roi)
-gt = labels_test.to_ndarray(eval_roi)
+# %%
+raw_input = raw_test.to_ndarray(small_eval_roi.grow(context, context))
+raw_output = raw_test.to_ndarray(small_eval_roi)
+gt = labels_test.to_ndarray(small_eval_roi)
 
 # Predict on the validation data
 with torch.no_grad():
@@ -464,6 +466,18 @@ cube(
     title="Prediction",
 )
 
+# %% [markdown]
+# Here we visualize the prediction results:
+# ![affs-prediction](_static/dataset_tutorial/affs-prediction.gif)
+# ![affs-prediction-cube](_static/dataset_tutorial/affs-prediction.jpg)
+
+# %% [markdown]
+# ## Blockwise Processing
+# Now that we have a trained model, we can use it to process the full volume.
+# We will use the `volara` library to do this. It provides a simple interface
+# for blockwise processing of large volumes. We will use the `volara_torch`
+# module to wrap our trained model and use it in a blockwise pipeline.
+
 # %%
 
 from volara.datasets import (
@@ -476,6 +490,7 @@ from volara.lut import LUT
 from volara.blockwise import ExtractFrags, AffAgglom, GraphMWS, Relabel
 from volara_torch.blockwise import Predict
 from volara_torch.models import TorchModel
+from volara.workers import LocalWorker
 
 raw_dataset = RawDataset(store="cremi.zarr/test/raw", scale_shift=(1.0 / 255.0, 0.0))
 affs_dataset = AffsDataset(store="cremi.zarr/test/affs", neighborhood=neighborhood)
@@ -495,8 +510,7 @@ scripted_unet = torch.jit.script(module)
 torch.jit.save(scripted_unet, "cremi.zarr/affs_unet.pt")
 torch.save(scripted_unet.state_dict(), "cremi.zarr/affs_unet_state.pt")
 
-pred_size_growth = Coordinate(32, 256, 256)
-blocksize = Coordinate(unet.min_output_shape) + pred_size_growth
+pred_size_growth = blocksize - Coordinate(unet.min_output_shape)
 affs_model = TorchModel(
     in_channels=1,
     min_input_shape=unet.min_input_shape,
@@ -514,6 +528,8 @@ predict_affs = Predict(
     in_data=raw_dataset,
     out_data=[affs_dataset],
     num_workers=1,
+    worker_config=LocalWorker(),
+    roi=large_eval_roi,
 )
 
 extract_frags = ExtractFrags(
@@ -525,6 +541,7 @@ extract_frags = ExtractFrags(
     bias=[-0.5, -0.2, -0.2, -0.5, -0.5, -0.8, -0.8],
     remove_debris=32,
     num_workers=4,
+    roi=large_eval_roi,
 )
 aff_agglom = AffAgglom(
     db=frag_db,
@@ -543,6 +560,7 @@ aff_agglom = AffAgglom(
         ],
     },
     num_workers=4,
+    roi=large_eval_roi,
 )
 graph_mws = GraphMWS(
     db=frag_db,
@@ -552,7 +570,8 @@ graph_mws = GraphMWS(
         "affs_xy": (1.0, -0.2),
         "affs_long_xy": (1.0, -0.8),
     },
-    roi=(raw_test.roi.offset, raw_test.roi.shape),
+    roi=large_eval_roi,
+    worker_config=LocalWorker(),
 )
 
 relabel = Relabel(
@@ -561,24 +580,79 @@ relabel = Relabel(
     lut=segment_lut,
     block_size=blocksize,
     num_workers=4,
+    roi=large_eval_roi,
 )
 
-# pipeline = predict_affs + extract_frags + aff_agglom + graph_mws + relabel
-predict_affs.drop()
-predict_affs.run_blockwise(multiprocessing=False)
-# %%
-extract_frags.drop()
-extract_frags.run_blockwise(multiprocessing=True)
-# %%
-aff_agglom.drop()
-aff_agglom.run_blockwise(multiprocessing=True)
-# %%
-graph_mws.drop()
-graph_mws.run_blockwise(multiprocessing=False)
-# %%
-relabel.drop()
-relabel.run_blockwise(multiprocessing=True)
+# %% [markdown]
+# Now we can run the blockwise pipeline to predict affinities, extract fragments,
+# agglomerate them, and relabel the segments.
 
+# %%
+
+pipeline = predict_affs + extract_frags + aff_agglom + graph_mws + relabel
+pipeline.drop()
+pipeline.run_blockwise()
+
+# %% [markdown]
+# ## Visualizing the results
+
+# %%
+from funlib.persistence import open_ds
+
+affs = open_ds("cremi.zarr/test/affs")
+affs.lazy_op(lambda x: x[[0, 3, 4]] / 255.0)
+gif_2d(
+    arrays={
+        "Raw": open_ds("cremi.zarr/test/raw"),
+        "Affs": affs,
+        "Frags": open_ds("cremi.zarr/test/frags"),
+        "Pred Labels": open_ds("cremi.zarr/test/pred_labels"),
+    },
+    array_types={
+        "Raw": "raw",
+        "Affs": "affs",
+        "Frags": "labels",
+        "Pred Labels": "labels",
+    },
+    title="CREMI Affs Prediction",
+    filename="_static/dataset_tutorial/cremi-prediction.gif",
+    fps=10,
+)
+cube(
+    arrays={
+        "raw": open_ds("cremi.zarr/test/raw"),
+        "affs": affs,
+        "frags": open_ds("cremi.zarr/test/frags"),
+        "pred_labels": open_ds("cremi.zarr/test/pred_labels"),
+    },
+    array_types={
+        "raw": "raw",
+        "affs": "affs",
+        "frags": "labels",
+        "pred_labels": "labels",
+    },
+    title="CREMI Affs Prediction",
+    filename="_static/dataset_tutorial/cremi-prediction.jpg",
+)
+# %% [markdown]
+# Here we visualize the prediction results:
+# ![cremi-prediction](_static/dataset_tutorial/cremi-prediction.gif)
+# ![cremi-prediction-cube](_static/dataset_tutorial/cremi-prediction.jpg)
+
+# %% [markdown]
+# ## Embedding Affinities (Experimental)
+# In this section we will experiment with a fun method for instance segmentation
+# that is a slight variation on the standard affinity prediction method.
+# Instead of predicting affinities directly, we will predict an embedding space
+# from which we can compute affinities for a given distance function.
+# We will use a UNet to produce an embedding space, and then a simple MLP
+# as our distance function.
+
+# The goal is to show the flexibility of the DaCapo toolbox and how it can be used
+# to implement different methods for instance segmentation.
+
+# %% [markdown]
+# ### Model
 # %%
 
 if torch.cuda.is_available():
@@ -611,19 +685,23 @@ unet = tems.UNet.funlib_api(
 
 # this ensures we output the appropriate number of channels,
 # use the appropriate final activation etc.
-module = torch.nn.Sequential(unet, torch.nn.Conv3d(32, emb_dim, kernel_size=1)).to(
-    device
-)
+module = torch.nn.Sequential(
+    unet, torch.nn.Conv3d(32, emb_dim, kernel_size=1), torch.nn.Tanh()
+).to(device)
 
-
+# extra data input since we don't just want to use the minimum input size
 extra = torch.tensor((2, 64, 64))
 
+# %% [markdown]
+# ### Training Data
+
+# %%
 train_dataset = iterable_dataset(
     datasets={"raw": raw_train, "gt": labels_train},
     shapes={"raw": unet.min_input_shape + extra, "gt": unet.min_output_shape + extra},
     transforms={
         "raw": torchvision.transforms.Lambda(lambda x: x[None].float() / 255.0),
-        ("gt", "affs"): Affs(neighborhood=neighborhood),
+        ("gt", "affs"): Affs(neighborhood=neighborhood, concat_dim=0),
         ("gt", "affs_mask"): AffsMask(neighborhood=neighborhood),
         (("affs", "affs_mask"), "weights"): BalanceLabels((1, -1, -1, -1)),
     },
@@ -643,33 +721,23 @@ train_dataset = iterable_dataset(
     ),
 )
 
+# %% [markdown]
+# ### Learned distance function
 
-class DistanceHead(torch.nn.Module):
-    def __init__(self, in_channels: int = 12, incr_factor: int = 12):
-        super().__init__()
-        self.conv1 = torch.nn.Conv3d(
-            in_channels, in_channels * incr_factor, kernel_size=1
-        )
-        self.relu = torch.nn.ReLU()
-        self.conv2 = torch.nn.Conv3d(in_channels * incr_factor, 1, kernel_size=1)
-        self.sigmoid = torch.nn.Sigmoid()
+from dacapo_toolbox.modules.distance_head import DistanceHead
 
-        torch.nn.init.kaiming_normal_(
-            self.conv1.weight, mode="fan_out", nonlinearity="relu"
-        )
-        torch.nn.init.kaiming_normal_(
-            self.conv2.weight, mode="fan_out", nonlinearity="sigmoid"
-        )
-
-    def forward(self, x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-        return self.sigmoid(self.conv2(self.relu(self.conv1(x - y)))).squeeze(1)
-
-
+# Distance head takes in two embedding arrays and outputs a distance value between 0 and 1.
+# We will learn a separate distance function for each offset in the neighborhood.
 dist_heads = [
     DistanceHead(in_channels=emb_dim).to(device) for _ in range(len(neighborhood))
 ]
-learned_affs = Affs(neighborhood=neighborhood, dist_func=dist_heads)
+learned_affs = Affs(neighborhood=neighborhood, dist_func=dist_heads, concat_dim=1)
 
+
+# %% [markdown]
+# ### Training Loop
+
+# %%
 loss_func = torch.nn.BCELoss(reduction="none")
 mse_loss = torch.nn.MSELoss()
 
@@ -678,7 +746,7 @@ import itertools
 optimizer = torch.optim.Adam(
     list(module.parameters())
     + list(itertools.chain(*[dist_head.parameters() for dist_head in dist_heads])),
-    lr=1e-4,
+    lr=5e-5,
 )
 dataloader = torch.utils.data.DataLoader(
     train_dataset,
@@ -697,7 +765,7 @@ for iteration, batch in tqdm(enumerate(iter(dataloader))):
     optimizer.zero_grad()
 
     emb = module(raw)
-    pred_affs = learned_affs(emb, concat_dim=1)
+    pred_affs = learned_affs(emb)
 
     voxel_loss = loss_func(pred_affs, target.float()) * weight
     loss = voxel_loss.mean() + 0.001 * mse_loss(
@@ -717,8 +785,15 @@ plt.xlabel("Iteration")
 plt.ylabel("Loss")
 plt.title("Loss Curve")
 plt.savefig("_static/dataset_tutorial/emb-loss-curve.png")
-plt.show()
 plt.close()
+
+# %% [markdown]
+# Here we visualize the loss curve for the embedding training:
+# ![emb-loss-curve](_static/dataset_tutorial/emb-loss-curve.png)
+
+# %% [markdown]
+# ## Evaluation
+# Now that we have trained our model, we can evaluate it on the test data.
 
 # %%
 import mwatershed as mws
@@ -728,9 +803,9 @@ from funlib.geometry import Roi
 # raise ValueError(center_slice, raw_test.roi)
 module = module.eval()
 unet = unet.eval()
-raw_input = raw_test.to_ndarray(eval_roi.grow(context, context))
-raw_output = raw_test.to_ndarray(eval_roi)
-gt = labels_test.to_ndarray(eval_roi)
+raw_input = raw_test.to_ndarray(small_eval_roi.grow(context, context))
+raw_output = raw_test.to_ndarray(small_eval_roi)
+gt = labels_test.to_ndarray(small_eval_roi)
 
 # Predict on the validation data
 with torch.no_grad():
@@ -740,7 +815,7 @@ with torch.no_grad():
     emb = module(
         (torch.from_numpy(raw_input).float() / 255.0).unsqueeze(0).unsqueeze(0)
     )
-    pred = learned_affs(emb, concat_dim=1).cpu().detach().numpy()
+    pred = learned_affs(emb).cpu().detach().numpy()
     pred_labels = mws.agglom(pred[0].astype(np.float64) - 0.5, offsets=neighborhood)
 
 # %%
@@ -787,20 +862,18 @@ cube(
     title="Prediction",
 )
 
+# %% [markdown]
+# Here we visualize the prediction results:
+# ![emb-prediction](_static/dataset_tutorial/emb-prediction.gif)
+# ![emb-prediction-cube](_static/dataset_tutorial/emb-prediction.jpg)
+
+# %% [markdown]
+# ### Blockwise Processing
+
 # %%
-from volara.datasets import (
-    Raw as RawDataset,
-    Affs as AffsDataset,
-    Labels as LabelsDataset,
-)
-from volara.dbs import SQLite
-from volara.lut import LUT
-from volara.blockwise import ExtractFrags, AffAgglom, GraphMWS, Relabel
-from volara_torch.blockwise import Predict
-from volara_torch.models import TorchModel
 
 raw_dataset = RawDataset(store="cremi.zarr/test/raw", scale_shift=(1.0 / 255.0, 0.0))
-emb_dataset = RawDataset(store="cremi.zarr/test/emb")
+emb_dataset = RawDataset(store="cremi.zarr/test/emb", scale_shift=(1.0 / 128.0, -0.5))
 affs_dataset = AffsDataset(store="cremi.zarr/test/emb_affs", neighborhood=neighborhood)
 frags_dataset = LabelsDataset(store="cremi.zarr/test/emb_frags")
 labels_dataset = LabelsDataset(store="cremi.zarr/test/emb_pred_labels")
@@ -824,35 +897,40 @@ emb_model = TorchModel(
     min_output_shape=unet.min_output_shape,
     min_step_shape=unet.equivariant_step,
     out_channels=emb_dim,
-    out_range=(0.0, 1.0),
+    out_range=(-1.0, 1.0),
     save_path="cremi.zarr/emb_unet.pt",
     checkpoint_file="cremi.zarr/emb_unet_state.pt",
     pred_size_growth=pred_size_growth,
 )
 
-min_output_shape = Coordinate(1, 1, 1)
-min_input_shape = min_output_shape + Coordinate(1, 23, 23) * 2
+# During evaluation we don't want to pad the output of the aff prediction
+learned_affs.pad = False
 torch.save(learned_affs, "cremi.zarr/learned_affs.pt")
 affs_model = TorchModel(
     in_channels=emb_dim,
-    min_input_shape=min_output_shape + Coordinate(1, 23, 23) * 2,
+    min_input_shape=min_output_shape + Coordinate(1, 23, 23),
     min_output_shape=min_output_shape,
     min_step_shape=Coordinate(1, 1, 1),
     out_channels=len(neighborhood),
     out_range=(0.0, 1.0),
     save_path="cremi.zarr/learned_affs.pt",
     pred_size_growth=pred_size_growth,
+    context_override=(Coordinate(0, 0, 0), Coordinate(1, 23, 23)),
 )
 
 predict_emb = Predict(
     checkpoint=emb_model,
     in_data=raw_dataset,
     out_data=[emb_dataset],
+    worker_config=LocalWorker(),
+    roi=large_eval_roi,
 )
 predict_affs = Predict(
     checkpoint=affs_model,
     in_data=emb_dataset,
     out_data=[affs_dataset],
+    worker_config=LocalWorker(),
+    roi=large_eval_roi,
 )
 
 extract_frags = ExtractFrags(
@@ -863,6 +941,8 @@ extract_frags = ExtractFrags(
     context=Coordinate(16, 16, 16),
     bias=[-0.5, -0.2, -0.2, -0.5, -0.5, -0.8, -0.8],
     remove_debris=32,
+    num_workers=4,
+    roi=large_eval_roi,
 )
 aff_agglom = AffAgglom(
     db=emb_db,
@@ -875,6 +955,8 @@ aff_agglom = AffAgglom(
         "affs_xy": [Coordinate(0, 1, 0), Coordinate(0, 0, 1)],
         "affs_long_xy": [Coordinate(0, 7, 0), Coordinate(0, 0, 7)],
     },
+    num_workers=4,
+    roi=large_eval_roi,
 )
 graph_mws = GraphMWS(
     db=emb_db,
@@ -884,7 +966,8 @@ graph_mws = GraphMWS(
         "affs_xy": (1.0, -0.2),
         "affs_long_xy": (1.0, -0.8),
     },
-    roi=(raw_test.roi.offset, raw_test.roi.shape),
+    roi=large_eval_roi,
+    worker_config=LocalWorker(),
 )
 
 relabel = Relabel(
@@ -892,26 +975,61 @@ relabel = Relabel(
     seg_data=labels_dataset,
     lut=emb_lut,
     block_size=blocksize,
+    num_workers=4,
+    roi=large_eval_roi,
 )
 
-# pipeline = predict_emb + predict_affs + extract_frags + aff_agglom + graph_mws + relabel
+# %%
 predict_emb.drop()
 predict_emb.run_blockwise(multiprocessing=False)
-# %%
-predict_affs.drop()
-predict_affs.run_blockwise(multiprocessing=False)
-# %%
-extract_frags.drop()
-extract_frags.run_blockwise(multiprocessing=False)
-# %%
-aff_agglom.drop()
-aff_agglom.run_blockwise(multiprocessing=False)
-# %%
-graph_mws.drop()
-graph_mws.run_blockwise(multiprocessing=False)
-# %%
-relabel.drop()
-relabel.run_blockwise(multiprocessing=False)
+pipeline = predict_affs + extract_frags + aff_agglom + graph_mws + relabel
+pipeline.drop()
+pipeline.run_blockwise(multiprocessing=True)
 
+# %%
+from funlib.persistence import open_ds
 
+emb_affs = open_ds("cremi.zarr/test/emb_affs")
+emb_affs.lazy_op(lambda x: x[[0, 3, 4]] / 255.0)
+gif_2d(
+    arrays={
+        "Raw": open_ds("cremi.zarr/test/raw"),
+        "Emb": open_ds("cremi.zarr/test/emb"),
+        "Affs": emb_affs,
+        "Frags": open_ds("cremi.zarr/test/emb_frags"),
+        "Pred Labels": open_ds("cremi.zarr/test/emb_pred_labels"),
+    },
+    array_types={
+        "Raw": "raw",
+        "Emb": "pca",
+        "Affs": "affs",
+        "Frags": "labels",
+        "Pred Labels": "labels",
+    },
+    title="CREMI Embedding Prediction",
+    filename="_static/dataset_tutorial/cremi-emb-prediction.gif",
+    fps=10,
+)
+cube(
+    arrays={
+        "raw": open_ds("cremi.zarr/test/raw"),
+        "emb": open_ds("cremi.zarr/test/emb"),
+        "affs": emb_affs,
+        "frags": open_ds("cremi.zarr/test/emb_frags"),
+        "pred_labels": open_ds("cremi.zarr/test/emb_pred_labels"),
+    },
+    array_types={
+        "raw": "raw",
+        "emb": "pca",
+        "affs": "affs",
+        "frags": "labels",
+        "pred_labels": "labels",
+    },
+    title="CREMI Embedding Prediction",
+    filename="_static/dataset_tutorial/cremi-emb-prediction.jpg",
+)
 
+# %% [markdown]
+# Here we visualize the prediction results:
+# ![cremi-emb-prediction](_static/dataset_tutorial/cremi-emb-prediction.gif)
+# ![cremi-emb-prediction-cube](_static/dataset_tutorial/cremi-emb-prediction.jpg)

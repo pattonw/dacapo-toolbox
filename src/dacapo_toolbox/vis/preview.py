@@ -6,6 +6,8 @@ import numpy as np
 from funlib.persistence import Array
 from sklearn.decomposition import PCA
 
+from pathlib import Path
+
 
 from matplotlib import colors as mcolors
 from matplotlib import cm
@@ -60,7 +62,10 @@ def gif_2d(
     filename: str,
     title: str,
     fps: int = 10,
+    overwrite: bool = False,
 ):
+    if Path(filename).exists() and not overwrite:
+        return
     transformed_arrays = {}
     for key, arr in arrays.items():
         assert arr.voxel_size.dims == 3, (
@@ -155,7 +160,11 @@ def cube(
     azim: float = -60,
     light_azdeg: float = 205,
     light_altdeg: float = 20,
+    overwrite: bool = False,
 ):
+    if Path(filename).exists() and not overwrite:
+        return
+
     lightsource = mcolors.LightSource(azdeg=light_azdeg, altdeg=light_altdeg)
 
     transformed_arrays = {}
