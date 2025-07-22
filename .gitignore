@@ -5,7 +5,11 @@ docs/source/tutorials
 tutorials/**/*.zarr
 *.hdf
 *.gif
+*.png
+*.jpg
 .coverage
 coverage.xml
 uv.lock
 .vscode
+build
+volara_logs

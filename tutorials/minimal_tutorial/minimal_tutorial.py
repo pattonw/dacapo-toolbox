@@ -209,7 +209,7 @@ plt.close()
 # We always want to be explicit when we define our data split for training and validation so that we are aware what data is being used for training and validation.
 
 # %%
-from dacapo_toolbox.datasplits import SimpleDataSplitConfig
+from dacapo_toolbox.depricated.datasplits import SimpleDataSplitConfig
 
 # %%
 
@@ -218,14 +218,14 @@ datasplit = SimpleDataSplitConfig(
     path="cremi.zarr",
 )
 print(f"Train datasets: {datasplit.train}")
-print(f"Validation datasets: {datasplit.validate}")
+print(f"Test datasets: {datasplit.test}")
 
 # %% [markdown]
 # ### Augmentation
 # We almost always want to use rotations when training in EM data. This is because the structures we care about rarely have strict orientations relative to the zyx axes. However because we usually some axial anisotropy in our data, we want to be careful about how we apply these rotations.
 # %%
-from dacapo_toolbox.trainers import GunpowderTrainerConfig
-from dacapo_toolbox.trainers.gp_augments import ElasticAugmentConfig
+from dacapo_toolbox.depricated.trainers import GunpowderTrainerConfig
+from dacapo_toolbox.depricated.trainers.gp_augments import ElasticAugmentConfig
 
 # build a trainer config with elastic deformations accounting for the anisotropy
 trainer = GunpowderTrainerConfig(
@@ -479,7 +479,7 @@ plt.show()
 import mwatershed as mws
 
 # Lets predict on some validation data:
-val_raw, val_gt = datasplit.validate[0].raw, datasplit.validate[0].gt
+val_raw, val_gt = datasplit.test[0].raw, datasplit.test[0].gt
 # fetch a xy slice from the center of our validation volume
 # We snap to grid to a multiple of the max downsampling factor of
 # the unet (1, 8, 8) to ensure downsampling is always possible

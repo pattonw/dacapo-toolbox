@@ -10,7 +10,8 @@
    overview
    install
    api
-   tutorials/minimal_tutorial/minimal_tutorial
+   tutorials/dataset/dataset_overview
+   tutorials/dataset/dataset_training
 
 .. include:: ../../README.md
    :parser: myst_parser.sphinx_
