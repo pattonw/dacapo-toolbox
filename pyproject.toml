@@ -38,6 +38,7 @@ docs = [
     "volara>=1.0.1",
     "volara-torch>=1.0.0",
     "wget>=3.2",
+    "jupytext>=1.17.2",
 ]
 
 [tool.mypy]
