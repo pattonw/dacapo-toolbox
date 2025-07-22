@@ -237,8 +237,8 @@ def cube(
             "lightsource": lightsource,
         }
 
-        lz, ly, lx = np.s_[0, :, :], np.s_[:, 0, :], np.s_[:, :, 0]
-        uz, uy, ux = np.s_[-1, :, :], np.s_[:, -1, :], np.s_[:, :, -1]
+        _lz, ly, _lx = np.s_[0, :, :], np.s_[:, 0, :], np.s_[:, :, 0]
+        uz, _uy, ux = np.s_[-1, :, :], np.s_[:, -1, :], np.s_[:, :, -1]
         # ax.plot_surface(xx[lx], yy[lx], zz[lx], facecolors=face_colors[lx], **kwargs)
         ax.plot_surface(xx[ux], yy[ux], zz[ux], facecolors=face_colors[ux], **kwargs)
         ax.plot_surface(xx[ly], yy[ly], zz[ly], facecolors=face_colors[ly], **kwargs)

@@ -2,6 +2,7 @@ import attr
 
 from tems import UNet
 from .architecture import ArchitectureConfig
+from .impl.cnnectome_unet_impl import ConvPass, Upsample
 
 from funlib.geometry import Coordinate
 import torch
