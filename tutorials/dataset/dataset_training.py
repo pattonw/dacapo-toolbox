@@ -507,7 +507,7 @@ segment_lut = LUT(
 
 unet = unet.eval()
 scripted_unet = torch.jit.script(module)
-torch.jit.save(scripted_unet, "cremi.zarr/affs_unet.pt")
+torch.jit.save(scripted_unet, "cremi.zarr/affs_unet.ts")
 torch.save(scripted_unet.state_dict(), "cremi.zarr/affs_unet_state.pt")
 
 pred_size_growth = blocksize - Coordinate(unet.min_output_shape)
@@ -518,7 +518,7 @@ affs_model = TorchModel(
     min_step_shape=unet.equivariant_step,
     out_channels=len(neighborhood),
     out_range=(0.0, 1.0),
-    save_path="cremi.zarr/affs_unet.pt",
+    save_path="cremi.zarr/affs_unet.ts",
     checkpoint_file="cremi.zarr/affs_unet_state.pt",
     pred_size_growth=pred_size_growth,
 )
