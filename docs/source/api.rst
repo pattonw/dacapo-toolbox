@@ -9,9 +9,6 @@ API Reference
 Dataset
 =======
 
-    .. automodule:: dacapo_toolbox.dataset
-        :members:
-
     .. autoclass:: dacapo_toolbox.dataset.iterable_dataset
         :members:
 
@@ -30,14 +27,8 @@ Dataset
 Transforms
 ==========
 
-    .. automodule:: dacapo_toolbox.transforms
-        :members:
-
 Affinities
 ----------
-
-    .. automodule:: dacapo_toolbox.transforms.affs
-        :members:
 
     .. autoclass:: dacapo_toolbox.transforms.affs.Affs
         :members:
@@ -51,9 +42,6 @@ Affinities
 Distances
 ---------
 
-    .. automodule:: dacapo_toolbox.transforms.distances
-        :members:
-
     .. autoclass:: dacapo_toolbox.transforms.distances.SignedDistanceTransform
         :members:
 
@@ -62,8 +50,6 @@ Distances
 
 LSDS
 ----
-    .. automodule:: dacapo_toolbox.transforms.lsds
-        :members:
 
     .. autoclass:: dacapo_toolbox.transforms.lsds.LSD
         :members:
@@ -73,9 +59,6 @@ LSDS
 Weight Balancing
 ----------------
 
-    .. automodule:: dacapo_toolbox.transforms.weight_balancing
-        :members:
-
     .. autoclass:: dacapo_toolbox.transforms.weight_balancing.BalanceLabels
         :members:
 
@@ -83,9 +66,6 @@ Weight Balancing
 
 Visualizations
 ==============
-
-    .. automodule:: dacapo_toolbox.vis.preview
-        :members:
 
     .. autofunction:: dacapo_toolbox.vis.preview.gif_2d
 
@@ -98,3 +78,5 @@ Sample Data
         :members:
 
     .. autofunction:: dacapo_toolbox.sample_datasets.cremi
+
+

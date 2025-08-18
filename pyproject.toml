@@ -70,5 +70,5 @@ per-file-ignores = { "tutorials/*.py" = ["E402"] }
 
 [tool.uv.sources]
 gunpowder = { git = "https://github.com/funkelab/gunpowder", rev = "patch-1.4.2" }
-volara = { git = "https://github.com/e11bio/volara", rev = "benchmarking" }
-volara-torch = { git = "https://github.com/e11bio/volara-torch", rev = "bugfix" }
+volara = { git = "https://github.com/e11bio/volara" }
+volara-torch = { git = "https://github.com/e11bio/volara-torch" }
