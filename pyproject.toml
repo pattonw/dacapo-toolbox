@@ -20,9 +20,9 @@ build-backend = "setuptools.build_meta"
 dev = [
     "pytest>=8.3.4",
     "pytest-cov>=6.0.0",
-    "mypy>=1.15.0",
     "ruff>=0.9.6",
     "pytest-xdist>=3.6.1",
+    "ty>=0.0.1a18",
 ]
 examples = [
     "matplotlib>=3.10.3",
@@ -47,20 +47,6 @@ docs = [
     "myst-parser>=4.0",
 ]
 
-[tool.mypy]
-files = "src/dacapo_toolbox"
-strict = false
-disallow_any_generics = false
-disallow_subclassing_any = false
-show_error_codes = true
-pretty = true
-exclude = ["docs/*"]
-
-[[tool.mypy.overrides]]
-module = [
-    "edt.*",
-]
-ignore_missing_imports = true
 
 [tool.setuptools.package-data]
 "dacapo_toolbox" = ["py.typed"]

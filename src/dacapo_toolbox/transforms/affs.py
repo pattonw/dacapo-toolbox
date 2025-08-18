@@ -7,7 +7,7 @@ from typing import Callable
 def compute_affs(
     arr: torch.Tensor,
     offset: Sequence[int],
-    dist_func: callable,
+    dist_func: Callable,
     pad: bool = False,
 ) -> torch.Tensor:
     """
@@ -15,7 +15,7 @@ def compute_affs(
     function `dist_func`. if `pad` is True, `arr` will be padded s.t. the output shape
     matches the input shape.
     """
-    offset = torch.tensor(offset, device=arr.device)
+    offset: torch.Tensor = torch.tensor(offset, device=arr.device)
     offset_dim = len(offset)
 
     if pad:
@@ -89,12 +89,18 @@ class Affs(torch.nn.Module):
             self.dist_func = equality_no_bg_dist_func
         elif callable(dist_func):
             self.dist_func = dist_func
-        elif all(isinstance(func, torch.nn.Module) for func in dist_func):
-            self.dist_func = torch.nn.ModuleList(dist_func)
-        elif all(callable(func) for func in dist_func):
-            self.dist_func = dist_func
         else:
-            raise ValueError(f"Unknown distance function: {dist_func}")
+            try:
+                dist_iterator = iter(dist_func)  # type: ignore
+            except TypeError:
+                raise ValueError(f"Unknown distance function: {dist_func}")
+            iterable_dist_func = list(dist_iterator)
+            if all(isinstance(func, torch.nn.Module) for func in iterable_dist_func):
+                self.dist_func = torch.nn.ModuleList(iterable_dist_func)
+            elif all(callable(func) for func in iterable_dist_func):
+                self.dist_func = iterable_dist_func
+            else:
+                raise ValueError(f"Unknown distance function: {dist_func}")
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if (not isinstance(self.dist_func, torch.nn.ModuleList)) and callable(

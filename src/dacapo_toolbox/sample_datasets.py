@@ -5,6 +5,7 @@ import wget
 import h5py
 
 from funlib.persistence import open_ds, prepare_ds, Array
+from funlib.geometry import Coordinate
 
 
 def cremi(zarr_path: Path) -> tuple[Array, Array, Array, Array]:
@@ -39,7 +40,7 @@ def cremi(zarr_path: Path) -> tuple[Array, Array, Array, Array]:
             arr = prepare_ds(
                 zarr_path / f"{mode}/{dataset}",
                 data.shape,
-                voxel_size=(40, 4, 4),
+                voxel_size=Coordinate(40, 4, 4),
                 units=["nm", "nm", "nm"],
                 axis_names=["z", "y", "x"],
                 dtype=data.dtype,

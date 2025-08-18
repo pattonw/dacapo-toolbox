@@ -77,16 +77,11 @@ def gif_2d(
             transformed_arrays[key] = arr
     arrays = transformed_arrays
 
-    z_slices = None
-    for arr in arrays.values():
-        arr_z_slices = arr.roi.shape[0] // arr.voxel_size[0]
-        if z_slices is None:
-            z_slices = arr_z_slices
-        else:
-            assert z_slices == arr_z_slices, (
-                f"All arrays must have the same number of z slices, "
-                f"got {z_slices} and {arr_z_slices}"
-            )
+    z_arr_slices = [arr.roi.shape[0] // arr.voxel_size[0] for arr in arrays.values()]
+    z_slices = min(z_arr_slices)
+    assert z_slices == max(z_arr_slices), (
+        f"All arrays must have the same number of z slices, got {z_arr_slices}"
+    )
 
     fig, axes = plt.subplots(1, len(arrays), figsize=(2 + 5 * len(arrays), 6))
 
@@ -209,7 +204,7 @@ def cube(
 
     def draw_cube(ax, arr: Array, cmap=None, interpolation=None):
         assert arr.voxel_size.dims == 3, (
-            f"Array {arr.name} must be 3D, got {arr.voxel_size.dims}D"
+            f"Array must be 3D, got voxel size: {arr.voxel_size}"
         )
         kwargs = {
             "interpolation": interpolation,
@@ -260,7 +255,7 @@ def cube(
             draw_cube(ax, arr, cmap=label_cmap, interpolation="none")
         elif array_types[key] == "raw" or array_types[key] == "pca":
             if arr.data.ndim == 3:
-                draw_cube(ax, arr, cmap=cm.gray)
+                draw_cube(ax, arr, cmap=cm.gray)  # type: ignore
             elif arr.data.ndim == 4:
                 draw_cube(ax, arr)
         elif array_types[key] == "affs":

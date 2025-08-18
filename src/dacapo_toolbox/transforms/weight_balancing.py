@@ -33,7 +33,7 @@ def balance_weights(
     if mask is not None:
         error_scale = error_scale * mask
     else:
-        mask = torch.ones_like(labels, dtype=bool)
+        mask = torch.ones_like(labels, dtype=torch.bool)
 
     if slab is None:
         slab = error_scale.shape

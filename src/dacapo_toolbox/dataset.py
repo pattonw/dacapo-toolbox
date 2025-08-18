@@ -3,6 +3,7 @@ import logging
 from collections.abc import Sequence
 
 import gunpowder as gp
+from gunpowder.nodes.gp_graph_source import GraphSource as GPGraphSource
 import networkx as nx
 import dask.array as da
 import numpy as np
@@ -29,11 +30,11 @@ def interpolatable_dtypes(dtype) -> bool:
 def nx_to_gp_graph(
     graph: nx.Graph,
     scale: Sequence[float],
-) -> gp.gp_graph_source.GraphSource:
+) -> gp.Graph:
     """
     Convert a NetworkX graph to a gunpowder Graph.
     """
-    graph = gp.Graph(
+    graph: gp.Graph = gp.Graph(
         [
             gp.Node(
                 node,
@@ -73,7 +74,10 @@ class PipelineDataset(torch.utils.data.IterableDataset):
         pipeline: gp.Pipeline,
         request: gp.BatchRequest,
         keys: list[gp.ArrayKey],
-        transforms: dict[str | tuple[str, str], Callable] = None,
+        transforms: dict[
+            str | tuple[str | tuple[str, ...], str | tuple[str, ...]], Callable
+        ]
+        | None = None,
     ):
         self.pipeline = pipeline
         self.request = request
@@ -219,7 +223,7 @@ def iterable_dataset(
     shapes: dict[str, Sequence[int]],
     weights: Sequence[float] | None = None,
     transforms: dict[
-        str | tuple[str | tuple[str, ...], str | tuple[str, ...]], Any | Sequence[Any]
+        str | tuple[str | tuple[str, ...], str | tuple[str, ...]], Callable
     ]
     | None = None,
     sampling_strategies: MaskedSampling
@@ -295,14 +299,15 @@ def iterable_dataset(
 
     # Get source nodes
     dataset_sources = []
+
+    # type hints since zip seems to get rid of the type info
+    # crop_datasets: list[Array | nx.Graph]
+    # crop_scale: Coordinate
+    # sampling_strategy: MaskedSampling | PointSampling | None
+
     for crop_datasets, crop_scale, sampling_strategy in zip(
         crops_datasets, crops_scale, sampling_strategies
     ):
-        # type hints since zip seems to get rid of the type info
-        crop_datasets: list[Array | nx.Graph]
-        crop_scale: Coordinate
-        sampling_strategy: MaskedSampling | PointSampling | None
-
         crop_arrays = [array for array in crop_datasets if isinstance(array, Array)]
 
         for dataset in crop_datasets:
@@ -366,8 +371,7 @@ def iterable_dataset(
             )
             for key, array in zip(array_keys, crop_arrays)
         ) + tuple(
-            gp.gp_graph_source.GraphSource(key, graph)
-            for key, graph in zip(graph_keys, crop_graphs)
+            GPGraphSource(key, graph) for key, graph in zip(graph_keys, crop_graphs)
         )
 
         crop_sources += (
@@ -424,8 +428,10 @@ def iterable_dataset(
         pipeline += gp.DeformAugment(
             control_point_spacing=Coordinate(
                 deform_augment_config.control_point_spacing
+                or (1,) * crop_scale[0].dims()
             ),
-            jitter_sigma=deform_augment_config.jitter_sigma,
+            jitter_sigma=deform_augment_config.jitter_sigma
+            or (0,) * crop_scale[0].dims(),
             scale_interval=deform_augment_config.scale_interval,
             rotate=deform_augment_config.rotate,
             subsample=deform_augment_config.subsample,

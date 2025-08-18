@@ -1,4 +1,4 @@
-name: Python mypy
+name: type-check
 
 on:
   pull_request:
@@ -10,13 +10,13 @@ on:
 
 jobs:
   static-analysis:
-    name: Python mypy
+    name: ty
     runs-on: ubuntu-latest
     steps:
       - name: Setup checkout
         uses: actions/checkout@v4
       - name: Install uv
         uses: astral-sh/setup-uv@v5
-      - name: mypy
+      - name: ty
         run: |
-          uv run --pre --extra dev mypy
+          uv run --pre --extra dev ty check src/dacapo_toolbox
