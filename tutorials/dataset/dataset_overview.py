@@ -24,6 +24,14 @@ from funlib.persistence import Array
 from skimage.data import astronaut
 import matplotlib.pyplot as plt
 
+from pathlib import Path
+
+out_ds = Path("_static/dataset_overview")
+if not out_ds.exists():
+    out_ds.mkdir(parents=True)
+
+# %%
+
 dataset = iterable_dataset(
     {"astronaut": Array(astronaut().transpose((2, 0, 1)), voxel_size=(1, 1))},
     shapes={"astronaut": (256, 256)},
@@ -338,7 +346,6 @@ from dacapo_toolbox.dataset import (
     DeformAugmentConfig,
     MaskedSampling,
     PointSampling,
-    nx_to_gp_graph,
 )
 from dacapo_toolbox.transforms.affs import Affs, AffsMask
 from funlib.persistence import Array
@@ -474,7 +481,7 @@ for i, batch in enumerate(iter_ds):
     axs[0, 3].set_title("Affs Mask")
     axs[0, 4].set_title("Mask")
 
-    plt.savefig(f"_static/dataset_overview/affs_batch_{i}.png")
+    plt.savefig(out_ds / f"affs_batch_{i}.png")
 
 # %% [markdown]
 # Visualize the batches:

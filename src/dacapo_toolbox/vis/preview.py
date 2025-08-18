@@ -62,7 +62,7 @@ def gif_2d(
     filename: str,
     title: str,
     fps: int = 10,
-    overwrite: bool = False,
+    overwrite: bool = True,
 ):
     if Path(filename).exists() and not overwrite:
         return
@@ -160,7 +160,7 @@ def cube(
     azim: float = -60,
     light_azdeg: float = 205,
     light_altdeg: float = 20,
-    overwrite: bool = False,
+    overwrite: bool = True,
 ):
     if Path(filename).exists() and not overwrite:
         return
