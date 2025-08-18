@@ -1,5 +1,7 @@
 # %% [markdown]
-# # Overview of the `dacapo_toolbox.iterable_dataset` helper function
+# # Dataset Overview
+# 
+# ## Overview of the `dacapo_toolbox.iterable_dataset` helper function
 #
 # The `iterable_dataset` function is a powerful helper function that wraps around
 # `gunpowder` and `funlib` libraries to provide a simple and powerful entrypoint

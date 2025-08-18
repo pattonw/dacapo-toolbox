@@ -726,6 +726,7 @@ train_dataset = iterable_dataset(
 # %% [markdown]
 # ### Learned distance function
 
+# %%
 from dacapo_toolbox.modules.distance_head import DistanceHead
 
 # Distance head takes in two embedding arrays and outputs a distance value between 0 and 1.
