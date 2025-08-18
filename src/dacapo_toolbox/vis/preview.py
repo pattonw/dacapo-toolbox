@@ -22,8 +22,8 @@ def pca_nd(emb: Array, n_components: int = 3) -> Array:
     emb_data = emb_data - emb_data.mean(
         axis=tuple(range(1, len(emb_data.shape))), keepdims=True
     )  # center the data
-    emb_data /= emb_data.std(
-        axis=tuple(range(1, len(emb_data.shape))), keepdims=True
+    emb_data /= (
+        emb_data.std(axis=tuple(range(1, len(emb_data.shape))), keepdims=True) + 1e-4
     )  # normalize the data
 
     emb_data = emb_data.reshape(num_channels, -1)  # flatten the spatial dimensions
