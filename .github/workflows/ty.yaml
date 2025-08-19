@@ -19,4 +19,4 @@ jobs:
         uses: astral-sh/setup-uv@v5
       - name: ty
         run: |
-          uv run --pre --extra dev ty check src/dacapo_toolbox
+          uv run --pre --all-extras ty check src/dacapo_toolbox

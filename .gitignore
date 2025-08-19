@@ -13,3 +13,4 @@ uv.lock
 .vscode
 build
 volara_logs
+lightning_logs

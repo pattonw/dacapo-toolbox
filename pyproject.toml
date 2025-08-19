@@ -17,6 +17,8 @@ build-backend = "setuptools.build_meta"
 
 
 [project.optional-dependencies]
+postprocessing = ["volara-torch>=1.0.0", "volara>=1.0.1"]
+vis = ["matplotlib>=3.10.5"]
 dev = [
     "pytest>=8.3.4",
     "pytest-cov>=6.0.0",
@@ -24,10 +26,9 @@ dev = [
     "pytest-xdist>=3.6.1",
     "ty>=0.0.1a18",
 ]
-examples = [
-    "matplotlib>=3.10.3",
-    "torchvision>=0.22.0",
-]
+accelerators = ["accelerate>=1.10.0", "lightning>=2.5.3"]
+sample-datasets = ["wget>=3.2"]
+examples = ["torchvision>=0.22.0"]
 docs = [
     "h5py>=3.13.0",
     "ipykernel>=6.29.5",
@@ -45,10 +46,6 @@ docs = [
     "sphinx-rtd-theme>=2.0",
     "nbsphinx>=0.9.7",
     "myst-parser>=4.0",
-]
-accelerators = [
-    "accelerate>=1.10.0",
-    "lightning>=2.5.3",
 ]
 
 
