@@ -76,13 +76,13 @@ for i, batch in enumerate(iter_ds):
     if i >= 8:  # Limit to 4 batches for demonstration
         break
     axs[0, 0].imshow(batch["noisy_s0"], cmap="gray")
-    axs[0, 1].imshow(batch["lsd_s0"][[0,1,5]].permute(1, 2, 0).float())
-    axs[0, 2].imshow(batch["lsd_s0"][[2,3,5]].permute(1, 2, 0).float())
+    axs[0, 1].imshow(batch["lsd_s0"][[0, 1, 5]].permute(1, 2, 0).float())
+    axs[0, 2].imshow(batch["lsd_s0"][[2, 3, 5]].permute(1, 2, 0).float())
     axs[0, 3].imshow(batch["lsd_s0"][4], cmap="gray")
     axs[0, 4].imshow(batch["lsd_s0"][5], cmap="gray")
     axs[1, 0].imshow(batch["noisy_s1"], cmap="gray")
-    axs[1, 1].imshow(batch["lsd_s1"][[0,1,5]].permute(1, 2, 0).float())
-    axs[1, 2].imshow(batch["lsd_s1"][[2,3,5]].permute(1, 2, 0).float())
+    axs[1, 1].imshow(batch["lsd_s1"][[0, 1, 5]].permute(1, 2, 0).float())
+    axs[1, 2].imshow(batch["lsd_s1"][[2, 3, 5]].permute(1, 2, 0).float())
     axs[1, 3].imshow(batch["lsd_s1"][4], cmap="gray")
     axs[1, 4].imshow(batch["lsd_s1"][5], cmap="gray")
 

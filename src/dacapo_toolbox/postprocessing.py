@@ -139,9 +139,7 @@ def blockwise_predict_mutex(
                 )
             edge_names.append(name)
             edge_coords.append(
-                list(coords)
-                if isinstance(coords, Coordinate)
-                else coords
+                list(coords) if isinstance(coords, Coordinate) else coords
             )
             edge_biases.append(bias)
 

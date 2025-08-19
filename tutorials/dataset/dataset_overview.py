@@ -1,6 +1,6 @@
 # %% [markdown]
 # # Dataset Overview
-# 
+#
 # ## Overview of the `dacapo_toolbox.iterable_dataset` helper function
 #
 # The `iterable_dataset` function is a powerful helper function that wraps around

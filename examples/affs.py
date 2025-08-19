@@ -22,9 +22,13 @@ logging.basicConfig(level=logging.DEBUG)
 side_length = 2048
 
 # two different datasets with vastly different blob sizes
-blobs_a = data.binary_blobs(length=side_length, blob_size_fraction=20/side_length, n_dim=2)
+blobs_a = data.binary_blobs(
+    length=side_length, blob_size_fraction=20 / side_length, n_dim=2
+)
 blobs_a_gt = label(blobs_a, connectivity=2)
-blobs_b = data.binary_blobs(length=side_length, blob_size_fraction=100/side_length, n_dim=2)
+blobs_b = data.binary_blobs(
+    length=side_length, blob_size_fraction=100 / side_length, n_dim=2
+)
 blobs_b_gt = label(blobs_b, connectivity=2)
 mask = np.ones((side_length, side_length), dtype=bool)
 mask[side_length // 2 : side_length] = 0

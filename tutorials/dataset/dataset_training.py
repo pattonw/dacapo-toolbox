@@ -492,7 +492,6 @@ blocksize = Coordinate(unet.min_output_shape) + blocksize
 
 # default biases:
 # interpolate log offset distances to a range of [-0.2, -0.8]
-# it seems reasonable that doubling the offset distance should have 
 
 blockwise_predict_mutex(
     raw_store="cremi.zarr/test/raw",
@@ -507,7 +506,15 @@ blockwise_predict_mutex(
     in_channels=1,
     model_context=unet.context // 2,
     predict_worker=LocalWorker(),  # optional, TODO: provided because cannot reinitialize cuda in a forked process
-    extract_frag_bias=[-0.5, -0.2, -0.2, -0.5, -0.5, -0.8, -0.8],  # optional, TODO: defaults not very good yet
+    extract_frag_bias=[
+        -0.5,
+        -0.2,
+        -0.2,
+        -0.5,
+        -0.5,
+        -0.8,
+        -0.8,
+    ],  # optional, TODO: defaults not very good yet
     edge_scores=[  # optional, TODO: defaults not very good yet
         ("affs_z", [Coordinate(1, 0, 0)], -0.5),
         ("affs_xy", [Coordinate(0, 1, 0), Coordinate(0, 0, 1)], -0.2),
