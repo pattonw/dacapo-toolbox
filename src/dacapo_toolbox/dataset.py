@@ -14,7 +14,6 @@ from funlib.persistence import Array
 import torch
 
 import time
-from typing import Any
 import functools
 from dataclasses import dataclass
 from .tmp import gcd

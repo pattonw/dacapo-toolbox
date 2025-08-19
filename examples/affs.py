@@ -13,7 +13,6 @@ from torchvision.transforms import v2 as transforms
 import logging
 import numpy as np
 from skimage.measure import label
-import networkx as nx
 from itertools import product
 
 logging.basicConfig(level=logging.DEBUG)
