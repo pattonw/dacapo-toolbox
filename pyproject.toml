@@ -46,6 +46,10 @@ docs = [
     "nbsphinx>=0.9.7",
     "myst-parser>=4.0",
 ]
+accelerators = [
+    "accelerate>=1.10.0",
+    "lightning>=2.5.3",
+]
 
 
 [tool.setuptools.package-data]
