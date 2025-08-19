@@ -479,119 +479,52 @@ cube(
 # module to wrap our trained model and use it in a blockwise pipeline.
 
 # %%
-
-from volara.datasets import (
-    Raw as RawDataset,
-    Affs as AffsDataset,
-    Labels as LabelsDataset,
-)
-from volara.dbs import SQLite
-from volara.lut import LUT
-from volara.blockwise import ExtractFrags, AffAgglom, GraphMWS, Relabel
-from volara_torch.blockwise import Predict
-from volara_torch.models import TorchModel
+from dacapo_toolbox.postprocessing import blockwise_predict_mutex
 from volara.workers import LocalWorker
 
-raw_dataset = RawDataset(store="cremi.zarr/test/raw", scale_shift=(1.0 / 255.0, 0.0))
-affs_dataset = AffsDataset(store="cremi.zarr/test/affs", neighborhood=neighborhood)
-frags_dataset = LabelsDataset(store="cremi.zarr/test/frags")
-labels_dataset = LabelsDataset(store="cremi.zarr/test/pred_labels")
-
-frag_db = SQLite(
-    path="cremi.zarr/frags.db",
-    edge_attrs={"affs_xy": "float", "affs_z": "float", "affs_long_xy": "float"},
-)
-segment_lut = LUT(
-    path="cremi.zarr/frag-lut",
-)
 
 unet = unet.eval()
 scripted_unet = torch.jit.script(module)
-torch.jit.save(scripted_unet, "cremi.zarr/affs_unet.ts")
-torch.save(scripted_unet.state_dict(), "cremi.zarr/affs_unet_state.pt")
+torch.jit.save(scripted_unet, "cremi.zarr/affs_unet.pt")
+torch.save(scripted_unet.state_dict(), "cremi.zarr/weights.pth")
 
-pred_size_growth = blocksize - Coordinate(unet.min_output_shape)
-affs_model = TorchModel(
+blocksize = Coordinate(unet.min_output_shape) + blocksize
+
+# default biases:
+# interpolate log offset distances to a range of [-0.2, -0.8]
+# it seems reasonable that doubling the offset distance should have 
+
+blockwise_predict_mutex(
+    raw_store="cremi.zarr/test/raw",
+    affs_store="cremi.zarr/test/affs",  # optional, provided for visualization
+    frags_store="cremi.zarr/test/frags",  # optional, provided for visualization
+    labels_store="cremi.zarr/test/pred_labels",
+    lut_path="cremi.zarr/test/lut.npz",  # optional, TODO: test
+    sqlite_db_path="cremi.zarr/test/graph.db",  # optional, TODO: test
+    neighborhood=neighborhood,
+    blocksize=blocksize,
+    model_path="cremi.zarr/affs_unet.pt",
     in_channels=1,
-    min_input_shape=unet.min_input_shape,
-    min_output_shape=unet.min_output_shape,
-    min_step_shape=unet.equivariant_step,
-    out_channels=len(neighborhood),
-    out_range=(0.0, 1.0),
-    save_path="cremi.zarr/affs_unet.ts",
-    checkpoint_file="cremi.zarr/affs_unet_state.pt",
-    pred_size_growth=pred_size_growth,
-)
-
-predict_affs = Predict(
-    checkpoint=affs_model,
-    in_data=raw_dataset,
-    out_data=[affs_dataset],
-    num_workers=1,
-    worker_config=LocalWorker(),
+    model_context=unet.context // 2,
+    predict_worker=LocalWorker(),  # optional, TODO: provided because cannot reinitialize cuda in a forked process
+    extract_frag_bias=[-0.5, -0.2, -0.2, -0.5, -0.5, -0.8, -0.8],  # optional, TODO: defaults not very good yet
+    edge_scores=[  # optional, TODO: defaults not very good yet
+        ("affs_z", [Coordinate(1, 0, 0)], -0.5),
+        ("affs_xy", [Coordinate(0, 1, 0), Coordinate(0, 0, 1)], -0.2),
+        (
+            "affs_long_xy",
+            [
+                Coordinate(0, 7, 0),
+                Coordinate(0, 0, 7),
+                Coordinate(0, 23, 0),
+                Coordinate(0, 0, 23),
+            ],
+            -0.8,
+        ),
+    ],
+    graph_mws_worker=LocalWorker(),
     roi=large_eval_roi,
 )
-
-extract_frags = ExtractFrags(
-    db=frag_db,
-    affs_data=affs_dataset,
-    frags_data=frags_dataset,
-    block_size=blocksize,
-    context=Coordinate(16, 16, 16),
-    bias=[-0.5, -0.2, -0.2, -0.5, -0.5, -0.8, -0.8],
-    remove_debris=32,
-    num_workers=4,
-    roi=large_eval_roi,
-)
-aff_agglom = AffAgglom(
-    db=frag_db,
-    affs_data=affs_dataset,
-    frags_data=frags_dataset,
-    block_size=blocksize,
-    context=Coordinate(16, 16, 16),
-    scores={
-        "affs_z": [Coordinate(1, 0, 0)],
-        "affs_xy": [Coordinate(0, 1, 0), Coordinate(0, 0, 1)],
-        "affs_long_xy": [
-            Coordinate(0, 7, 0),
-            Coordinate(0, 0, 7),
-            Coordinate(0, 23, 0),
-            Coordinate(0, 0, 23),
-        ],
-    },
-    num_workers=4,
-    roi=large_eval_roi,
-)
-graph_mws = GraphMWS(
-    db=frag_db,
-    lut=segment_lut,
-    weights={
-        "affs_z": (1.0, -0.5),
-        "affs_xy": (1.0, -0.2),
-        "affs_long_xy": (1.0, -0.8),
-    },
-    roi=large_eval_roi,
-    worker_config=LocalWorker(),
-)
-
-relabel = Relabel(
-    frags_data=frags_dataset,
-    seg_data=labels_dataset,
-    lut=segment_lut,
-    block_size=blocksize,
-    num_workers=4,
-    roi=large_eval_roi,
-)
-
-# %% [markdown]
-# Now we can run the blockwise pipeline to predict affinities, extract fragments,
-# agglomerate them, and relabel the segments.
-
-# %%
-
-pipeline = predict_affs + extract_frags + aff_agglom + graph_mws + relabel
-pipeline.drop()
-pipeline.run_blockwise()
 
 # %% [markdown]
 # ## Visualizing the results
@@ -636,405 +569,8 @@ cube(
     title="CREMI Affs Prediction",
     filename="_static/dataset_tutorial/cremi-prediction.jpg",
 )
+
 # %% [markdown]
 # Here we visualize the prediction results:
 # ![cremi-prediction](_static/dataset_tutorial/cremi-prediction.gif)
 # ![cremi-prediction-cube](_static/dataset_tutorial/cremi-prediction.jpg)
-
-# %% [markdown]
-# ## Embedding Affinities (Experimental)
-# In this section we will experiment with a fun method for instance segmentation
-# that is a slight variation on the standard affinity prediction method.
-# Instead of predicting affinities directly, we will predict an embedding space
-# from which we can compute affinities for a given distance function.
-# We will use a UNet to produce an embedding space, and then a simple MLP
-# as our distance function.
-
-# The goal is to show the flexibility of the DaCapo toolbox and how it can be used
-# to implement different methods for instance segmentation.
-
-# %% [markdown]
-# ### Model
-# %%
-
-if torch.cuda.is_available():
-    device = torch.device("cuda")
-elif torch.backends.mps.is_available():
-    device = torch.device("cpu")
-else:
-    device = torch.device("cpu")
-
-emb_dim = 36
-unet = tems.UNet.funlib_api(
-    dims=3,
-    in_channels=1,
-    num_fmaps=32,
-    fmap_inc_factor=4,
-    downsample_factors=[(1, 2, 2), (1, 2, 2), (1, 2, 2)],
-    kernel_size_down=[
-        [(1, 3, 3), (1, 3, 3)],
-        [(1, 3, 3), (1, 3, 3)],
-        [(1, 3, 3), (1, 3, 3)],
-        [(1, 3, 3), (1, 3, 3)],
-    ],
-    kernel_size_up=[
-        [(1, 3, 3), (1, 3, 3)],
-        [(1, 3, 3), (1, 3, 3)],
-        [(3, 3, 3), (3, 3, 3)],
-    ],
-    activation="LeakyReLU",
-)
-
-# this ensures we output the appropriate number of channels,
-# use the appropriate final activation etc.
-module = torch.nn.Sequential(
-    unet, torch.nn.Conv3d(32, emb_dim, kernel_size=1), torch.nn.Tanh()
-).to(device)
-
-# extra data input since we don't just want to use the minimum input size
-extra = torch.tensor((2, 64, 64))
-
-# %% [markdown]
-# ### Training Data
-
-# %%
-train_dataset = iterable_dataset(
-    datasets={"raw": raw_train, "gt": labels_train},
-    shapes={"raw": unet.min_input_shape + extra, "gt": unet.min_output_shape + extra},
-    transforms={
-        "raw": torchvision.transforms.Lambda(lambda x: x[None].float() / 255.0),
-        ("gt", "affs"): Affs(neighborhood=neighborhood, concat_dim=0),
-        ("gt", "affs_mask"): AffsMask(neighborhood=neighborhood),
-        (("affs", "affs_mask"), "weights"): BalanceLabels((1, -1, -1, -1)),
-    },
-    deform_augment_config=DeformAugmentConfig(
-        p=0.1,
-        control_point_spacing=(2, 10, 10),
-        jitter_sigma=(0.5, 2, 2),
-        rotate=True,
-        subsample=4,
-        rotation_axes=(1, 2),
-        scale_interval=(1.0, 1.0),
-    ),
-    simple_augment_config=SimpleAugmentConfig(
-        p=1.0,
-        mirror_only=(1, 2),
-        transpose_only=(1, 2),
-    ),
-)
-
-# %% [markdown]
-# ### Learned distance function
-
-# %%
-from dacapo_toolbox.modules.distance_head import DistanceHead
-
-# Distance head takes in two embedding arrays and outputs a distance value between 0 and 1.
-# We will learn a separate distance function for each offset in the neighborhood.
-dist_heads = [
-    DistanceHead(in_channels=emb_dim).to(device) for _ in range(len(neighborhood))
-]
-learned_affs = Affs(neighborhood=neighborhood, dist_func=dist_heads, concat_dim=1)
-
-
-# %% [markdown]
-# ### Training Loop
-
-# %%
-loss_func = torch.nn.BCELoss(reduction="none")
-mse_loss = torch.nn.MSELoss()
-
-import itertools
-
-optimizer = torch.optim.Adam(
-    list(module.parameters())
-    + list(itertools.chain(*[dist_head.parameters() for dist_head in dist_heads])),
-    lr=5e-5,
-)
-dataloader = torch.utils.data.DataLoader(
-    train_dataset,
-    batch_size=3,
-    num_workers=4,
-)
-losses = []
-
-for iteration, batch in tqdm(enumerate(iter(dataloader))):
-    raw, target, weight = (
-        batch["raw"].to(device),
-        batch["affs"].to(device),
-        batch["weights"].to(device),
-    )
-
-    optimizer.zero_grad()
-
-    emb = module(raw)
-    pred_affs = learned_affs(emb)
-
-    voxel_loss = loss_func(pred_affs, target.float()) * weight
-    loss = voxel_loss.mean() + 0.001 * mse_loss(
-        emb, emb / torch.norm(emb, dim=1, keepdim=True)
-    )
-    loss.backward()
-    optimizer.step()
-
-    losses.append(loss.item())
-
-    if iteration >= NUM_ITERATIONS:
-        break
-
-# %%
-plt.plot(losses)
-plt.xlabel("Iteration")
-plt.ylabel("Loss")
-plt.title("Loss Curve")
-plt.savefig("_static/dataset_tutorial/emb-loss-curve.png")
-plt.close()
-
-# %% [markdown]
-# Here we visualize the loss curve for the embedding training:
-# ![emb-loss-curve](_static/dataset_tutorial/emb-loss-curve.png)
-
-# %% [markdown]
-# ## Evaluation
-# Now that we have trained our model, we can evaluate it on the test data.
-
-# %%
-import mwatershed as mws
-from funlib.geometry import Roi
-
-# Read the raw data
-# raise ValueError(center_slice, raw_test.roi)
-module = module.eval()
-unet = unet.eval()
-raw_input = raw_test.to_ndarray(small_eval_roi.grow(context, context))
-raw_output = raw_test.to_ndarray(small_eval_roi)
-gt = labels_test.to_ndarray(small_eval_roi)
-
-# Predict on the validation data
-with torch.no_grad():
-    device = torch.device("cpu")
-    module = module.to(device)
-    learned_affs = learned_affs.to(device)
-    emb = module(
-        (torch.from_numpy(raw_input).float() / 255.0).unsqueeze(0).unsqueeze(0)
-    )
-    pred = learned_affs(emb).cpu().detach().numpy()
-    pred_labels = mws.agglom(pred[0].astype(np.float64) - 0.5, offsets=neighborhood)
-
-# %%
-# Plot the results
-gif_2d(
-    arrays={
-        "Raw": Array(raw_output, voxel_size=raw_test.voxel_size),
-        "GT": Array(gt, voxel_size=raw_test.voxel_size),
-        "Pred Emb": Array(
-            emb.cpu().detach().numpy()[0], voxel_size=raw_test.voxel_size
-        ),
-        "Pred Affs": Array(pred[0][[0, 3, 4]], voxel_size=raw_test.voxel_size),
-        "Pred": Array(pred_labels, voxel_size=raw_test.voxel_size),
-    },
-    array_types={
-        "Raw": "raw",
-        "GT": "labels",
-        "Pred Emb": "pca",
-        "Pred Affs": "affs",
-        "Pred": "labels",
-    },
-    filename="_static/dataset_tutorial/emb-prediction.gif",
-    title="Prediction",
-    fps=10,
-)
-cube(
-    arrays={
-        "Raw": Array(raw_output, voxel_size=raw_test.voxel_size),
-        "GT": Array(gt, voxel_size=raw_test.voxel_size),
-        "Pred Emb": Array(
-            emb.cpu().detach().numpy()[0], voxel_size=raw_test.voxel_size
-        ),
-        "Pred Affs": Array(pred[0][[0, 3, 4]], voxel_size=raw_test.voxel_size),
-        "Pred": Array(pred_labels, voxel_size=raw_test.voxel_size),
-    },
-    array_types={
-        "Raw": "raw",
-        "GT": "labels",
-        "Pred Emb": "pca",
-        "Pred Affs": "affs",
-        "Pred": "labels",
-    },
-    filename="_static/dataset_tutorial/emb-prediction.jpg",
-    title="Prediction",
-)
-
-# %% [markdown]
-# Here we visualize the prediction results:
-# ![emb-prediction](_static/dataset_tutorial/emb-prediction.gif)
-# ![emb-prediction-cube](_static/dataset_tutorial/emb-prediction.jpg)
-
-# %% [markdown]
-# ### Blockwise Processing
-
-# %%
-
-raw_dataset = RawDataset(store="cremi.zarr/test/raw", scale_shift=(1.0 / 255.0, 0.0))
-emb_dataset = RawDataset(store="cremi.zarr/test/emb", scale_shift=(1.0 / 128.0, -0.5))
-affs_dataset = AffsDataset(store="cremi.zarr/test/emb_affs", neighborhood=neighborhood)
-frags_dataset = LabelsDataset(store="cremi.zarr/test/emb_frags")
-labels_dataset = LabelsDataset(store="cremi.zarr/test/emb_pred_labels")
-
-emb_db = SQLite(
-    path="cremi.zarr/emb.db",
-    edge_attrs={"affs_xy": "float", "affs_z": "float", "affs_long_xy": "float"},
-)
-emb_lut = LUT(
-    path="cremi.zarr/emb-lut",
-)
-
-unet = unet.eval()
-scripted_unet = torch.jit.script(module)
-torch.jit.save(scripted_unet, "cremi.zarr/emb_unet.pt")
-torch.save(scripted_unet.state_dict(), "cremi.zarr/emb_unet_state.pt")
-min_output_shape = Coordinate(unet.min_output_shape)
-emb_model = TorchModel(
-    in_channels=1,
-    min_input_shape=unet.min_input_shape,
-    min_output_shape=unet.min_output_shape,
-    min_step_shape=unet.equivariant_step,
-    out_channels=emb_dim,
-    out_range=(-1.0, 1.0),
-    save_path="cremi.zarr/emb_unet.pt",
-    checkpoint_file="cremi.zarr/emb_unet_state.pt",
-    pred_size_growth=pred_size_growth,
-)
-
-# During evaluation we don't want to pad the output of the aff prediction
-learned_affs.pad = False
-torch.save(learned_affs, "cremi.zarr/learned_affs.pt")
-affs_model = TorchModel(
-    in_channels=emb_dim,
-    min_input_shape=min_output_shape + Coordinate(1, 23, 23),
-    min_output_shape=min_output_shape,
-    min_step_shape=Coordinate(1, 1, 1),
-    out_channels=len(neighborhood),
-    out_range=(0.0, 1.0),
-    save_path="cremi.zarr/learned_affs.pt",
-    pred_size_growth=pred_size_growth,
-    context_override=(Coordinate(0, 0, 0), Coordinate(1, 23, 23)),
-)
-
-predict_emb = Predict(
-    checkpoint=emb_model,
-    in_data=raw_dataset,
-    out_data=[emb_dataset],
-    worker_config=LocalWorker(),
-    roi=large_eval_roi,
-)
-predict_affs = Predict(
-    checkpoint=affs_model,
-    in_data=emb_dataset,
-    out_data=[affs_dataset],
-    worker_config=LocalWorker(),
-    roi=large_eval_roi,
-)
-
-extract_frags = ExtractFrags(
-    db=emb_db,
-    affs_data=affs_dataset,
-    frags_data=frags_dataset,
-    block_size=blocksize,
-    context=Coordinate(16, 16, 16),
-    bias=[-0.5, -0.4, -0.4, -0.45, -0.45, -0.5, -0.5],
-    remove_debris=32,
-    num_workers=4,
-    roi=large_eval_roi,
-)
-aff_agglom = AffAgglom(
-    db=emb_db,
-    affs_data=affs_dataset,
-    frags_data=frags_dataset,
-    block_size=blocksize,
-    context=Coordinate(16, 16, 16),
-    scores={
-        "affs_z": [Coordinate(1, 0, 0)],
-        "affs_xy": [Coordinate(0, 1, 0), Coordinate(0, 0, 1)],
-        "affs_long_xy": [Coordinate(0, 7, 0), Coordinate(0, 0, 7)],
-    },
-    num_workers=4,
-    roi=large_eval_roi,
-)
-graph_mws = GraphMWS(
-    db=emb_db,
-    lut=emb_lut,
-    weights={
-        "affs_z": (1.0, -0.5),
-        "affs_xy": (1.0, -0.2),
-        "affs_long_xy": (1.0, -0.8),
-    },
-    roi=large_eval_roi,
-    worker_config=LocalWorker(),
-)
-
-relabel = Relabel(
-    frags_data=frags_dataset,
-    seg_data=labels_dataset,
-    lut=emb_lut,
-    block_size=blocksize,
-    num_workers=4,
-    roi=large_eval_roi,
-)
-
-# %%
-predict_emb.drop()
-predict_emb.run_blockwise(multiprocessing=False)
-pipeline = predict_affs + extract_frags + aff_agglom + graph_mws + relabel
-pipeline.drop()
-pipeline.run_blockwise(multiprocessing=True)
-
-# %%
-from funlib.persistence import open_ds
-
-emb_affs = open_ds("cremi.zarr/test/emb_affs")
-emb_affs.lazy_op(lambda x: x[[0, 3, 4]] / 255.0)
-raw = open_ds("cremi.zarr/test/raw")
-raw.lazy_op(large_eval_roi)
-gif_2d(
-    arrays={
-        "Raw": raw,
-        "Emb": open_ds("cremi.zarr/test/emb"),
-        "Affs": emb_affs,
-        "Frags": open_ds("cremi.zarr/test/emb_frags"),
-        "Pred Labels": open_ds("cremi.zarr/test/emb_pred_labels"),
-    },
-    array_types={
-        "Raw": "raw",
-        "Emb": "pca",
-        "Affs": "affs",
-        "Frags": "labels",
-        "Pred Labels": "labels",
-    },
-    title="CREMI Embedding Prediction",
-    filename="_static/dataset_tutorial/cremi-emb-prediction.gif",
-    fps=10,
-)
-cube(
-    arrays={
-        "raw": open_ds("cremi.zarr/test/raw"),
-        "emb": open_ds("cremi.zarr/test/emb"),
-        "affs": emb_affs,
-        "frags": open_ds("cremi.zarr/test/emb_frags"),
-        "pred_labels": open_ds("cremi.zarr/test/emb_pred_labels"),
-    },
-    array_types={
-        "raw": "raw",
-        "emb": "pca",
-        "affs": "affs",
-        "frags": "labels",
-        "pred_labels": "labels",
-    },
-    title="CREMI Embedding Prediction",
-    filename="_static/dataset_tutorial/cremi-emb-prediction.jpg",
-)
-
-# %% [markdown]
-# Here we visualize the prediction results:
-# ![cremi-emb-prediction](_static/dataset_tutorial/cremi-emb-prediction.gif)
-# ![cremi-emb-prediction-cube](_static/dataset_tutorial/cremi-emb-prediction.jpg)
