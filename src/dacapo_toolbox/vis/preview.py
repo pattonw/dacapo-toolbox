@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from funlib.geometry import Coordinate
+from funlib.geometry import Coordinate, Roi
 from matplotlib import animation
 from matplotlib.colors import ListedColormap
 import numpy as np
@@ -46,6 +46,36 @@ def pca_nd(emb: Array, n_components: int = 3) -> Array:
         axis_names=emb.axis_names,
         types=emb.types,
     )
+
+
+def pca_nd_faces(faces: list[np.ndarray], n_components: int = 3) -> list[np.ndarray]:
+    flattened_faces = [fc.reshape(fc.shape[0], -1) for fc in faces]
+    emb_data = np.concatenate(flattened_faces, axis=1)
+
+    scale = emb_data.std(axis=1, keepdims=True) + 1e-4
+    shift = emb_data.mean(axis=1, keepdims=True)
+
+    emb_data = emb_data - shift  # center the data
+    emb_data /= scale  # normalize the data
+
+    # Apply PCA
+    pca = PCA(n_components=n_components)
+    principal_components = pca.fit_transform(emb_data.T)
+
+    min_val = principal_components.min(axis=0)
+    max_val = principal_components.max(axis=0)
+
+    principal_faces = []
+    for fc in faces:
+        in_face = (fc.reshape(fc.shape[0], -1) - shift) / scale
+        principal_components = pca.transform(in_face.T).T.reshape(
+            n_components, *fc.shape[1:]
+        )
+
+        principal_components -= min_val.reshape(n_components, 1, 1)
+        principal_components /= (max_val - min_val).reshape(n_components, 1, 1)
+        principal_faces.append(principal_components)
+    return principal_faces
 
 
 def get_cmap(seed: int = 1) -> ListedColormap:
@@ -160,38 +190,87 @@ def cube(
     if Path(filename).exists() and not overwrite:
         return
 
+    total_roi = None
+    for arr in arrays.values():
+        if total_roi is None:
+            total_roi = arr.roi
+        else:
+            total_roi = total_roi.union(arr.roi)
+
     lightsource = mcolors.LightSource(azdeg=light_azdeg, altdeg=light_altdeg)
 
-    transformed_arrays = {}
-    for key, arr in arrays.items():
-        assert arr.voxel_size.dims == 3, (
-            f"Array {key} must be 3D, got {arr.voxel_size.dims}D"
-        )
+    def read_faces(
+        arrays: dict[str, Array],
+    ) -> dict[str, tuple[list[np.ndarray], list[np.ndarray]]]:
+        faces = {}
+        for name, arr in arrays.items():
+            assert arr.voxel_size.dims == 3, (
+                f"Array {name} must be 3D, got {arr.voxel_size.dims}D"
+            )
+            lower = arr.roi.offset
+            upper = lower + arr.roi.shape - arr.voxel_size
+            shape = arr.roi.shape
+            vshape = shape / arr.voxel_size
+            slice_thickness = arr.voxel_size
+
+            z, y, x = tuple(
+                range(start, stop, step)
+                for start, stop, step in zip(arr.roi.begin, arr.roi.end, arr.voxel_size)
+            )
+
+            def face(high: bool, axis: int) -> Roi:
+                a = Coordinate(axis == 0, axis == 1, axis == 2)
+                b = Coordinate(axis != 0, axis != 1, axis != 2)
+                base = upper if high else lower
+                return Roi(base * a + lower * b, shape * b + slice_thickness * a)
+
+            def face_coords(
+                high: bool, axis: int
+            ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+                if axis == 0:
+                    zz = np.ones((vshape[1], vshape[2])) * (
+                        upper[0] if high else lower[0]
+                    )
+                    yy, xx = np.meshgrid(y, x, indexing="ij")
+                elif axis == 1:
+                    yy = np.ones((vshape[0], vshape[2])) * (
+                        upper[1] if high else lower[1]
+                    )
+                    zz, xx = np.meshgrid(z, x, indexing="ij")
+                else:
+                    xx = np.ones((vshape[0], vshape[1])) * (
+                        upper[2] if high else lower[2]
+                    )
+                    zz, yy = np.meshgrid(z, y, indexing="ij")
+                return xx, yy, zz
+
+            face_rois = [face(False, axis) for axis in range(3)] + [
+                face(True, axis) for axis in range(3)
+            ]
+            face_coords_list = [face_coords(False, axis) for axis in range(3)] + [
+                face_coords(True, axis) for axis in range(3)
+            ]
+            faces[name] = (
+                [arr[r].squeeze() for r in face_rois],
+                face_coords_list,
+            )
+        return faces
+
+    faces = read_faces(arrays)
+
+    transformed_faces = {}
+    for key, (face_data, face_coords) in faces.items():
         if array_types[key] == "pca":
-            transformed_arrays[key] = pca_nd(arr)
+            transformed_faces[key] = (pca_nd_faces(face_data), face_coords)
         elif array_types[key] == "labels":
-            normalized = Array(
-                arr.data % 256 / 255.0,
-                voxel_size=arr.voxel_size,
-                offset=arr.offset,
-                units=arr.units,
-                axis_names=arr.axis_names,
-                types=arr.types,
-            )
-            transformed_arrays[key] = normalized
-        elif array_types[key] == "raw":
-            normalized = Array(
-                (arr.data - arr.data.min()) / (arr.data.max() - arr.data.min()),
-                voxel_size=arr.voxel_size,
-                offset=arr.offset,
-                units=arr.units,
-                axis_names=arr.axis_names,
-                types=arr.types,
-            )
-            transformed_arrays[key] = normalized
+            if face_data[0].dtype != np.uint8:
+                normalized = [fd % 256 / 255.0 for fd in face_data]
+            else:
+                normalized = [fd / 255.0 for fd in face_data]
+            transformed_faces[key] = (normalized, face_coords)
         else:
-            transformed_arrays[key] = arr
-    arrays = transformed_arrays
+            transformed_faces[key] = (face_data, face_coords)
+    faces = transformed_faces
 
     fig, axes = plt.subplots(
         1,
@@ -202,28 +281,30 @@ def cube(
 
     label_cmap = get_cmap()
 
-    def draw_cube(ax, arr: Array, cmap=None, interpolation=None):
-        assert arr.voxel_size.dims == 3, (
-            f"Array must be 3D, got voxel size: {arr.voxel_size}"
+    def draw_cube(
+        ax,
+        faces: tuple[list[np.ndarray], list[tuple[np.ndarray, np.ndarray, np.ndarray]]],
+        roi: Roi,
+        cmap=None,
+        interpolation=None,
+    ):
+        face_colors, face_coords = faces
+        xx, yy, zz = (
+            [xxyyzz[0] for xxyyzz in face_coords],
+            [xxyyzz[1] for xxyyzz in face_coords],
+            [xxyyzz[2] for xxyyzz in face_coords],
         )
         kwargs = {
             "interpolation": interpolation,
             "cmap": cmap,
+            "vmin": 0,
+            "vmax": 1,
         }
 
-        z, y, x = tuple(
-            np.linspace(start, stop, count)
-            for start, stop, count in zip(
-                arr.roi.begin, arr.roi.end, arr.roi.shape // arr.voxel_size
-            )
-        )
-        zz, yy, xx = np.meshgrid(z, y, x, indexing="ij")
-
-        face_colors = (
-            cmap(arr[arr.roi])
-            if cmap is not None
-            else arr[arr.roi].transpose(1, 2, 3, 0)
-        )
+        face_colors = [
+            cmap(fc) if cmap is not None else fc.transpose(1, 2, 0)
+            for fc in face_colors
+        ]
 
         kwargs = {
             "rcount": 256,
@@ -232,35 +313,36 @@ def cube(
             "lightsource": lightsource,
         }
 
-        _lz, ly, _lx = np.s_[0, :, :], np.s_[:, 0, :], np.s_[:, :, 0]
-        uz, _uy, ux = np.s_[-1, :, :], np.s_[:, -1, :], np.s_[:, :, -1]
-        # ax.plot_surface(xx[lx], yy[lx], zz[lx], facecolors=face_colors[lx], **kwargs)
-        ax.plot_surface(xx[ux], yy[ux], zz[ux], facecolors=face_colors[ux], **kwargs)
-        ax.plot_surface(xx[ly], yy[ly], zz[ly], facecolors=face_colors[ly], **kwargs)
-        # ax.plot_surface(xx[uy], yy[uy], zz[uy], facecolors=face_colors[uy], **kwargs)
-        # ax.plot_surface(xx[lz], yy[lz], zz[lz], facecolors=face_colors[lz], **kwargs)
-        ax.plot_surface(xx[uz], yy[uz], zz[uz], facecolors=face_colors[uz], **kwargs)
+        # ax.plot_surface(xx[0], yy[0], zz[0], facecolors=face_colors[0], **kwargs)
+        ax.plot_surface(xx[1], yy[1], zz[1], facecolors=face_colors[1], **kwargs)
+        # ax.plot_surface(xx[2], yy[2], zz[2], facecolors=face_colors[2], **kwargs)
+        ax.plot_surface(xx[3], yy[3], zz[3], facecolors=face_colors[3], **kwargs)
+        # ax.plot_surface(xx[4], yy[4], zz[4], facecolors=face_colors[4], **kwargs)
+        ax.plot_surface(xx[5], yy[5], zz[5], facecolors=face_colors[5], **kwargs)
 
-        ax.set_xlim(x[0], x[-1])
-        ax.set_ylim(y[0], y[-1])
-        ax.set_zlim(z[0], z[-1])
-        ax.set_box_aspect(arr.roi.shape[::-1])
+        ax.set_xlim(roi.begin[2], roi.end[2])
+        ax.set_ylim(roi.begin[1], roi.end[1])
+        ax.set_zlim(roi.begin[0], roi.end[0])
+        ax.set_box_aspect(roi.shape[::-1])
 
         ax.axis("off")
 
-    for jj, (key, arr) in enumerate(arrays.items()):
-        ax = axes[jj]
+    for jj, (key, face_data) in enumerate(faces.items()):
+        ax = axes[jj] if len(arrays) > 1 else axes
+        face_colors = face_data[0]
 
         if array_types[key] == "labels":
-            draw_cube(ax, arr, cmap=label_cmap, interpolation="none")
+            draw_cube(
+                ax, face_data, roi=total_roi, cmap=label_cmap, interpolation="none"
+            )
         elif array_types[key] == "raw" or array_types[key] == "pca":
-            if arr.data.ndim == 3:
-                draw_cube(ax, arr, cmap=cm.gray)  # type: ignore
-            elif arr.data.ndim == 4:
-                draw_cube(ax, arr)
+            if face_colors[0].ndim == 2:
+                draw_cube(ax, face_data, roi=total_roi, cmap=cm.gray)  # type: ignore
+            elif face_colors[0].ndim == 3:
+                draw_cube(ax, face_data, roi=total_roi)
         elif array_types[key] == "affs":
             # Show the affinities
-            draw_cube(ax, arr, interpolation="none")
+            draw_cube(ax, face_data, roi=total_roi, interpolation="none")
 
         ax.set_title(key)
         # Without this line, the default cube view is elev = 30, azim = -60.
