@@ -89,8 +89,13 @@ class PipelineDataset(torch.utils.data.IterableDataset):
             batch_request = self.request.copy()
             batch_request._random_seed = random.randint(0, 2**32 - 1)
             batch = self.pipeline.request_batch(batch_request)
+            # TODO: Throw warning on incorrect byteorder!
             torch_batch = {
-                str(key): torch.from_numpy(batch[key].data.copy())
+                str(key): torch.from_numpy(
+                    batch[key]
+                    .data.astype(batch[key].data.dtype.newbyteorder("="))
+                    .copy()
+                )
                 if isinstance(key, gp.ArrayKey)
                 else gp_to_nx_graph(batch[key])
                 for key in self.keys
