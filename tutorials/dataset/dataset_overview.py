@@ -392,10 +392,10 @@ g.add_nodes_from(
         (i, {"position": position})
         for i, position in enumerate(
             [
-                (side_length * 2, side_length * 2),
-                (0, side_length * 2),
-                (side_length * 2, 0),
-                (0, 0),
+                (side_length * 2 - 0.5, side_length * 2 - 0.5),
+                (0.5, side_length * 2 - 0.5),
+                (side_length * 2 - 0.5, 0.5),
+                (0.5, 0.5),
             ]
         )
     ]
@@ -453,7 +453,7 @@ import matplotlib.pyplot as plt
 
 for i, batch in enumerate(iter_ds):
     print(f"Batch {i}")
-    if i >= 6:  # Limit to 4 batches for demonstration
+    if i >= 4:  # Limit to 4 batches for demonstration
         break
     points = batch["sample_points"]
     xs = np.array([attrs["position"][0] for attrs in points.nodes.values()])
@@ -489,5 +489,3 @@ for i, batch in enumerate(iter_ds):
 # ![Affs Batch 1](_static/dataset_overview/affs_batch_1.png)
 # ![Affs Batch 2](_static/dataset_overview/affs_batch_2.png)
 # ![Affs Batch 3](_static/dataset_overview/affs_batch_3.png)
-# ![Affs Batch 4](_static/dataset_overview/affs_batch_4.png)
-# ![Affs Batch 5](_static/dataset_overview/affs_batch_5.png)
