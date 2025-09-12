@@ -47,8 +47,8 @@ from funlib.persistence import Array
 from funlib.geometry import Coordinate, Roi
 from dacapo_toolbox.sample_datasets import cremi
 
-if not Path("_static/dataset_tutorial").exists():
-    Path("_static/dataset_tutorial").mkdir(parents=True, exist_ok=True)
+if not Path("_static/cremi").exists():
+    Path("_static/cremi").mkdir(parents=True, exist_ok=True)
 
 raw_train, labels_train, raw_test, labels_test = cremi(Path("cremi.zarr"))
 
@@ -59,9 +59,11 @@ NUM_ITERATIONS = 300
 blocksize = Coordinate(32, 256, 256)
 # We choose a small and large eval roi for performance evaluation
 # The small roi will be processed in memory, the large will be processed blockwise
-offset = Coordinate(46, 465, 465)
+offset = Coordinate(78, 465, 465)
 small_eval_roi = Roi(offset, blocksize) * raw_test.voxel_size
-large_eval_roi = Roi(offset - blocksize, blocksize * 3) * raw_test.voxel_size
+large_eval_roi = (
+    Roi(offset - blocksize, blocksize * Coordinate(1, 3, 3)) * raw_test.voxel_size
+)
 
 
 # %% [markdown]
@@ -80,21 +82,21 @@ from dacapo_toolbox.vis.preview import gif_2d, cube
 gif_2d(
     arrays={"Train Raw": raw_train, "Train Labels": labels_train},
     array_types={"Train Raw": "raw", "Train Labels": "labels"},
-    filename="_static/dataset_tutorial/training-data.gif",
+    filename="_static/cremi/training-data.gif",
     title="Training Data",
     fps=10,
 )
 cube(
     arrays={"Train Raw": raw_train, "Train Labels": labels_train},
     array_types={"Train Raw": "raw", "Train Labels": "labels"},
-    filename="_static/dataset_tutorial/training-data.jpg",
+    filename="_static/cremi/training-data.jpg",
     title="Training Data",
 )
 
 # %% [markdown]
 # Here we visualize the training data:
-# ![training-data](_static/dataset_tutorial/training-data.gif)
-# ![training-data-cube](_static/dataset_tutorial/training-data.jpg)
+# ![training-data](_static/cremi/training-data.gif)
+# ![training-data-cube](_static/cremi/training-data.jpg)
 
 # %% [markdown]
 # ### Testing data
@@ -103,21 +105,21 @@ cube(
 gif_2d(
     arrays={"Test Raw": raw_test, "Test Labels": labels_test},
     array_types={"Test Raw": "raw", "Test Labels": "labels"},
-    filename="_static/dataset_tutorial/testing-data.gif",
+    filename="_static/cremi/testing-data.gif",
     title="Testing Data",
     fps=10,
 )
 cube(
     arrays={"Test Raw": raw_test, "Test Labels": labels_test},
     array_types={"Test Raw": "raw", "Test Labels": "labels"},
-    filename="_static/dataset_tutorial/testing-data.jpg",
+    filename="_static/cremi/testing-data.jpg",
     title="Testing Data",
 )
 
 # %% [markdown]
 # Here we visualize the test data:
-# ![test-data](_static/dataset_tutorial/test-data.gif)
-# ![test-data-cube](_static/dataset_tutorial/test-data.jpg)
+# ![test-data](_static/cremi/test-data.gif)
+# ![test-data-cube](_static/cremi/test-data.jpg)
 
 # %% [markdown]
 # ### DaCapo
@@ -164,7 +166,7 @@ gif_2d(
         "Labels": Array(batch["gt"].numpy(), voxel_size=labels_train.voxel_size),
     },
     array_types={"Raw": "raw", "Labels": "labels"},
-    filename="_static/dataset_tutorial/simple-batch.gif",
+    filename="_static/cremi/simple-batch.gif",
     title="Simple Batch",
     fps=10,
 )
@@ -174,14 +176,14 @@ cube(
         "Labels": Array(batch["gt"].numpy(), voxel_size=labels_train.voxel_size),
     },
     array_types={"Raw": "raw", "Labels": "labels"},
-    filename="_static/dataset_tutorial/simple-batch.jpg",
+    filename="_static/cremi/simple-batch.jpg",
     title="Simple Batch",
 )
 
 # %% [markdown]
 # Here we visualize the training data:
-# ![simple-batch](_static/dataset_tutorial/simple-batch.gif)
-# ![simple-batch-cube](_static/dataset_tutorial/simple-batch.jpg)
+# ![simple-batch](_static/cremi/simple-batch.gif)
+# ![simple-batch-cube](_static/cremi/simple-batch.jpg)
 
 
 # %% [markdown]
@@ -251,7 +253,7 @@ gif_2d(
         "Affs": "affs",
         "Affs Mask": "affs",
     },
-    filename="_static/dataset_tutorial/affs-batch.gif",
+    filename="_static/cremi/affs-batch.gif",
     title="Affinities Batch",
     fps=10,
 )
@@ -274,14 +276,14 @@ cube(
         "Affs": "affs",
         "Affs Mask": "affs",
     },
-    filename="_static/dataset_tutorial/affs-batch.jpg",
+    filename="_static/cremi/affs-batch.jpg",
     title="Affinities Batch",
 )
 
 # %% [markdown]
 # Here we visualize a batch with (raw, gt, target) triplets for the affinities task:
-# ![affs-batch](_static/dataset_tutorial/affs-batch.gif)
-# ![affs-batch-cube](_static/dataset_tutorial/affs-batch.jpg)
+# ![affs-batch](_static/cremi/affs-batch.gif)
+# ![affs-batch-cube](_static/cremi/affs-batch.jpg)
 
 # %% [markdown]
 # ### Models
@@ -396,7 +398,7 @@ plt.plot(losses)
 plt.xlabel("Iteration")
 plt.ylabel("Loss")
 plt.title("Loss Curve")
-plt.savefig("_static/dataset_tutorial/affs-loss-curve.png")
+plt.savefig("_static/cremi/affs-loss-curve.png")
 plt.show()
 plt.close()
 
@@ -445,7 +447,7 @@ gif_2d(
         "Pred Affs": "affs",
         "Pred": "labels",
     },
-    filename="_static/dataset_tutorial/affs-prediction.gif",
+    filename="_static/cremi/affs-prediction.gif",
     title="Prediction",
     fps=10,
 )
@@ -462,14 +464,14 @@ cube(
         "Pred Affs": "affs",
         "Pred": "labels",
     },
-    filename="_static/dataset_tutorial/affs-prediction.jpg",
+    filename="_static/cremi/affs-prediction.jpg",
     title="Prediction",
 )
 
 # %% [markdown]
 # Here we visualize the prediction results:
-# ![affs-prediction](_static/dataset_tutorial/affs-prediction.gif)
-# ![affs-prediction-cube](_static/dataset_tutorial/affs-prediction.jpg)
+# ![affs-prediction](_static/cremi/affs-prediction.gif)
+# ![affs-prediction-cube](_static/cremi/affs-prediction.jpg)
 
 # %% [markdown]
 # ## Blockwise Processing
@@ -498,14 +500,12 @@ blockwise_predict_mutex(
     affs_store="cremi.zarr/test/affs",  # optional, provided for visualization
     frags_store="cremi.zarr/test/frags",  # optional, provided for visualization
     labels_store="cremi.zarr/test/pred_labels",
-    lut_path="cremi.zarr/test/lut.npz",  # optional, TODO: test
-    sqlite_db_path="cremi.zarr/test/graph.db",  # optional, TODO: test
     neighborhood=neighborhood,
     blocksize=blocksize,
     model_path="cremi.zarr/affs_unet.pt",
     in_channels=1,
     model_context=unet.context // 2,
-    predict_worker=LocalWorker(),  # optional, TODO: provided because cannot reinitialize cuda in a forked process
+    predict_worker=LocalWorker(),  # optional, see docstring
     extract_frag_bias=[
         -0.5,
         -0.2,
@@ -529,7 +529,9 @@ blockwise_predict_mutex(
             -0.8,
         ),
     ],
-    graph_mws_worker=LocalWorker(),
+    num_extract_frag_workers=3,
+    num_aff_agglom_workers=3,
+    num_relabel_workers=3,
     roi=large_eval_roi,
 )
 
@@ -557,12 +559,12 @@ gif_2d(
         "Pred Labels": "labels",
     },
     title="CREMI Affs Prediction",
-    filename="_static/dataset_tutorial/cremi-prediction.gif",
+    filename="_static/cremi/cremi-prediction.gif",
     fps=10,
 )
 cube(
     arrays={
-        "raw": open_ds("cremi.zarr/test/raw"),
+        "raw": raw,
         "affs": affs,
         "frags": open_ds("cremi.zarr/test/frags"),
         "pred_labels": open_ds("cremi.zarr/test/pred_labels"),
@@ -574,10 +576,10 @@ cube(
         "pred_labels": "labels",
     },
     title="CREMI Affs Prediction",
-    filename="_static/dataset_tutorial/cremi-prediction.jpg",
+    filename="_static/cremi/cremi-prediction.jpg",
 )
 
 # %% [markdown]
 # Here we visualize the prediction results:
-# ![cremi-prediction](_static/dataset_tutorial/cremi-prediction.gif)
-# ![cremi-prediction-cube](_static/dataset_tutorial/cremi-prediction.jpg)
+# ![cremi-prediction](_static/cremi/cremi-prediction.gif)
+# ![cremi-prediction-cube](_static/cremi/cremi-prediction.jpg)
