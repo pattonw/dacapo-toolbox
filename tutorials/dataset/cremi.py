@@ -41,6 +41,7 @@ import dask
 dask.config.set(scheduler="single-threaded")
 
 from pathlib import Path
+from functools import partial
 from tqdm import tqdm
 
 from funlib.persistence import Array
@@ -212,7 +213,6 @@ train_dataset = iterable_dataset(
     transforms={
         ("gt", "affs"): Affs(neighborhood=neighborhood, concat_dim=0),
         ("gt", "affs_mask"): AffsMask(neighborhood=neighborhood),
-        (("affs", "affs_mask"), "weights"): BalanceLabels((1, -1, -1, -1)),
     },
     deform_augment_config=DeformAugmentConfig(
         p=0.1,
@@ -321,8 +321,24 @@ unet = tems.UNet.funlib_api(
     activation="LeakyReLU",
 )
 
-module = torch.nn.Sequential(
-    unet, torch.nn.Conv3d(32, len(neighborhood), kernel_size=1), torch.nn.Sigmoid()
+# Small sigmoid wrapper to apply sigmoid only when not training
+# this is because training BCEWithLogitsLoss is more stable
+# than training with a sigmoid followed by BCELoss
+class SigmoidWrapper(torch.nn.Module):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+        self.apply_sigmoid = True
+
+    def forward(self, x):
+        logits = self.model(x)
+        if self.apply_sigmoid and not self.training:
+            return torch.sigmoid(logits)
+        return logits
+
+
+module = SigmoidWrapper(
+    torch.nn.Sequential(unet, torch.nn.Conv3d(32, len(neighborhood), kernel_size=1))
 ).to(device)
 
 # %% [markdown]
@@ -343,7 +359,6 @@ train_dataset = iterable_dataset(
         "raw": torchvision.transforms.Lambda(lambda x: x[None].float() / 255.0),
         ("gt", "affs"): Affs(neighborhood=neighborhood, concat_dim=0),
         ("gt", "affs_mask"): AffsMask(neighborhood=neighborhood),
-        (("affs", "affs_mask"), "weights"): BalanceLabels((1, -1, -1, -1)),
     },
     deform_augment_config=DeformAugmentConfig(
         p=0.1,
@@ -361,8 +376,8 @@ train_dataset = iterable_dataset(
     ),
 )
 
-loss_func = torch.nn.BCELoss(reduction="none")
-optimizer = torch.optim.Adam(module.parameters(), lr=1e-4)
+loss_func = partial(torchvision.ops.sigmoid_focal_loss, reduction="none")
+optimizer = torch.optim.Adam(module.parameters(), lr=5e-5)
 dataloader = torch.utils.data.DataLoader(
     train_dataset,
     batch_size=3,
@@ -371,17 +386,17 @@ dataloader = torch.utils.data.DataLoader(
 losses = []
 
 for iteration, batch in tqdm(enumerate(iter(dataloader))):
-    raw, target, weight = (
+    raw, target, affs_mask = (
         batch["raw"].to(device),
         batch["affs"].to(device),
-        batch["weights"].to(device),
+        batch["affs_mask"].to(device),
     )
     optimizer.zero_grad()
 
     output = module(raw)
 
     voxel_loss = loss_func(output, target.float())
-    loss = (voxel_loss * weight).mean()
+    loss = (voxel_loss * affs_mask).sum() / affs_mask.sum()
     loss.backward()
     optimizer.step()
 
