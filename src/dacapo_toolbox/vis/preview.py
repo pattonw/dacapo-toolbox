@@ -8,8 +8,6 @@ from sklearn.decomposition import PCA
 
 from pathlib import Path
 
-import time
-
 from matplotlib import colors as mcolors
 from matplotlib import cm
 
@@ -99,7 +97,37 @@ def gif_2d(
     optimize_gif: bool = False,
     frame_skip: int = 2,
 ):
-    t_start = time.time()
+    """
+    Create a 2D GIF preview of the given arrays.
+
+    Parameters
+    ----------
+    arrays : dict[str, Array]
+        A dictionary of named arrays to visualize. Each array must be 3D,
+        with optional channels.
+    array_types : dict[str, str]
+        A dictionary specifying the type of each array. Supported types are:
+        - "raw": Grayscale raw data.
+        - "labels": Integer labels, visualized with a random color map.
+        - "affs": Affinity graphs, visualized as RGB images.
+        - "pca": High-dimensional data, visualized using PCA to reduce to 3 channels.
+    filename : str
+        The output filename for the GIF.
+    title : str
+        The title to display on the GIF.
+    fps : int, optional
+        Frames per second for the GIF. Default is 10.
+    overwrite : bool, optional
+        Whether to overwrite the output file if it already exists. Default is True.
+    dpi : int, optional
+        Dots per inch for the output GIF. Default is 72.
+    max_size : int, optional
+        Maximum size (in pixels) for the largest dimension of the images. Default is 256.
+    optimize_gif : bool, optional
+        Whether to optimize the GIF for smaller file size. Default is False.
+    frame_skip : int, optional
+        Number of frames to skip when generating the GIF for faster creation. Default is 2.
+    """
     if Path(filename).exists() and not overwrite:
         return
     transformed_arrays = {}
@@ -176,15 +204,9 @@ def gif_2d(
             slice_ims.append(im)
         ims.append(slice_ims)
 
-    t_im_gen = time.time()
-    print(f"generated images in {t_im_gen - t_start:.1f}s")
-
     ims = ims + ims[::-1]
     ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
     fig.suptitle(title, fontsize=16)
-
-    t_animation = time.time()
-    print(f"built animation in {t_animation - t_im_gen}s")
 
     # Use optimized writer settings for faster GIF creation
     from matplotlib.animation import PillowWriter
@@ -196,7 +218,6 @@ def gif_2d(
 
     ani.save(filename, writer=writer, dpi=dpi)
     plt.close()
-    print(f"Saved gif to {filename} in {time.time() - t_animation:.1f}s")
 
 
 def cube(
@@ -214,7 +235,45 @@ def cube(
     shade: bool = True,
     dpi: int = 100,
 ):
-    t_start = time.time()
+    """
+    Preview 3D arrays as cubes with matplotlib. Arrays do not need to be the same size
+    their relative sizes and shifts will be respected.
+
+    Parameters
+    ----------
+    arrays : dict[str, Array]
+        A dictionary of named arrays to visualize. Each array must be 3D,
+        with optional channels.
+    array_types : dict[str, str]
+        A dictionary specifying the type of each array. Supported types are:
+        - "raw": Grayscale raw data.
+        - "labels": Integer labels, visualized with a random color map.
+        - "affs": Affinity graphs, visualized as RGB images.
+        - "pca": High-dimensional data, visualized using PCA to reduce to 3
+            channels.
+    filename : str
+        The output filename for the image.
+    title : str
+        The title to display on the image.
+    elev : float, optional
+        Elevation angle for the 3D view. Default is 30.
+    azim : float, optional
+        Azimuth angle for the 3D view. Default is -60.
+    light_azdeg : float, optional
+        Azimuth angle for the light source. Default is 205.
+    light_altdeg : float, optional
+        Altitude angle for the light source. Default is 20.
+    overwrite : bool, optional
+        Whether to overwrite the output file if it already exists. Default is True.
+    rcount : int, optional
+        Number of rows for the surface plot. Default is 128.
+    ccount : int, optional
+        Number of columns for the surface plot. Default is 128.
+    shade : bool, optional
+        Whether to shade the surface plot. Default is True.
+    dpi : int, optional
+        Dots per inch for the output image. Default is 100.
+    """
     if Path(filename).exists() and not overwrite:
         return
 
@@ -301,9 +360,6 @@ def cube(
             transformed_faces[key] = (face_data, face_coords)
     faces = transformed_faces
 
-    t_processed = time.time()
-    print(f"processed data in {t_processed - t_start:.1f}s")
-
     fig, axes = plt.subplots(
         1,
         len(arrays),
@@ -384,10 +440,5 @@ def cube(
 
     plt.tight_layout()
 
-    t_drawn = time.time()
-    print(f"drew figure in {t_drawn - t_processed:.1f}s")
-
     plt.savefig(filename, bbox_inches="tight", pad_inches=0.1, dpi=dpi)
     plt.close(fig)
-
-    print(f"Saved cube to {filename} in {time.time() - t_drawn:.1f}s")
