@@ -100,6 +100,46 @@ def blockwise_predict_mutex(
     drop : bool, optional
         If `True`, drop the pipeline after running it. This is useful to free up resources
         and avoid keeping the pipeline in memory. Defaults to `True`.
+    predict_worker : Worker | None, optional
+        Worker configuration for the affinity prediction step. If `None`, processing is done
+        in a subprocess or in the main thread in the case of running blockwise with
+        `multiprocessing=False`. If you are running prediction within the same script as
+        training and you have already accessed a GPU device, you must provide a worker config
+        e.g. `LocalWorker()` to avoid the error: "Cannot re-initialize CUDA in forked subprocess".
+    extract_frag_bias : Sequence[float] | None, optional
+        List of biases to use for fragment extraction. If `None`, biases are computed based
+        on the log distance of the neighborhood offsets, this is not yet particularly good.
+        Defaults to `None`.
+    remove_debris : int, optional
+        Minimum size of fragments to keep. Fragments smaller than this will be removed.
+        Defaults to 32.
+    num_extract_frag_workers : int, optional
+        Number of workers to use for fragment extraction. Defaults to 1.
+    extract_frag_worker : Worker | None, optional
+        Worker configuration for the fragment extraction step. If `None`, processing is done
+        in a subprocess or in the main thread in the case of running blockwise with
+        `multiprocessing=False`.
+    edge_scores : Sequence[tuple[Sequence[Coordinate] | Coordinate, float] | tuple[str, Sequence[Coordinate] | Coordinate, float]] | None, optional
+        List of tuples defining the edges to agglomerate and their associated biases.
+        Each tuple can be either (offsets, bias) or (name, offsets, bias).
+        If `None`, all edges in the neighborhood are used with a default bias of -0.5.
+        Defaults to `None`.
+    num_aff_agglom_workers : int, optional
+        Number of workers to use for affinity agglomeration. Defaults to 1.
+    aff_agglom_worker : Worker | None, optional
+        Worker configuration for the affinity agglomeration step. If `None`, processing is done
+        in a subprocess or in the main thread in the case of running blockwise with
+        `multiprocessing=False`.
+    graph_mws_worker : Worker | None, optional
+        Worker configuration for the graph mutex watershed step. If `None`, processing is done
+        in a subprocess or in the main thread in the case of running blockwise with
+        `multiprocessing=False`.
+    num_relabel_workers : int, optional
+        Number of workers to use for relabeling. Defaults to 1.
+    relabel_worker : Worker | None, optional
+        Worker configuration for the relabeling step. If `None`, processing is done
+        in a subprocess or in the main thread in the case of running blockwise with
+        `multiprocessing=False`.
     """
 
     with tempfile.TemporaryDirectory() as tmpdir:
