@@ -11,7 +11,7 @@
    install
    api
    tutorials/dataset/dataset_overview
-   tutorials/dataset/dataset_training
+   tutorials/dataset/cremi
 
 .. include:: ../../README.md
    :parser: myst_parser.sphinx_

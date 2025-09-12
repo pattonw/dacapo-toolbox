@@ -1,0 +1,1011 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cremi Example &mdash; DaCapo  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="Dataset Overview" href="dataset_overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            DaCapo
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">DaCapo Toolbox:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#dataset">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#transforms">Transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#visualizations">Visualizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#sample-data">Sample Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataset_overview.html">Dataset Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Cremi Example</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Introduction-and-overview">Introduction and overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Environment-setup">Environment setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Data-Preparation">Data Preparation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Training-data">Training data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Testing-data">Testing data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#DaCapo">DaCapo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Data-Split">Data Split</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Tasks">Tasks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Models">Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Training-loop">Training loop</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Blockwise-Processing">Blockwise Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Visualizing-the-results">Visualizing the results</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DaCapo</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Cremi Example</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/tutorials/dataset/cremi.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Cremi-Example">
+<h1>Cremi Example<a class="headerlink" href="#Cremi-Example" title="Link to this heading"></a></h1>
+<p>This tutorial demonstrates some simple pipelines using the dacapo_toolbox dataset on <a class="reference external" href="https://cremi.org/data/">cremi data</a>. We’ll cover a fun method for instance segmentation using a 2.5D U-Net.</p>
+<section id="Introduction-and-overview">
+<h2>Introduction and overview<a class="headerlink" href="#Introduction-and-overview" title="Link to this heading"></a></h2>
+<p>In this tutorial we will cover a few basic ML tasks using the DaCapo toolbox. We will:</p>
+<ul class="simple">
+<li><p>Prepare a dataloader for the CREMI dataset</p></li>
+<li><p>Train a simple 2D U-Net for both instance and semantic segmentation</p></li>
+<li><p>Visualize the results</p></li>
+</ul>
+</section>
+<section id="Environment-setup">
+<h2>Environment setup<a class="headerlink" href="#Environment-setup" title="Link to this heading"></a></h2>
+<p>If you have not already done so, you will need to install DaCapo. You can do this by first creating a new environment and then installing the DaCapo Toolbox.</p>
+<p>I highly recommend using <a class="reference external" href="https://docs.astral.sh/uv/">uv</a> for environment management, but there are many tools to choose from.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>uv<span class="w"> </span>init
+uv<span class="w"> </span>add<span class="w"> </span>git+https://github.com/pattonw/dacapo-toolbox.git
+</pre></div>
+</div>
+</section>
+<section id="Data-Preparation">
+<h2>Data Preparation<a class="headerlink" href="#Data-Preparation" title="Link to this heading"></a></h2>
+<p>DaCapo works with zarr, so we will download <a class="reference external" href="https://cremi.org/static/data/sample_A%2B_20160601.hdf">CREMI Sample A</a> and save it as a zarr file.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mp</span>
+
+<span class="n">mp</span><span class="o">.</span><span class="n">set_start_method</span><span class="p">(</span><span class="s2">&quot;fork&quot;</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+
+<span class="n">dask</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">scheduler</span><span class="o">=</span><span class="s2">&quot;single-threaded&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">funlib.persistence</span><span class="w"> </span><span class="kn">import</span> <span class="n">Array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">funlib.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinate</span><span class="p">,</span> <span class="n">Roi</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dacapo_toolbox.sample_datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">cremi</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;_static/cremi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;_static/cremi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">raw_train</span><span class="p">,</span> <span class="n">labels_train</span><span class="p">,</span> <span class="n">raw_test</span><span class="p">,</span> <span class="n">labels_test</span> <span class="o">=</span> <span class="n">cremi</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;cremi.zarr&quot;</span><span class="p">))</span>
+
+<span class="c1"># define some variables that we will use later</span>
+<span class="c1"># The number of iterations we will train</span>
+<span class="n">NUM_ITERATIONS</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="c1"># A reasonable block size for processing image data with a UNet</span>
+<span class="n">blocksize</span> <span class="o">=</span> <span class="n">Coordinate</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>
+<span class="c1"># We choose a small and large eval roi for performance evaluation</span>
+<span class="c1"># The small roi will be processed in memory, the large will be processed blockwise</span>
+<span class="n">offset</span> <span class="o">=</span> <span class="n">Coordinate</span><span class="p">(</span><span class="mi">78</span><span class="p">,</span> <span class="mi">465</span><span class="p">,</span> <span class="mi">465</span><span class="p">)</span>
+<span class="n">small_eval_roi</span> <span class="o">=</span> <span class="n">Roi</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">blocksize</span><span class="p">)</span> <span class="o">*</span> <span class="n">raw_test</span><span class="o">.</span><span class="n">voxel_size</span>
+<span class="n">large_eval_roi</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">Roi</span><span class="p">(</span><span class="n">offset</span> <span class="o">-</span> <span class="n">blocksize</span><span class="p">,</span> <span class="n">blocksize</span> <span class="o">*</span> <span class="n">Coordinate</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">*</span> <span class="n">raw_test</span><span class="o">.</span><span class="n">voxel_size</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Lets visualize our train and test data</p>
+<section id="Training-data">
+<h3>Training data<a class="headerlink" href="#Training-data" title="Link to this heading"></a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dacapo_toolbox.vis.preview</span><span class="w"> </span><span class="kn">import</span> <span class="n">gif_2d</span><span class="p">,</span> <span class="n">cube</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1"># create a 2D gif of the training data</span>
+<span class="n">gif_2d</span><span class="p">(</span>
+    <span class="n">arrays</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Train Raw&quot;</span><span class="p">:</span> <span class="n">raw_train</span><span class="p">,</span> <span class="s2">&quot;Train Labels&quot;</span><span class="p">:</span> <span class="n">labels_train</span><span class="p">},</span>
+    <span class="n">array_types</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Train Raw&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="s2">&quot;Train Labels&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">},</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;_static/cremi/training-data.gif&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Training Data&quot;</span><span class="p">,</span>
+    <span class="n">fps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cube</span><span class="p">(</span>
+    <span class="n">arrays</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Train Raw&quot;</span><span class="p">:</span> <span class="n">raw_train</span><span class="p">,</span> <span class="s2">&quot;Train Labels&quot;</span><span class="p">:</span> <span class="n">labels_train</span><span class="p">},</span>
+    <span class="n">array_types</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Train Raw&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="s2">&quot;Train Labels&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">},</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;_static/cremi/training-data.jpg&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Training Data&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Here we visualize the training data: <img alt="training-data" src="../../_images/training-data.gif" /> <img alt="training-data-cube" src="../../_images/training-data.jpg" /></p>
+</section>
+<section id="Testing-data">
+<h3>Testing data<a class="headerlink" href="#Testing-data" title="Link to this heading"></a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gif_2d</span><span class="p">(</span>
+    <span class="n">arrays</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Test Raw&quot;</span><span class="p">:</span> <span class="n">raw_test</span><span class="p">,</span> <span class="s2">&quot;Test Labels&quot;</span><span class="p">:</span> <span class="n">labels_test</span><span class="p">},</span>
+    <span class="n">array_types</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Test Raw&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="s2">&quot;Test Labels&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">},</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;_static/cremi/testing-data.gif&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Testing Data&quot;</span><span class="p">,</span>
+    <span class="n">fps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cube</span><span class="p">(</span>
+    <span class="n">arrays</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Test Raw&quot;</span><span class="p">:</span> <span class="n">raw_test</span><span class="p">,</span> <span class="s2">&quot;Test Labels&quot;</span><span class="p">:</span> <span class="n">labels_test</span><span class="p">},</span>
+    <span class="n">array_types</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Test Raw&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="s2">&quot;Test Labels&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">},</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;_static/cremi/testing-data.jpg&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Testing Data&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Here we visualize the test data: <img alt="test-data" src="tutorials/dataset/_static/cremi/test-data.gif" /> <img alt="test-data-cube" src="tutorials/dataset/_static/cremi/test-data.jpg" /></p>
+</section>
+<section id="DaCapo">
+<h3>DaCapo<a class="headerlink" href="#DaCapo" title="Link to this heading"></a></h3>
+<p>Now that we have some data, lets look at how we can use DaCapo to interface with it for some common ML use cases.</p>
+</section>
+<section id="Data-Split">
+<h3>Data Split<a class="headerlink" href="#Data-Split" title="Link to this heading"></a></h3>
+<p>We always want to be explicit when we define our data split for training and validation so that we are aware what data is being used for training and validation.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dacapo_toolbox.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">iterable_dataset</span><span class="p">,</span>
+    <span class="n">DeformAugmentConfig</span><span class="p">,</span>
+    <span class="n">SimpleAugmentConfig</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/runner/work/dacapo-toolbox/dacapo-toolbox/.venv/lib/python3.11/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">iterable_dataset</span><span class="p">(</span>
+    <span class="n">datasets</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">raw_train</span><span class="p">,</span> <span class="s2">&quot;gt&quot;</span><span class="p">:</span> <span class="n">labels_train</span><span class="p">},</span>
+    <span class="n">shapes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span> <span class="s2">&quot;gt&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">)},</span>
+    <span class="n">deform_augment_config</span><span class="o">=</span><span class="n">DeformAugmentConfig</span><span class="p">(</span>
+        <span class="n">p</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">control_point_spacing</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="n">jitter_sigma</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">rotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">subsample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">rotation_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">scale_interval</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">simple_augment_config</span><span class="o">=</span><span class="n">SimpleAugmentConfig</span><span class="p">(</span>
+        <span class="n">p</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">mirror_only</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">transpose_only</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">trim</span><span class="o">=</span><span class="n">Coordinate</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">batch_gen</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/runner/work/dacapo-toolbox/dacapo-toolbox/.venv/lib/python3.11/site-packages/gunpowder/nodes/deform_augment.py:164: UserWarning: Rotating with anisotropic control point spacingmay lead to exaggerated stretching.
+  warnings.warn(
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">batch_gen</span><span class="p">)</span>
+<span class="n">gif_2d</span><span class="p">(</span>
+    <span class="n">arrays</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_train</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+        <span class="s2">&quot;Labels&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;gt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">labels_train</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="n">array_types</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="s2">&quot;Labels&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">},</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;_static/cremi/simple-batch.gif&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Simple Batch&quot;</span><span class="p">,</span>
+    <span class="n">fps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cube</span><span class="p">(</span>
+    <span class="n">arrays</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_train</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+        <span class="s2">&quot;Labels&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;gt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">labels_train</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="n">array_types</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="s2">&quot;Labels&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">},</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;_static/cremi/simple-batch.jpg&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Simple Batch&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Here we visualize the training data: <img alt="simple-batch" src="../../_images/simple-batch.gif" /> <img alt="simple-batch-cube" src="../../_images/simple-batch.jpg" /></p>
+</section>
+<section id="Tasks">
+<h3>Tasks<a class="headerlink" href="#Tasks" title="Link to this heading"></a></h3>
+<p>When training for instance segmentation, it is not possible to directly predict label ids since the ids have to be unique accross the full volume which is not possible to do with the local context that a UNet operates on. So instead we need to transform our labels into some intermediate representation that is both easy to predict and easy to post process. The most common method we use is a combination of <a class="reference external" href="https://arxiv.org/pdf/1706.00120">affinities</a> with optional
+<a class="reference external" href="https://github.com/funkelab/lsd">lsds</a> for prediction plus <a class="reference external" href="https://arxiv.org/abs/1904.12654">mutex watershed</a> for post processing.</p>
+<p>Next we will define the task that encapsulates this process.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dacapo_toolbox.transforms.affs</span><span class="w"> </span><span class="kn">import</span> <span class="n">Affs</span><span class="p">,</span> <span class="n">AffsMask</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dacapo_toolbox.transforms.weight_balancing</span><span class="w"> </span><span class="kn">import</span> <span class="n">BalanceLabels</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torchvision</span>
+
+<span class="n">neighborhood</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">23</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="n">train_dataset</span> <span class="o">=</span> <span class="n">iterable_dataset</span><span class="p">(</span>
+    <span class="n">datasets</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">raw_train</span><span class="p">,</span> <span class="s2">&quot;gt&quot;</span><span class="p">:</span> <span class="n">labels_train</span><span class="p">},</span>
+    <span class="n">shapes</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span> <span class="s2">&quot;gt&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">256</span><span class="p">)},</span>
+    <span class="n">transforms</span><span class="o">=</span><span class="p">{</span>
+        <span class="p">(</span><span class="s2">&quot;gt&quot;</span><span class="p">,</span> <span class="s2">&quot;affs&quot;</span><span class="p">):</span> <span class="n">Affs</span><span class="p">(</span><span class="n">neighborhood</span><span class="o">=</span><span class="n">neighborhood</span><span class="p">,</span> <span class="n">concat_dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;gt&quot;</span><span class="p">,</span> <span class="s2">&quot;affs_mask&quot;</span><span class="p">):</span> <span class="n">AffsMask</span><span class="p">(</span><span class="n">neighborhood</span><span class="o">=</span><span class="n">neighborhood</span><span class="p">),</span>
+        <span class="p">((</span><span class="s2">&quot;affs&quot;</span><span class="p">,</span> <span class="s2">&quot;affs_mask&quot;</span><span class="p">),</span> <span class="s2">&quot;weights&quot;</span><span class="p">):</span> <span class="n">BalanceLabels</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+    <span class="p">},</span>
+    <span class="n">deform_augment_config</span><span class="o">=</span><span class="n">DeformAugmentConfig</span><span class="p">(</span>
+        <span class="n">p</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">control_point_spacing</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="n">jitter_sigma</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">rotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">subsample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">rotation_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">scale_interval</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">simple_augment_config</span><span class="o">=</span><span class="n">SimpleAugmentConfig</span><span class="p">(</span>
+        <span class="n">p</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">mirror_only</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">transpose_only</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">batch_gen</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/runner/work/dacapo-toolbox/dacapo-toolbox/.venv/lib/python3.11/site-packages/gunpowder/nodes/deform_augment.py:164: UserWarning: Rotating with anisotropic control point spacingmay lead to exaggerated stretching.
+  warnings.warn(
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">batch_gen</span><span class="p">)</span>
+<span class="n">gif_2d</span><span class="p">(</span>
+    <span class="n">arrays</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_train</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+        <span class="s2">&quot;GT&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;gt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span> <span class="o">%</span> <span class="mi">256</span><span class="p">,</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_train</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+        <span class="s2">&quot;Affs&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;affs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]],</span>
+            <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_train</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;Affs Mask&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;affs_mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]],</span>
+            <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_train</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">},</span>
+    <span class="n">array_types</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;GT&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Affs&quot;</span><span class="p">:</span> <span class="s2">&quot;affs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Affs Mask&quot;</span><span class="p">:</span> <span class="s2">&quot;affs&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;_static/cremi/affs-batch.gif&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Affinities Batch&quot;</span><span class="p">,</span>
+    <span class="n">fps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cube</span><span class="p">(</span>
+    <span class="n">arrays</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_train</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+        <span class="s2">&quot;GT&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;gt&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_train</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+        <span class="s2">&quot;Affs&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;affs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]],</span>
+            <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_train</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="s2">&quot;Affs Mask&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span>
+            <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;affs_mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]],</span>
+            <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_train</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">},</span>
+    <span class="n">array_types</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;GT&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Affs&quot;</span><span class="p">:</span> <span class="s2">&quot;affs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Affs Mask&quot;</span><span class="p">:</span> <span class="s2">&quot;affs&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;_static/cremi/affs-batch.jpg&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Affinities Batch&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Here we visualize a batch with (raw, gt, target) triplets for the affinities task: <img alt="affs-batch" src="../../_images/affs-batch.gif" /> <img alt="affs-batch-cube" src="../../_images/affs-batch.jpg" /></p>
+</section>
+<section id="Models">
+<h3>Models<a class="headerlink" href="#Models" title="Link to this heading"></a></h3>
+<p>Lets define our model</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">tems</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+
+<span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+
+<span class="n">unet</span> <span class="o">=</span> <span class="n">tems</span><span class="o">.</span><span class="n">UNet</span><span class="o">.</span><span class="n">funlib_api</span><span class="p">(</span>
+    <span class="n">dims</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">num_fmaps</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+    <span class="n">fmap_inc_factor</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">downsample_factors</span><span class="o">=</span><span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)],</span>
+    <span class="n">kernel_size_down</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)],</span>
+        <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)],</span>
+        <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)],</span>
+        <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)],</span>
+    <span class="p">],</span>
+    <span class="n">kernel_size_up</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)],</span>
+        <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)],</span>
+        <span class="p">[(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)],</span>
+    <span class="p">],</span>
+    <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;LeakyReLU&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+    <span class="n">unet</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Conv3d</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">neighborhood</span><span class="p">),</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">()</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Training-loop">
+<h3>Training loop<a class="headerlink" href="#Training-loop" title="Link to this heading"></a></h3>
+<p>Now we can bring everything together and train our model.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="n">extra</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">64</span><span class="p">))</span>
+<span class="n">train_dataset</span> <span class="o">=</span> <span class="n">iterable_dataset</span><span class="p">(</span>
+    <span class="n">datasets</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">raw_train</span><span class="p">,</span> <span class="s2">&quot;gt&quot;</span><span class="p">:</span> <span class="n">labels_train</span><span class="p">},</span>
+    <span class="n">shapes</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">unet</span><span class="o">.</span><span class="n">min_input_shape</span> <span class="o">+</span> <span class="n">extra</span><span class="p">,</span>
+        <span class="s2">&quot;gt&quot;</span><span class="p">:</span> <span class="n">unet</span><span class="o">.</span><span class="n">min_output_shape</span> <span class="o">+</span> <span class="n">extra</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">transforms</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">Lambda</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="o">/</span> <span class="mf">255.0</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;gt&quot;</span><span class="p">,</span> <span class="s2">&quot;affs&quot;</span><span class="p">):</span> <span class="n">Affs</span><span class="p">(</span><span class="n">neighborhood</span><span class="o">=</span><span class="n">neighborhood</span><span class="p">,</span> <span class="n">concat_dim</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;gt&quot;</span><span class="p">,</span> <span class="s2">&quot;affs_mask&quot;</span><span class="p">):</span> <span class="n">AffsMask</span><span class="p">(</span><span class="n">neighborhood</span><span class="o">=</span><span class="n">neighborhood</span><span class="p">),</span>
+        <span class="p">((</span><span class="s2">&quot;affs&quot;</span><span class="p">,</span> <span class="s2">&quot;affs_mask&quot;</span><span class="p">),</span> <span class="s2">&quot;weights&quot;</span><span class="p">):</span> <span class="n">BalanceLabels</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+    <span class="p">},</span>
+    <span class="n">deform_augment_config</span><span class="o">=</span><span class="n">DeformAugmentConfig</span><span class="p">(</span>
+        <span class="n">p</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">control_point_spacing</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="n">jitter_sigma</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">rotate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">subsample</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">rotation_axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">scale_interval</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="p">),</span>
+    <span class="n">simple_augment_config</span><span class="o">=</span><span class="n">SimpleAugmentConfig</span><span class="p">(</span>
+        <span class="n">p</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">mirror_only</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">transpose_only</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">loss_func</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">BCELoss</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">DataLoader</span><span class="p">(</span>
+    <span class="n">train_dataset</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">num_workers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">iteration</span><span class="p">,</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">dataloader</span><span class="p">))):</span>
+    <span class="n">raw</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;raw&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span>
+        <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;affs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span>
+        <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;weights&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+    <span class="n">output</span> <span class="o">=</span> <span class="n">module</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+
+    <span class="n">voxel_loss</span> <span class="o">=</span> <span class="n">loss_func</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">voxel_loss</span> <span class="o">*</span> <span class="n">weight</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+    <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">iteration</span> <span class="o">&gt;=</span> <span class="n">NUM_ITERATIONS</span><span class="p">:</span>
+        <span class="k">break</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/home/runner/work/dacapo-toolbox/dacapo-toolbox/.venv/lib/python3.11/site-packages/gunpowder/nodes/deform_augment.py:164: UserWarning: Rotating with anisotropic control point spacingmay lead to exaggerated stretching.
+  warnings.warn(
+300it [1:42:07, 20.42s/it]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">funlib.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coordinate</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Iteration&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Loss&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Loss Curve&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;_static/cremi/affs-loss-curve.png&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/tutorials_dataset_cremi_27_0.png" src="../../_images/tutorials_dataset_cremi_27_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">mwatershed</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mws</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">funlib.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Roi</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">unet</span> <span class="o">=</span> <span class="n">unet</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">context</span> <span class="o">=</span> <span class="n">Coordinate</span><span class="p">(</span><span class="n">unet</span><span class="o">.</span><span class="n">context</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">raw_test</span><span class="o">.</span><span class="n">voxel_size</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">raw_input</span> <span class="o">=</span> <span class="n">raw_test</span><span class="o">.</span><span class="n">to_ndarray</span><span class="p">(</span><span class="n">small_eval_roi</span><span class="o">.</span><span class="n">grow</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">context</span><span class="p">))</span>
+<span class="n">raw_output</span> <span class="o">=</span> <span class="n">raw_test</span><span class="o">.</span><span class="n">to_ndarray</span><span class="p">(</span><span class="n">small_eval_roi</span><span class="p">)</span>
+<span class="n">gt</span> <span class="o">=</span> <span class="n">labels_test</span><span class="o">.</span><span class="n">to_ndarray</span><span class="p">(</span><span class="n">small_eval_roi</span><span class="p">)</span>
+
+<span class="c1"># Predict on the validation data</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">pred</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">module</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">raw_input</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="o">/</span> <span class="mf">255.0</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="p">)</span>
+<span class="n">pred_labels</span> <span class="o">=</span> <span class="n">mws</span><span class="o">.</span><span class="n">agglom</span><span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="n">neighborhood</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot the results</span>
+<span class="n">gif_2d</span><span class="p">(</span>
+    <span class="n">arrays</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">raw_output</span><span class="p">,</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_test</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+        <span class="s2">&quot;GT&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">gt</span> <span class="o">%</span> <span class="mi">256</span><span class="p">,</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_test</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+        <span class="s2">&quot;Pred Affs&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">][[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]],</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_test</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+        <span class="s2">&quot;Pred&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">pred_labels</span> <span class="o">%</span> <span class="mi">256</span><span class="p">,</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_test</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="n">array_types</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;GT&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Pred Affs&quot;</span><span class="p">:</span> <span class="s2">&quot;affs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Pred&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;_static/cremi/affs-prediction.gif&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Prediction&quot;</span><span class="p">,</span>
+    <span class="n">fps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cube</span><span class="p">(</span>
+    <span class="n">arrays</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">raw_output</span><span class="p">,</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_test</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+        <span class="s2">&quot;GT&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">gt</span><span class="p">,</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_test</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+        <span class="s2">&quot;Pred Affs&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="mi">0</span><span class="p">][[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]],</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_test</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+        <span class="s2">&quot;Pred&quot;</span><span class="p">:</span> <span class="n">Array</span><span class="p">(</span><span class="n">pred_labels</span><span class="p">,</span> <span class="n">voxel_size</span><span class="o">=</span><span class="n">raw_test</span><span class="o">.</span><span class="n">voxel_size</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="n">array_types</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;GT&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Pred Affs&quot;</span><span class="p">:</span> <span class="s2">&quot;affs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Pred&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;_static/cremi/affs-prediction.jpg&quot;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Prediction&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Here we visualize the prediction results: <img alt="affs-prediction" src="../../_images/affs-prediction.gif" /> <img alt="affs-prediction-cube" src="../../_images/affs-prediction.jpg" /></p>
+</section>
+</section>
+<section id="Blockwise-Processing">
+<h2>Blockwise Processing<a class="headerlink" href="#Blockwise-Processing" title="Link to this heading"></a></h2>
+<p>Now that we have a trained model, we can use it to process the full volume. We will use the <code class="docutils literal notranslate"><span class="pre">volara</span></code> library to do this. It provides a simple interface for blockwise processing of large volumes. We will use the <code class="docutils literal notranslate"><span class="pre">volara_torch</span></code> module to wrap our trained model and use it in a blockwise pipeline.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dacapo_toolbox.postprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">blockwise_predict_mutex</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">volara.workers</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalWorker</span>
+
+
+<span class="n">unet</span> <span class="o">=</span> <span class="n">unet</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">scripted_unet</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">scripted_unet</span><span class="p">,</span> <span class="s2">&quot;cremi.zarr/affs_unet.pt&quot;</span><span class="p">)</span>
+<span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">scripted_unet</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s2">&quot;cremi.zarr/weights.pth&quot;</span><span class="p">)</span>
+
+<span class="n">blocksize</span> <span class="o">=</span> <span class="n">Coordinate</span><span class="p">(</span><span class="n">unet</span><span class="o">.</span><span class="n">min_output_shape</span><span class="p">)</span> <span class="o">+</span> <span class="n">blocksize</span>
+
+<span class="c1"># default biases:</span>
+<span class="c1"># interpolate log offset distances to a range of [-0.2, -0.8]</span>
+
+<span class="n">blockwise_predict_mutex</span><span class="p">(</span>
+    <span class="n">raw_store</span><span class="o">=</span><span class="s2">&quot;cremi.zarr/test/raw&quot;</span><span class="p">,</span>
+    <span class="n">affs_store</span><span class="o">=</span><span class="s2">&quot;cremi.zarr/test/affs&quot;</span><span class="p">,</span>  <span class="c1"># optional, provided for visualization</span>
+    <span class="n">frags_store</span><span class="o">=</span><span class="s2">&quot;cremi.zarr/test/frags&quot;</span><span class="p">,</span>  <span class="c1"># optional, provided for visualization</span>
+    <span class="n">labels_store</span><span class="o">=</span><span class="s2">&quot;cremi.zarr/test/pred_labels&quot;</span><span class="p">,</span>
+    <span class="n">neighborhood</span><span class="o">=</span><span class="n">neighborhood</span><span class="p">,</span>
+    <span class="n">blocksize</span><span class="o">=</span><span class="n">blocksize</span><span class="p">,</span>
+    <span class="n">model_path</span><span class="o">=</span><span class="s2">&quot;cremi.zarr/affs_unet.pt&quot;</span><span class="p">,</span>
+    <span class="n">in_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">model_context</span><span class="o">=</span><span class="n">unet</span><span class="o">.</span><span class="n">context</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">predict_worker</span><span class="o">=</span><span class="n">LocalWorker</span><span class="p">(),</span>  <span class="c1"># optional, see docstring</span>
+    <span class="n">extract_frag_bias</span><span class="o">=</span><span class="p">[</span>
+        <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.8</span><span class="p">,</span>
+        <span class="o">-</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="p">],</span>  <span class="c1"># optional, TODO: defaults not very good yet</span>
+    <span class="n">edge_scores</span><span class="o">=</span><span class="p">[</span>  <span class="c1"># optional, TODO: defaults not very good yet</span>
+        <span class="p">(</span><span class="s2">&quot;affs_z&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Coordinate</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;affs_xy&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Coordinate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">Coordinate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">),</span>
+        <span class="p">(</span>
+            <span class="s2">&quot;affs_long_xy&quot;</span><span class="p">,</span>
+            <span class="p">[</span>
+                <span class="n">Coordinate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="n">Coordinate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span>
+                <span class="n">Coordinate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">23</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="n">Coordinate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">23</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="o">-</span><span class="mf">0.8</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">num_extract_frag_workers</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">num_aff_agglom_workers</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">num_relabel_workers</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">roi</span><span class="o">=</span><span class="n">large_eval_roi</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+INFO:root:Running block with config volara_logs/affs-predict-meta/config.json...
+INFO:funlib.persistence.graphs.sqlite_graph_database:dropping collections nodes, edges
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+/tmp/tmpv7zodtyj/lut.npz
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+affs-predict ▶:  56%|█████▌    | 5/9 [10:43&lt;08:34, 128.66s/blocks, ⧗=0, ▶=1, ✔=5, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:getting block
+
+frags-extract-frags ▶:   0%|          | 0/9 [00:00&lt;?, ?blocks/s]
+INFO:volara.blockwise.blockwise:got block frags-extract-frags/0 with read ROI [1760:3200, 652:2076, 652:2076] (1440, 1424, 1424) and write ROI [1840:3120, 836:1892, 836:1892] (1280, 1056, 1056)
+frags-extract-frags ▶:   0%|          | 0/9 [00:00&lt;?, ?blocks/s, ⧗=8, ▶=1, ✔=0, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:getting block
+INFO:volara.blockwise.blockwise:getting block
+INFO:/home/runner/work/dacapo-toolbox/dacapo-toolbox/.venv/lib/python3.11/site-packages/volara/blockwise/extract_frags.py:Found 1363 fragments
+INFO:volara.blockwise.blockwise:getting block
+
+frags-extract-frags ▶:   0%|          | 0/9 [00:08&lt;?, ?blocks/s, ⧗=8, ▶=0, ✔=1, ✗=0, ∅=0]
+affs-predict ▶:  67%|██████▋   | 6/9 [12:55&lt;06:29, 129.80s/blocks, ⧗=0, ▶=1, ✔=6, ✗=0, ∅=0]
+frags-extract-frags ▶:  11%|█         | 1/9 [02:12&lt;01:04,  8.05s/blocks, ⧗=6, ▶=1, ✔=1, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block frags-extract-frags/1 with read ROI [1760:3200, 652:2076, 1708:3132] (1440, 1424, 1424) and write ROI [1840:3120, 836:1892, 1892:2948] (1280, 1056, 1056)
+
+frags-extract-frags ▶:  11%|█         | 1/9 [02:12&lt;01:04,  8.05s/blocks, ⧗=6, ▶=2, ✔=1, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block frags-extract-frags/4 with read ROI [1760:3200, 652:2076, 2764:4092] (1440, 1424, 1328) and write ROI [1840:3120, 836:1892, 2948:3908] (1280, 1056, 960)
+INFO:/home/runner/work/dacapo-toolbox/dacapo-toolbox/.venv/lib/python3.11/site-packages/volara/blockwise/extract_frags.py:Found 1285 fragments
+INFO:volara.blockwise.blockwise:getting block
+
+frags-extract-frags ▶:  11%|█         | 1/9 [02:25&lt;01:04,  8.05s/blocks, ⧗=6, ▶=1, ✔=2, ✗=0, ∅=0]
+frags-extract-frags ▶:  22%|██▏       | 2/9 [02:25&lt;09:47, 83.96s/blocks, ⧗=6, ▶=1, ✔=2, ✗=0, ∅=0]INFO:/home/runner/work/dacapo-toolbox/dacapo-toolbox/.venv/lib/python3.11/site-packages/volara/blockwise/extract_frags.py:Found 1459 fragments
+INFO:volara.blockwise.blockwise:getting block
+
+frags-extract-frags ▶:  22%|██▏       | 2/9 [02:26&lt;09:47, 83.96s/blocks, ⧗=6, ▶=0, ✔=3, ✗=0, ∅=0]
+affs-predict ▶:  89%|████████▉ | 8/9 [17:18&lt;02:10, 130.34s/blocks, ⧗=0, ▶=1, ✔=8, ✗=0, ∅=0]
+frags-extract-frags ▶:  33%|███▎      | 3/9 [06:34&lt;04:36, 46.01s/blocks, ⧗=4, ▶=1, ✔=3, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block frags-extract-frags/2 with read ROI [1760:3200, 1708:3132, 652:2076] (1440, 1424, 1424) and write ROI [1840:3120, 1892:2948, 836:1892] (1280, 1056, 1056)
+
+frags-extract-frags ▶:  33%|███▎      | 3/9 [06:34&lt;04:36, 46.01s/blocks, ⧗=4, ▶=2, ✔=3, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block frags-extract-frags/7 with read ROI [1760:3200, 2764:4092, 652:2076] (1440, 1328, 1424) and write ROI [1840:3120, 2948:3908, 836:1892] (1280, 960, 1056)
+INFO:/home/runner/work/dacapo-toolbox/dacapo-toolbox/.venv/lib/python3.11/site-packages/volara/blockwise/extract_frags.py:Found 1544 fragments
+INFO:/home/runner/work/dacapo-toolbox/dacapo-toolbox/.venv/lib/python3.11/site-packages/volara/blockwise/extract_frags.py:Found 1582 fragments
+INFO:volara.blockwise.blockwise:getting block
+
+frags-extract-frags ▶:  33%|███▎      | 3/9 [06:47&lt;04:36, 46.01s/blocks, ⧗=4, ▶=1, ✔=4, ✗=0, ∅=0]
+frags-extract-frags ▶:  44%|████▍     | 4/9 [06:47&lt;10:56, 131.23s/blocks, ⧗=4, ▶=1, ✔=4, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:getting block
+
+frags-extract-frags ▶:  44%|████▍     | 4/9 [06:48&lt;10:56, 131.23s/blocks, ⧗=4, ▶=0, ✔=5, ✗=0, ∅=0]
+affs-predict ✔: 100%|██████████| 9/9 [19:29&lt;00:00, 129.90s/blocks, ⧗=0, ▶=0, ✔=9, ✗=0, ∅=0]
+
+frags-extract-frags ▶:  56%|█████▌    | 5/9 [08:45&lt;05:36, 84.24s/blocks, ⧗=0, ▶=1, ✔=5, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block frags-extract-frags/5 with read ROI [1760:3200, 1708:3132, 1708:3132] (1440, 1424, 1424) and write ROI [1840:3120, 1892:2948, 1892:2948] (1280, 1056, 1056)
+
+frags-extract-frags ▶:  56%|█████▌    | 5/9 [08:45&lt;05:36, 84.24s/blocks, ⧗=0, ▶=2, ✔=5, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block frags-extract-frags/11 with read ROI [1760:3200, 1708:3132, 2764:4092] (1440, 1424, 1328) and write ROI [1840:3120, 1892:2948, 2948:3908] (1280, 1056, 960)
+
+frags-extract-frags ▶:  56%|█████▌    | 5/9 [08:45&lt;05:36, 84.24s/blocks, ⧗=0, ▶=3, ✔=5, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block frags-extract-frags/13 with read ROI [1760:3200, 2764:4092, 1708:3132] (1440, 1328, 1424) and write ROI [1840:3120, 2948:3908, 1892:2948] (1280, 960, 1056)
+INFO:/home/runner/work/dacapo-toolbox/dacapo-toolbox/.venv/lib/python3.11/site-packages/volara/blockwise/extract_frags.py:Found 1636 fragments
+INFO:volara.blockwise.blockwise:getting block
+
+frags-extract-frags ▶:  56%|█████▌    | 5/9 [08:56&lt;05:36, 84.24s/blocks, ⧗=0, ▶=2, ✔=6, ✗=0, ∅=0]
+frags-extract-frags ▶:  67%|██████▋   | 6/9 [08:56&lt;04:57, 99.09s/blocks, ⧗=0, ▶=2, ✔=6, ✗=0, ∅=0]
+frags-extract-frags ▶:  67%|██████▋   | 6/9 [08:56&lt;04:57, 99.09s/blocks, ⧗=0, ▶=3, ✔=6, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block frags-extract-frags/23 with read ROI [1760:3200, 2764:4092, 2764:4092] (1440, 1328, 1328) and write ROI [1840:3120, 2948:3908, 2948:3908] (1280, 960, 960)
+INFO:volara.blockwise.blockwise:getting block
+fragments-aff-agglom ▶:   0%|          | 0/9 [00:00&lt;?, ?blocks/s, ⧗=8, ▶=1, ✔=0, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block fragments-aff-agglom/0 with read ROI [1800:3160, 744:1984, 744:1984] (1360, 1240, 1240) and write ROI [1840:3120, 836:1892, 836:1892] (1280, 1056, 1056)
+INFO:volara.blockwise.blockwise:getting block
+INFO:volara.blockwise.blockwise:getting block
+INFO:/home/runner/work/dacapo-toolbox/dacapo-toolbox/.venv/lib/python3.11/site-packages/volara/blockwise/extract_frags.py:Found 1555 fragments
+INFO:/home/runner/work/dacapo-toolbox/dacapo-toolbox/.venv/lib/python3.11/site-packages/volara/blockwise/extract_frags.py:Found 1436 fragments
+INFO:volara.blockwise.blockwise:getting block
+
+frags-extract-frags ▶:  67%|██████▋   | 6/9 [08:58&lt;04:57, 99.09s/blocks, ⧗=0, ▶=2, ✔=7, ✗=0, ∅=0]
+frags-extract-frags ▶:  78%|███████▊  | 7/9 [08:58&lt;02:14, 67.18s/blocks, ⧗=0, ▶=2, ✔=7, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block None
+fragments-aff-agglom ▶:   0%|          | 0/9 [00:01&lt;?, ?blocks/s, ⧗=6, ▶=2, ✔=0, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block fragments-aff-agglom/2 with read ROI [1800:3160, 1800:3040, 744:1984] (1360, 1240, 1240) and write ROI [1840:3120, 1892:2948, 836:1892] (1280, 1056, 1056)
+fragments-aff-agglom ▶:   0%|          | 0/9 [00:01&lt;?, ?blocks/s, ⧗=6, ▶=3, ✔=0, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block fragments-aff-agglom/7 with read ROI [1800:3160, 2856:4000, 744:1984] (1360, 1144, 1240) and write ROI [1840:3120, 2948:3908, 836:1892] (1280, 960, 1056)
+INFO:volara.blockwise.blockwise:getting block
+
+frags-extract-frags ▶:  78%|███████▊  | 7/9 [08:58&lt;02:14, 67.18s/blocks, ⧗=0, ▶=1, ✔=8, ✗=0, ∅=0]
+frags-extract-frags ▶:  89%|████████▉ | 8/9 [08:58&lt;00:45, 45.95s/blocks, ⧗=0, ▶=1, ✔=8, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block None
+INFO:volara.blockwise.blockwise:getting block
+fragments-aff-agglom ▶:  11%|█         | 1/9 [00:12&lt;01:28, 11.01s/blocks, ⧗=4, ▶=2, ✔=1, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block fragments-aff-agglom/1 with read ROI [1800:3160, 744:1984, 1800:3040] (1360, 1240, 1240) and write ROI [1840:3120, 836:1892, 1892:2948] (1280, 1056, 1056)
+fragments-aff-agglom ▶:  11%|█         | 1/9 [00:12&lt;01:28, 11.01s/blocks, ⧗=4, ▶=3, ✔=1, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:getting block
+fragments-aff-agglom ▶:  22%|██▏       | 2/9 [00:14&lt;00:38,  5.43s/blocks, ⧗=4, ▶=3, ✔=2, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block fragments-aff-agglom/4 with read ROI [1800:3160, 744:1984, 2856:4000] (1360, 1240, 1144) and write ROI [1840:3120, 836:1892, 2948:3908] (1280, 1056, 960)
+INFO:volara.blockwise.blockwise:getting block
+fragments-aff-agglom ▶:  33%|███▎      | 3/9 [00:14&lt;00:18,  3.10s/blocks, ⧗=4, ▶=2, ✔=3, ✗=0, ∅=0]INFO:/home/runner/work/dacapo-toolbox/dacapo-toolbox/.venv/lib/python3.11/site-packages/volara/blockwise/extract_frags.py:Found 1752 fragments
+INFO:volara.blockwise.blockwise:getting block
+
+frags-extract-frags ▶:  89%|████████▉ | 8/9 [09:14&lt;00:45, 45.95s/blocks, ⧗=0, ▶=0, ✔=9, ✗=0, ∅=0]
+frags-extract-frags ▶: 100%|██████████| 9/9 [09:14&lt;00:00, 36.51s/blocks, ⧗=0, ▶=0, ✔=9, ✗=0, ∅=0]
+frags-extract-frags ✔: 100%|██████████| 9/9 [09:14&lt;00:00, 61.60s/blocks, ⧗=0, ▶=0, ✔=9, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block None
+
+fragments-aff-agglom ▶:  33%|███▎      | 3/9 [00:17&lt;00:18,  3.10s/blocks, ⧗=0, ▶=3, ✔=3, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block fragments-aff-agglom/5 with read ROI [1800:3160, 1800:3040, 1800:3040] (1360, 1240, 1240) and write ROI [1840:3120, 1892:2948, 1892:2948] (1280, 1056, 1056)
+INFO:volara.blockwise.blockwise:getting block
+fragments-aff-agglom ▶:  44%|████▍     | 4/9 [00:22&lt;00:24,  4.97s/blocks, ⧗=0, ▶=3, ✔=4, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block fragments-aff-agglom/11 with read ROI [1800:3160, 1800:3040, 2856:4000] (1360, 1240, 1144) and write ROI [1840:3120, 1892:2948, 2948:3908] (1280, 1056, 960)
+INFO:volara.blockwise.blockwise:getting block
+fragments-aff-agglom ▶:  56%|█████▌    | 5/9 [00:24&lt;00:15,  3.88s/blocks, ⧗=0, ▶=3, ✔=5, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block fragments-aff-agglom/13 with read ROI [1800:3160, 2856:4000, 1800:3040] (1360, 1144, 1240) and write ROI [1840:3120, 2948:3908, 1892:2948] (1280, 960, 1056)
+INFO:volara.blockwise.blockwise:getting block
+fragments-aff-agglom ▶:  67%|██████▋   | 6/9 [00:30&lt;00:14,  4.70s/blocks, ⧗=0, ▶=3, ✔=6, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block fragments-aff-agglom/23 with read ROI [1800:3160, 2856:4000, 2856:4000] (1360, 1144, 1144) and write ROI [1840:3120, 2948:3908, 2948:3908] (1280, 960, 960)
+INFO:volara.blockwise.blockwise:getting block
+fragments-aff-agglom ▶:  78%|███████▊  | 7/9 [00:33&lt;00:08,  4.28s/blocks, ⧗=0, ▶=2, ✔=7, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block None
+INFO:volara.blockwise.blockwise:getting block
+fragments-aff-agglom ▶:  89%|████████▉ | 8/9 [00:34&lt;00:03,  3.01s/blocks, ⧗=0, ▶=1, ✔=8, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block None
+INFO:volara.blockwise.blockwise:getting block
+fragments-aff-agglom ✔: 100%|██████████| 9/9 [00:38&lt;00:00,  4.25s/blocks, ⧗=0, ▶=0, ✔=9, ✗=0, ∅=0]
+INFO:volara.blockwise.blockwise:getting block
+lut-graph-mws ▶:   0%|          | 0/1 [00:00&lt;?, ?blocks/s]INFO:volara.blockwise.blockwise:got block lut-graph-mws/0 with read ROI [1840:3120, 836:3908, 836:3908] (1280, 3072, 3072) and write ROI [1840:3120, 836:3908, 836:3908] (1280, 3072, 3072)
+lut-graph-mws ▶:   0%|          | 0/1 [00:00&lt;?, ?blocks/s, ⧗=0, ▶=1, ✔=0, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block None
+INFO:volara.blockwise.blockwise:getting block
+lut-graph-mws ✔: 100%|██████████| 1/1 [00:01&lt;00:00,  1.22s/blocks, ⧗=0, ▶=0, ✔=1, ✗=0, ∅=0]
+INFO:volara.blockwise.blockwise:getting block
+pred_labels-relabel ▶:   0%|          | 0/9 [00:00&lt;?, ?blocks/s]INFO:volara.blockwise.blockwise:got block pred_labels-relabel/0 with read ROI [1840:3120, 836:1892, 836:1892] (1280, 1056, 1056) and write ROI [1840:3120, 836:1892, 836:1892] (1280, 1056, 1056)
+pred_labels-relabel ▶:   0%|          | 0/9 [00:00&lt;?, ?blocks/s, ⧗=0, ▶=1, ✔=0, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:getting block
+pred_labels-relabel ▶:   0%|          | 0/9 [00:00&lt;?, ?blocks/s, ⧗=0, ▶=2, ✔=0, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block pred_labels-relabel/1 with read ROI [1840:3120, 836:1892, 1892:2948] (1280, 1056, 1056) and write ROI [1840:3120, 836:1892, 1892:2948] (1280, 1056, 1056)
+INFO:volara.blockwise.blockwise:got block None
+INFO:volara.blockwise.blockwise:getting block
+pred_labels-relabel ▶:   0%|          | 0/9 [00:00&lt;?, ?blocks/s, ⧗=0, ▶=3, ✔=0, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block pred_labels-relabel/2 with read ROI [1840:3120, 1892:2948, 836:1892] (1280, 1056, 1056) and write ROI [1840:3120, 1892:2948, 836:1892] (1280, 1056, 1056)
+INFO:volara.blockwise.blockwise:getting block
+pred_labels-relabel ▶:  11%|█         | 1/9 [00:02&lt;00:19,  2.45s/blocks, ⧗=0, ▶=3, ✔=1, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block pred_labels-relabel/4 with read ROI [1840:3120, 836:1892, 2948:3908] (1280, 1056, 960) and write ROI [1840:3120, 836:1892, 2948:3908] (1280, 1056, 960)
+INFO:volara.blockwise.blockwise:getting block
+pred_labels-relabel ▶:  22%|██▏       | 2/9 [00:02&lt;00:07,  1.09s/blocks, ⧗=0, ▶=3, ✔=2, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block pred_labels-relabel/5 with read ROI [1840:3120, 1892:2948, 1892:2948] (1280, 1056, 1056) and write ROI [1840:3120, 1892:2948, 1892:2948] (1280, 1056, 1056)
+INFO:volara.blockwise.blockwise:getting block
+pred_labels-relabel ▶:  33%|███▎      | 3/9 [00:02&lt;00:03,  1.52blocks/s, ⧗=0, ▶=3, ✔=3, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block pred_labels-relabel/7 with read ROI [1840:3120, 2948:3908, 836:1892] (1280, 960, 1056) and write ROI [1840:3120, 2948:3908, 836:1892] (1280, 960, 1056)
+INFO:volara.blockwise.blockwise:getting block
+pred_labels-relabel ▶:  44%|████▍     | 4/9 [00:02&lt;00:02,  2.21blocks/s, ⧗=0, ▶=2, ✔=4, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:getting block
+pred_labels-relabel ▶:  56%|█████▌    | 5/9 [00:02&lt;00:01,  2.21blocks/s, ⧗=0, ▶=2, ✔=5, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block pred_labels-relabel/11 with read ROI [1840:3120, 1892:2948, 2948:3908] (1280, 1056, 960) and write ROI [1840:3120, 1892:2948, 2948:3908] (1280, 1056, 960)
+pred_labels-relabel ▶:  56%|█████▌    | 5/9 [00:02&lt;00:01,  2.21blocks/s, ⧗=0, ▶=3, ✔=5, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block pred_labels-relabel/13 with read ROI [1840:3120, 2948:3908, 1892:2948] (1280, 960, 1056) and write ROI [1840:3120, 2948:3908, 1892:2948] (1280, 960, 1056)
+INFO:volara.blockwise.blockwise:getting block
+pred_labels-relabel ▶:  67%|██████▋   | 6/9 [00:03&lt;00:00,  3.99blocks/s, ⧗=0, ▶=2, ✔=6, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:getting block
+INFO:volara.blockwise.blockwise:getting block
+pred_labels-relabel ▶:  89%|████████▉ | 8/9 [00:03&lt;00:00,  3.99blocks/s, ⧗=0, ▶=1, ✔=8, ✗=0, ∅=0]INFO:volara.blockwise.blockwise:got block pred_labels-relabel/23 with read ROI [1840:3120, 2948:3908, 2948:3908] (1280, 960, 960) and write ROI [1840:3120, 2948:3908, 2948:3908] (1280, 960, 960)
+INFO:volara.blockwise.blockwise:getting block
+pred_labels-relabel ✔: 100%|██████████| 9/9 [00:03&lt;00:00,  2.87blocks/s, ⧗=0, ▶=0, ✔=9, ✗=0, ∅=0]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+Execution Summary
+-----------------
+
+  Task affs-predict:
+
+    num blocks : 9
+    completed ✔: 9 (skipped 0)
+    failed    ✗: 0
+    orphaned  ∅: 0
+
+    all blocks processed successfully
+
+  Task frags-extract-frags:
+
+    num blocks : 9
+    completed ✔: 9 (skipped 0)
+    failed    ✗: 0
+    orphaned  ∅: 0
+
+    all blocks processed successfully
+
+  Task fragments-aff-agglom:
+
+    num blocks : 9
+    completed ✔: 9 (skipped 0)
+    failed    ✗: 0
+    orphaned  ∅: 0
+
+    all blocks processed successfully
+
+  Task lut-graph-mws:
+
+    num blocks : 1
+    completed ✔: 1 (skipped 0)
+    failed    ✗: 0
+    orphaned  ∅: 0
+
+    all blocks processed successfully
+
+  Task pred_labels-relabel:
+
+    num blocks : 9
+    completed ✔: 9 (skipped 0)
+    failed    ✗: 0
+    orphaned  ∅: 0
+
+    all blocks processed successfully
+</pre></div></div>
+</div>
+</section>
+<section id="Visualizing-the-results">
+<h2>Visualizing the results<a class="headerlink" href="#Visualizing-the-results" title="Link to this heading"></a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">funlib.persistence</span><span class="w"> </span><span class="kn">import</span> <span class="n">open_ds</span>
+
+<span class="n">affs</span> <span class="o">=</span> <span class="n">open_ds</span><span class="p">(</span><span class="s2">&quot;cremi.zarr/test/affs&quot;</span><span class="p">)</span>
+<span class="n">affs</span><span class="o">.</span><span class="n">lazy_op</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span> <span class="o">/</span> <span class="mf">255.0</span><span class="p">)</span>
+<span class="n">raw</span> <span class="o">=</span> <span class="n">open_ds</span><span class="p">(</span><span class="s2">&quot;cremi.zarr/test/raw&quot;</span><span class="p">)</span>
+<span class="n">raw</span><span class="o">.</span><span class="n">lazy_op</span><span class="p">(</span><span class="n">large_eval_roi</span><span class="p">)</span>
+<span class="n">gif_2d</span><span class="p">(</span>
+    <span class="n">arrays</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="n">raw</span><span class="p">,</span>
+        <span class="s2">&quot;Affs&quot;</span><span class="p">:</span> <span class="n">affs</span><span class="p">,</span>
+        <span class="s2">&quot;Frags&quot;</span><span class="p">:</span> <span class="n">open_ds</span><span class="p">(</span><span class="s2">&quot;cremi.zarr/test/frags&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;Pred Labels&quot;</span><span class="p">:</span> <span class="n">open_ds</span><span class="p">(</span><span class="s2">&quot;cremi.zarr/test/pred_labels&quot;</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="n">array_types</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;Raw&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Affs&quot;</span><span class="p">:</span> <span class="s2">&quot;affs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Frags&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Pred Labels&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;CREMI Affs Prediction&quot;</span><span class="p">,</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;_static/cremi/cremi-prediction.gif&quot;</span><span class="p">,</span>
+    <span class="n">fps</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cube</span><span class="p">(</span>
+    <span class="n">arrays</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">raw</span><span class="p">,</span>
+        <span class="s2">&quot;affs&quot;</span><span class="p">:</span> <span class="n">affs</span><span class="p">,</span>
+        <span class="s2">&quot;frags&quot;</span><span class="p">:</span> <span class="n">open_ds</span><span class="p">(</span><span class="s2">&quot;cremi.zarr/test/frags&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;pred_labels&quot;</span><span class="p">:</span> <span class="n">open_ds</span><span class="p">(</span><span class="s2">&quot;cremi.zarr/test/pred_labels&quot;</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="n">array_types</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="s2">&quot;raw&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;affs&quot;</span><span class="p">:</span> <span class="s2">&quot;affs&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;frags&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pred_labels&quot;</span><span class="p">:</span> <span class="s2">&quot;labels&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;CREMI Affs Prediction&quot;</span><span class="p">,</span>
+    <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;_static/cremi/cremi-prediction.jpg&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+INFO:matplotlib.animation:Animation.save using &lt;class &#39;matplotlib.animation.PillowWriter&#39;&gt;
+</pre></div></div>
+</div>
+<p>Here we visualize the prediction results: <img alt="cremi-prediction" src="../../_images/cremi-prediction.gif" /> <img alt="cremi-prediction-cube" src="../../_images/cremi-prediction.jpg" /></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dataset_overview.html" class="btn btn-neutral float-left" title="Dataset Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, William Patton, Jeff Rhoades, Marwan Zouinkhi,  David Ackerman, Caroline Malin-Mayor, Jan Funke.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

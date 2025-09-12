@@ -21,6 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Dataset Overview" href="tutorials/dataset/dataset_overview.html" />
     <link rel="prev" title="Installation" href="install.html" /> 
 </head>
 
@@ -49,19 +50,11 @@
 <li class="toctree-l1"><a class="reference internal" href="install.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#dataset">Dataset</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dacapo_toolbox.dataset.iterable_dataset"><code class="docutils literal notranslate"><span class="pre">iterable_dataset</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dacapo_toolbox.dataset.SimpleAugmentConfig"><code class="docutils literal notranslate"><span class="pre">SimpleAugmentConfig</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dacapo_toolbox.dataset.DeformAugmentConfig"><code class="docutils literal notranslate"><span class="pre">DeformAugmentConfig</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dacapo_toolbox.dataset.MaskedSampling"><code class="docutils literal notranslate"><span class="pre">MaskedSampling</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dacapo_toolbox.dataset.PipelineDataset"><code class="docutils literal notranslate"><span class="pre">PipelineDataset</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dacapo_toolbox.dataset.PointSampling"><code class="docutils literal notranslate"><span class="pre">PointSampling</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dacapo_toolbox.dataset.SimpleAugmentConfig"><code class="docutils literal notranslate"><span class="pre">SimpleAugmentConfig</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dacapo_toolbox.dataset.gp_to_nx_graph"><code class="docutils literal notranslate"><span class="pre">gp_to_nx_graph()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dacapo_toolbox.dataset.iterable_dataset"><code class="docutils literal notranslate"><span class="pre">iterable_dataset()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dacapo_toolbox.dataset.nx_to_gp_graph"><code class="docutils literal notranslate"><span class="pre">nx_to_gp_graph()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">iterable_dataset</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">SimpleAugmentConfig</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">DeformAugmentConfig</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">MaskedSampling</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id4"><code class="docutils literal notranslate"><span class="pre">PointSampling</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#transforms">Transforms</a><ul>
@@ -74,32 +67,15 @@
 <li class="toctree-l4"><a class="reference internal" href="#dacapo_toolbox.transforms.affs.AffsMask.forward"><code class="docutils literal notranslate"><span class="pre">AffsMask.forward()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#dacapo_toolbox.transforms.affs.compute_affs"><code class="docutils literal notranslate"><span class="pre">compute_affs()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id5"><code class="docutils literal notranslate"><span class="pre">Affs</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id6"><code class="docutils literal notranslate"><span class="pre">Affs.forward()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#id7"><code class="docutils literal notranslate"><span class="pre">AffsMask</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id8"><code class="docutils literal notranslate"><span class="pre">AffsMask.forward()</span></code></a></li>
-</ul>
-</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#distances">Distances</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#dacapo_toolbox.transforms.distances.SDTBoundaryMask"><code class="docutils literal notranslate"><span class="pre">SDTBoundaryMask</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#dacapo_toolbox.transforms.distances.SDTBoundaryMask.forward"><code class="docutils literal notranslate"><span class="pre">SDTBoundaryMask.forward()</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="#dacapo_toolbox.transforms.distances.SignedDistanceTransform"><code class="docutils literal notranslate"><span class="pre">SignedDistanceTransform</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#dacapo_toolbox.transforms.distances.SignedDistanceTransform.forward"><code class="docutils literal notranslate"><span class="pre">SignedDistanceTransform.forward()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#id9"><code class="docutils literal notranslate"><span class="pre">SignedDistanceTransform</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id10"><code class="docutils literal notranslate"><span class="pre">SignedDistanceTransform.forward()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#id11"><code class="docutils literal notranslate"><span class="pre">SDTBoundaryMask</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id12"><code class="docutils literal notranslate"><span class="pre">SDTBoundaryMask.forward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dacapo_toolbox.transforms.distances.SDTBoundaryMask"><code class="docutils literal notranslate"><span class="pre">SDTBoundaryMask</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dacapo_toolbox.transforms.distances.SDTBoundaryMask.forward"><code class="docutils literal notranslate"><span class="pre">SDTBoundaryMask.forward()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -109,23 +85,12 @@
 <li class="toctree-l4"><a class="reference internal" href="#dacapo_toolbox.transforms.lsds.LSD.forward"><code class="docutils literal notranslate"><span class="pre">LSD.forward()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#dacapo_toolbox.transforms.lsds.deriv_based_covariance"><code class="docutils literal notranslate"><span class="pre">deriv_based_covariance()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#dacapo_toolbox.transforms.lsds.get_local_shape_descriptors"><code class="docutils literal notranslate"><span class="pre">get_local_shape_descriptors()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#dacapo_toolbox.transforms.lsds.outer_product"><code class="docutils literal notranslate"><span class="pre">outer_product()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#id13"><code class="docutils literal notranslate"><span class="pre">LSD</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id14"><code class="docutils literal notranslate"><span class="pre">LSD.forward()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#id15"><code class="docutils literal notranslate"><span class="pre">get_local_shape_descriptors()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#weight-balancing">Weight Balancing</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#dacapo_toolbox.transforms.weight_balancing.BalanceLabels"><code class="docutils literal notranslate"><span class="pre">BalanceLabels</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#dacapo_toolbox.transforms.weight_balancing.BalanceLabels.forward"><code class="docutils literal notranslate"><span class="pre">BalanceLabels.forward()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#id16"><code class="docutils literal notranslate"><span class="pre">BalanceLabels</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#id17"><code class="docutils literal notranslate"><span class="pre">BalanceLabels.forward()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#dacapo_toolbox.transforms.weight_balancing.balance_weights"><code class="docutils literal notranslate"><span class="pre">balance_weights()</span></code></a></li>
@@ -140,9 +105,11 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#sample-data">Sample Data</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#dacapo_toolbox.sample_datasets.cremi"><code class="docutils literal notranslate"><span class="pre">cremi()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id18"><code class="docutils literal notranslate"><span class="pre">cremi()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">cremi()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/dataset/dataset_overview.html">Dataset Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/dataset/cremi.html">Cremi Example</a></li>
 </ul>
 
         </div>
@@ -175,7 +142,39 @@
 <section id="dataset">
 <h1>Dataset<a class="headerlink" href="#dataset" title="Link to this heading"></a></h1>
 <blockquote>
-<div><dl class="py class" id="module-dacapo_toolbox.dataset">
+<div><dl class="py class">
+<dt class="sig sig-object py" id="dacapo_toolbox.dataset.iterable_dataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">iterable_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_strategies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simple_augment_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deform_augment_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolatable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.dataset.iterable_dataset" title="Link to this definition"></a></dt>
+<dd><p>Builds a gunpowder pipeline and wraps it in a torch IterableDataset.
+See <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset">https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset</a> for more info</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">IterableDataset</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dacapo_toolbox.dataset.SimpleAugmentConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">SimpleAugmentConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mirror_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mirror_probs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose_probs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.dataset.SimpleAugmentConfig" title="Link to this definition"></a></dt>
+<dd><p>The simple augment handles non-interpolating geometric transformations.
+This includes mirroring and transposing in n-dimensional space.
+See <a class="reference external" href="https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/simple_augment.py">https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/simple_augment.py</a>
+for more details.</p>
+<p>:param : param p: Probability of applying the augmentations.
+:param : param mirror_only: List of axes to mirror. If None, all axes may be mirrored.
+:param : param transpose_only: List of axes to transpose. If None, all axes may be transposed.
+:param : param mirror_probs: List of probabilities for each axis in <cite>mirror_only</cite>.</p>
+<blockquote>
+<div><p>If None, uses equal probability for all axes.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>:param<span class="classifier">param transpose_probs: Dictionary mapping tuples of axes to probabilities for transposing.</span></dt><dd><p>If None, uses equal probability for all axes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="dacapo_toolbox.dataset.DeformAugmentConfig">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">DeformAugmentConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_point_spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jitter_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.dataset.DeformAugmentConfig" title="Link to this definition"></a></dt>
 <dd><p>The deform augment handles interpolating geometric transformations.
@@ -211,147 +210,8 @@ may want to use “reject”.</p></li>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="dacapo_toolbox.dataset.PipelineDataset">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">PipelineDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pipeline</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.dataset.PipelineDataset" title="Link to this definition"></a></dt>
-<dd><p>A torch dataset that wraps a gunpowder pipeline and provides batches of data.
-It has support for applying torchvision style transforms to the resulting batches.</p>
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="dacapo_toolbox.dataset.PointSampling">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">PointSampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_points_key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.dataset.PointSampling" title="Link to this definition"></a></dt>
-<dd><p>Sampling strategy that uses a set of points to determine which samples to include.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>sample_points_key</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The key of the sample points array in the dataset.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="dacapo_toolbox.dataset.SimpleAugmentConfig">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">SimpleAugmentConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mirror_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mirror_probs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose_probs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.dataset.SimpleAugmentConfig" title="Link to this definition"></a></dt>
-<dd><p>The simple augment handles non-interpolating geometric transformations.
-This includes mirroring and transposing in n-dimensional space.
-See <a class="reference external" href="https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/simple_augment.py">https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/simple_augment.py</a>
-for more details.</p>
-<p>:param : param p: Probability of applying the augmentations.
-:param : param mirror_only: List of axes to mirror. If None, all axes may be mirrored.
-:param : param transpose_only: List of axes to transpose. If None, all axes may be transposed.
-:param : param mirror_probs: List of probabilities for each axis in <cite>mirror_only</cite>.</p>
-<blockquote>
-<div><p>If None, uses equal probability for all axes.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>:param<span class="classifier">param transpose_probs: Dictionary mapping tuples of axes to probabilities for transposing.</span></dt><dd><p>If None, uses equal probability for all axes.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dacapo_toolbox.dataset.gp_to_nx_graph">
-<span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">gp_to_nx_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.dataset.gp_to_nx_graph" title="Link to this definition"></a></dt>
-<dd><p>Convert a gunpowder Graph to a NetworkX graph.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dacapo_toolbox.dataset.iterable_dataset">
-<span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">iterable_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_strategies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simple_augment_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deform_augment_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolatable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.dataset.iterable_dataset" title="Link to this definition"></a></dt>
-<dd><p>Builds a gunpowder pipeline and wraps it in a torch IterableDataset.
-See <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset">https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset</a> for more info</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">IterableDataset</span></code></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dacapo_toolbox.dataset.nx_to_gp_graph">
-<span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">nx_to_gp_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.dataset.nx_to_gp_graph" title="Link to this definition"></a></dt>
-<dd><p>Convert a NetworkX graph to a gunpowder Graph.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GraphSource</span></code></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="id0">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">iterable_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datasets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_strategies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simple_augment_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deform_augment_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolatable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
-<dd><p>Builds a gunpowder pipeline and wraps it in a torch IterableDataset.
-See <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset">https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset</a> for more info</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">IterableDataset</span></code></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="id1">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">SimpleAugmentConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mirror_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mirror_probs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transpose_probs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
-<dd><p>The simple augment handles non-interpolating geometric transformations.
-This includes mirroring and transposing in n-dimensional space.
-See <a class="reference external" href="https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/simple_augment.py">https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/simple_augment.py</a>
-for more details.</p>
-<p>:param : param p: Probability of applying the augmentations.
-:param : param mirror_only: List of axes to mirror. If None, all axes may be mirrored.
-:param : param transpose_only: List of axes to transpose. If None, all axes may be transposed.
-:param : param mirror_probs: List of probabilities for each axis in <cite>mirror_only</cite>.</p>
-<blockquote>
-<div><p>If None, uses equal probability for all axes.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>:param<span class="classifier">param transpose_probs: Dictionary mapping tuples of axes to probabilities for transposing.</span></dt><dd><p>If None, uses equal probability for all axes.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="id2">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">DeformAugmentConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_point_spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jitter_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spatial_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotation_axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
-<dd><p>The deform augment handles interpolating geometric transformations.
-This includes scaling, rotation, and elastic deformations.
-See <a class="reference external" href="https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/deform_augment.py">https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/deform_augment.py</a>
-for more details.</p>
-<p>:param : param p: Probability of applying the augmentations.
-:param : param control_point_spacing: Spacing of the control points for the elastic deformation.
-:param : param jitter_sigma: Standard deviation of the Gaussian noise added to the control points.
-:param : param scale_interval: Interval for scaling the input data.
-:param : param rotate: Whether to apply random rotations.
-:param : param subsample: Subsampling factor for the control points.
-:param : param spatial_dims: Number of spatial dimensions.
-:param : param rotation_axes: Axes around which to rotate. If None, rotates around all axes.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="id3">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">MaskedSampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_masked</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'integral_mask'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
-<dd><p>Sampling strategy that uses a mask to determine which samples to include.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mask_key</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The key of the mask array in the dataset.</p></li>
-<li><p><strong>min_masked</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Minimum fraction of samples that must be masked in to include the
-sample. If less than this fraction is masked in, the sample is skipped.</p></li>
-<li><p><strong>strategy</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Optional strategy to apply to the mask. by default generates an integral
-mask for quick sampling at the cost of extra memory usage. If your dataset is large, you
-may want to use “reject”.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="id4">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.dataset.</span></span><span class="sig-name descname"><span class="pre">PointSampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample_points_key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
 <dd><p>Sampling strategy that uses a set of points to determine which samples to include.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -364,12 +224,10 @@ may want to use “reject”.</p></li>
 </section>
 <section id="transforms">
 <h1>Transforms<a class="headerlink" href="#transforms" title="Link to this heading"></a></h1>
-<blockquote>
-<div></div></blockquote>
 <section id="affinities">
-<span id="module-dacapo_toolbox.transforms"></span><h2>Affinities<a class="headerlink" href="#affinities" title="Link to this heading"></a></h2>
+<h2>Affinities<a class="headerlink" href="#affinities" title="Link to this heading"></a></h2>
 <blockquote>
-<div><dl class="py class" id="module-dacapo_toolbox.transforms.affs">
+<div><dl class="py class">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.affs.Affs">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.affs.</span></span><span class="sig-name descname"><span class="pre">Affs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neighborhood</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'equality'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concat_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.affs.Affs" title="Link to this definition"></a></dt>
 <dd><dl class="py method">
@@ -409,65 +267,34 @@ registered hooks while the latter silently ignores them.</p>
 
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="dacapo_toolbox.transforms.affs.compute_affs">
-<span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.affs.</span></span><span class="sig-name descname"><span class="pre">compute_affs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.affs.compute_affs" title="Link to this definition"></a></dt>
-<dd><p>Compute affinities on a given tensor <cite>arr</cite> using the specified <cite>offset</cite> and distance
-function <cite>dist_func</cite>. if <cite>pad</cite> is True, <cite>arr</cite> will be padded s.t. the output shape
-matches the input shape.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="id5">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.affs.</span></span><span class="sig-name descname"><span class="pre">Affs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neighborhood</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'equality'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concat_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
-<dd><dl class="py method">
-<dt class="sig sig-object py" id="id6">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
-<dd><p>Define the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.
-:rtype: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span></p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="id7">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.affs.</span></span><span class="sig-name descname"><span class="pre">AffsMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neighborhood</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
-<dd><dl class="py method">
-<dt class="sig sig-object py" id="id8">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id8" title="Link to this definition"></a></dt>
-<dd><p>Define the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.
-:rtype: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span></p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-</dd></dl>
-
 </div></blockquote>
 </section>
 <section id="distances">
 <h2>Distances<a class="headerlink" href="#distances" title="Link to this heading"></a></h2>
 <blockquote>
-<div><dl class="py class" id="module-dacapo_toolbox.transforms.distances">
+<div><dl class="py class">
+<dt class="sig sig-object py" id="dacapo_toolbox.transforms.distances.SignedDistanceTransform">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.distances.</span></span><span class="sig-name descname"><span class="pre">SignedDistanceTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.distances.SignedDistanceTransform" title="Link to this definition"></a></dt>
+<dd><p>Computes the signed distance transform of a label mask.
+The output is normalized to the range [-1, 1] using <cite>tanh(dist/sigma)</cite>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dacapo_toolbox.transforms.distances.SignedDistanceTransform.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.distances.SignedDistanceTransform.forward" title="Link to this definition"></a></dt>
+<dd><p>Define the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.
+:rtype: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.distances.SDTBoundaryMask">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.distances.</span></span><span class="sig-name descname"><span class="pre">SDTBoundaryMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.distances.SDTBoundaryMask" title="Link to this definition"></a></dt>
 <dd><p>Computes a binary mask of regions where the distance to the nearest boundary
@@ -491,80 +318,12 @@ registered hooks while the latter silently ignores them.</p>
 
 </dd></dl>
 
-<dl class="py class">
-<dt class="sig sig-object py" id="dacapo_toolbox.transforms.distances.SignedDistanceTransform">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.distances.</span></span><span class="sig-name descname"><span class="pre">SignedDistanceTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.distances.SignedDistanceTransform" title="Link to this definition"></a></dt>
-<dd><p>Computes the signed distance transform of a label mask.
-The output is normalized to the range [-1, 1] using <cite>tanh(dist/sigma)</cite>.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="dacapo_toolbox.transforms.distances.SignedDistanceTransform.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.distances.SignedDistanceTransform.forward" title="Link to this definition"></a></dt>
-<dd><p>Define the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.
-:rtype: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span></p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="id9">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.distances.</span></span><span class="sig-name descname"><span class="pre">SignedDistanceTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id9" title="Link to this definition"></a></dt>
-<dd><p>Computes the signed distance transform of a label mask.
-The output is normalized to the range [-1, 1] using <cite>tanh(dist/sigma)</cite>.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="id10">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id10" title="Link to this definition"></a></dt>
-<dd><p>Define the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.
-:rtype: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span></p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="id11">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.distances.</span></span><span class="sig-name descname"><span class="pre">SDTBoundaryMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id11" title="Link to this definition"></a></dt>
-<dd><p>Computes a binary mask of regions where the distance to the nearest boundary
-is less than the distance to the border of the image. This is useful to avoid
-training on the ambiguous boundary regions where the true distance to the nearest
-object is not known.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="id12">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id12" title="Link to this definition"></a></dt>
-<dd><p>Define the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.
-:rtype: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span></p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-</dd></dl>
-
 </div></blockquote>
 </section>
 <section id="lsds">
 <h2>LSDS<a class="headerlink" href="#lsds" title="Link to this heading"></a></h2>
 <blockquote>
-<div><dl class="py class" id="module-dacapo_toolbox.transforms.lsds">
+<div><dl class="py class">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.lsds.LSD">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.lsds.</span></span><span class="sig-name descname"><span class="pre">LSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.lsds.LSD" title="Link to this definition"></a></dt>
 <dd><p>Compute local shape descriptors (LSD) for a segmentation.</p>
@@ -596,74 +355,8 @@ registered hooks while the latter silently ignores them.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="dacapo_toolbox.transforms.lsds.deriv_based_covariance">
-<span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.lsds.</span></span><span class="sig-name descname"><span class="pre">deriv_based_covariance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sub_voxel_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_sigma_voxel</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.lsds.deriv_based_covariance" title="Link to this definition"></a></dt>
-<dd><p>Instead of using an inner product to compute covariance, we could
-take derivatives. Might be more efficient but seems harder to normalize
-appropriately between small and large objects.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.lsds.get_local_shape_descriptors">
 <span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.lsds.</span></span><span class="sig-name descname"><span class="pre">get_local_shape_descriptors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.lsds.get_local_shape_descriptors" title="Link to this definition"></a></dt>
-<dd><p>Compute local shape descriptors for the given segmentation.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>segmentation</strong> (<code class="docutils literal notranslate"><span class="pre">np.array</span></code> of <code class="docutils literal notranslate"><span class="pre">int</span></code>) – A label array to compute the local shape descriptors for.</p></li>
-<li><p><strong>sigma</strong> (<code class="docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="docutils literal notranslate"><span class="pre">float</span></code>) – The radius to consider for the local shape descriptor.</p></li>
-<li><p><strong>voxel_size</strong> (<code class="docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="docutils literal notranslate"><span class="pre">int</span></code>, optional) – The voxel size of <code class="docutils literal notranslate"><span class="pre">segmentation</span></code>. Defaults to 1.</p></li>
-<li><p><strong>labels</strong> (array-like of <code class="docutils literal notranslate"><span class="pre">int</span></code>, optional) – Restrict the computation to the given labels. Defaults to all
-labels inside the <code class="docutils literal notranslate"><span class="pre">roi</span></code> of <code class="docutils literal notranslate"><span class="pre">segmentation</span></code>.</p></li>
-<li><p><strong>downsample</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>, optional) – Compute the local shape descriptor on a downsampled volume for
-faster processing. Defaults to 1 (no downsampling).</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="dacapo_toolbox.transforms.lsds.outer_product">
-<span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.lsds.</span></span><span class="sig-name descname"><span class="pre">outer_product</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.lsds.outer_product" title="Link to this definition"></a></dt>
-<dd><p>Computes the unique values of the outer products of the first dimension
-of <code class="docutils literal notranslate"><span class="pre">array</span></code>. If <code class="docutils literal notranslate"><span class="pre">array</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(k,</span> <span class="pre">d,</span> <span class="pre">h,</span> <span class="pre">w)</span></code>, for example, the
-output will be of shape <code class="docutils literal notranslate"><span class="pre">(k*(k+1)/2,</span> <span class="pre">d,</span> <span class="pre">h,</span> <span class="pre">w)</span></code>.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="id13">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.lsds.</span></span><span class="sig-name descname"><span class="pre">LSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id13" title="Link to this definition"></a></dt>
-<dd><p>Compute local shape descriptors (LSD) for a segmentation.</p>
-<p>:param : param sigma: The gaussian kernel sigma to consider for the local shape descriptor.
-:param : param voxel_size: The voxel size of the segmentation. Defaults to 1 per axis.
-:param : param labels: Restrict the computation to the given labels. Defaults to all</p>
-<blockquote>
-<div><p>labels inside the ROI of the segmentation.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>:param<span class="classifier">param downsample: Compute the local shape descriptor on a downsampled volume for</span></dt><dd><p>faster processing. Defaults to 1 (no downsampling).</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="id14">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id14" title="Link to this definition"></a></dt>
-<dd><p>Define the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.
-:rtype: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></span></p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="id15">
-<span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.lsds.</span></span><span class="sig-name descname"><span class="pre">get_local_shape_descriptors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">segmentation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id15" title="Link to this definition"></a></dt>
 <dd><p>Compute local shape descriptors for the given segmentation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -685,31 +378,12 @@ faster processing. Defaults to 1 (no downsampling).</p></li>
 <section id="weight-balancing">
 <h2>Weight Balancing<a class="headerlink" href="#weight-balancing" title="Link to this heading"></a></h2>
 <blockquote>
-<div><dl class="py class" id="module-dacapo_toolbox.transforms.weight_balancing">
+<div><dl class="py class">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.weight_balancing.BalanceLabels">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.weight_balancing.</span></span><span class="sig-name descname"><span class="pre">BalanceLabels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clipmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clipmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.weight_balancing.BalanceLabels" title="Link to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.weight_balancing.BalanceLabels.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.weight_balancing.BalanceLabels.forward" title="Link to this definition"></a></dt>
-<dd><p>Define the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
-</div>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="id16">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.weight_balancing.</span></span><span class="sig-name descname"><span class="pre">BalanceLabels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clipmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clipmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id16" title="Link to this definition"></a></dt>
-<dd><dl class="py method">
-<dt class="sig sig-object py" id="id17">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id17" title="Link to this definition"></a></dt>
 <dd><p>Define the computation performed at every call.</p>
 <p>Should be overridden by all subclasses.</p>
 <div class="admonition note">
@@ -734,14 +408,14 @@ registered hooks while the latter silently ignores them.</p>
 <section id="visualizations">
 <h1>Visualizations<a class="headerlink" href="#visualizations" title="Link to this heading"></a></h1>
 <blockquote>
-<div><dl class="py function" id="module-dacapo_toolbox.vis.preview">
+<div><dl class="py function">
 <dt class="sig sig-object py" id="dacapo_toolbox.vis.preview.gif_2d">
-<span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.vis.preview.</span></span><span class="sig-name descname"><span class="pre">gif_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arrays</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.vis.preview.gif_2d" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.vis.preview.</span></span><span class="sig-name descname"><span class="pre">gif_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arrays</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">72</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimize_gif</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.vis.preview.gif_2d" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="dacapo_toolbox.vis.preview.cube">
-<span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.vis.preview.</span></span><span class="sig-name descname"><span class="pre">cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arrays</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">light_azdeg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">205</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">light_altdeg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.vis.preview.cube" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.vis.preview.</span></span><span class="sig-name descname"><span class="pre">cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arrays</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">light_azdeg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">205</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">light_altdeg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rcount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shade</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.vis.preview.cube" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </div></blockquote>
@@ -771,8 +445,8 @@ arrays for train and testing.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="id18">
-<span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.sample_datasets.</span></span><span class="sig-name descname"><span class="pre">cremi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zarr_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id18" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id0">
+<span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.sample_datasets.</span></span><span class="sig-name descname"><span class="pre">cremi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zarr_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
 <dd><p>Downloads a subset of the CREMI data and returns the raw and label
 arrays for train and testing.</p>
 <dl class="field-list simple">
@@ -799,6 +473,7 @@ arrays for train and testing.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="install.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorials/dataset/dataset_overview.html" class="btn btn-neutral float-right" title="Dataset Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
