@@ -8,7 +8,6 @@ from sklearn.decomposition import PCA
 
 from pathlib import Path
 
-
 from matplotlib import colors as mcolors
 from matplotlib import cm
 
@@ -93,6 +92,10 @@ def gif_2d(
     title: str,
     fps: int = 10,
     overwrite: bool = True,
+    dpi: int = 72,
+    max_size: int = 256,
+    optimize_gif: bool = False,
+    frame_skip: int = 2,
 ):
     if Path(filename).exists() and not overwrite:
         return
@@ -113,12 +116,12 @@ def gif_2d(
         f"All arrays must have the same number of z slices, got {z_arr_slices}"
     )
 
-    fig, axes = plt.subplots(1, len(arrays), figsize=(2 + 5 * len(arrays), 6))
+    fig, axes = plt.subplots(1, len(arrays), figsize=(2 + 3 * len(arrays), 4), dpi=dpi)
 
     label_cmap = get_cmap()
 
     ims = []
-    for ii in range(z_slices):
+    for ii in range(0, z_slices, frame_skip):  # Skip frames for faster GIF
         slice_ims = []
         for jj, (key, arr) in enumerate(arrays.items()):
             roi = arr.roi.copy()
@@ -127,8 +130,9 @@ def gif_2d(
             # Show the raw data
             x = arr[roi].squeeze(-arr.voxel_size.dims)  # squeeze out z dim
             shape = x.shape
-            scale_factor = shape[-2] // 256 if shape[-2] > 256 else 1
-            # only show 256x256 pixels, more resolution not needed for gif
+            # Limit resolution for GIF - smaller is faster
+            scale_factor = max(shape[-2] // max_size, 1) if shape[-2] > max_size else 1
+            # only show max_size pixels, more resolution not needed for gif
             if len(shape) == 2:
                 x = x[::scale_factor, ::scale_factor]
             elif len(shape) == 3:
@@ -172,7 +176,16 @@ def gif_2d(
     ims = ims + ims[::-1]
     ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
     fig.suptitle(title, fontsize=16)
-    ani.save(filename, writer="pillow", fps=fps)
+
+    # Use optimized writer settings for faster GIF creation
+    from matplotlib.animation import PillowWriter
+
+    if optimize_gif:
+        writer = PillowWriter(fps=fps)
+    else:
+        writer = PillowWriter(fps=fps, metadata=dict(artist="dacapo"), bitrate=1800)
+
+    ani.save(filename, writer=writer, dpi=dpi)
     plt.close()
 
 
@@ -186,6 +199,10 @@ def cube(
     light_azdeg: float = 205,
     light_altdeg: float = 20,
     overwrite: bool = True,
+    rcount: int = 128,
+    ccount: int = 128,
+    shade: bool = True,
+    dpi: int = 100,
 ):
     if Path(filename).exists() and not overwrite:
         return
@@ -307,9 +324,9 @@ def cube(
         ]
 
         kwargs = {
-            "rcount": 256,
-            "ccount": 256,
-            "shade": True,
+            "rcount": rcount,
+            "ccount": ccount,
+            "shade": shade,
             "lightsource": lightsource,
         }
 
@@ -351,5 +368,5 @@ def cube(
     fig.suptitle(title, fontsize=16)
 
     plt.tight_layout()
-    plt.savefig(filename, bbox_inches="tight", pad_inches=0.1)
+    plt.savefig(filename, bbox_inches="tight", pad_inches=0.1, dpi=dpi)
     plt.close(fig)
