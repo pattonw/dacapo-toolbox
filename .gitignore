@@ -14,3 +14,4 @@ uv.lock
 build
 volara_logs
 lightning_logs
+*.ipynb
