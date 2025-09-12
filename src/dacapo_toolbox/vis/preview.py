@@ -8,6 +8,8 @@ from sklearn.decomposition import PCA
 
 from pathlib import Path
 
+import time
+
 from matplotlib import colors as mcolors
 from matplotlib import cm
 
@@ -97,6 +99,7 @@ def gif_2d(
     optimize_gif: bool = False,
     frame_skip: int = 2,
 ):
+    t_start = time.time()
     if Path(filename).exists() and not overwrite:
         return
     transformed_arrays = {}
@@ -173,9 +176,15 @@ def gif_2d(
             slice_ims.append(im)
         ims.append(slice_ims)
 
+    t_im_gen = time.time()
+    print(f"generated images in {t_im_gen - t_start:.1f}s")
+
     ims = ims + ims[::-1]
     ani = animation.ArtistAnimation(fig, ims, blit=True, repeat_delay=1000)
     fig.suptitle(title, fontsize=16)
+
+    t_animation = time.time()
+    print(f"built animation in {t_animation - t_im_gen}s")
 
     # Use optimized writer settings for faster GIF creation
     from matplotlib.animation import PillowWriter
@@ -187,6 +196,7 @@ def gif_2d(
 
     ani.save(filename, writer=writer, dpi=dpi)
     plt.close()
+    print(f"Saved gif to {filename} in {time.time() - t_animation:.1f}s")
 
 
 def cube(
@@ -204,6 +214,7 @@ def cube(
     shade: bool = True,
     dpi: int = 100,
 ):
+    t_start = time.time()
     if Path(filename).exists() and not overwrite:
         return
 
@@ -213,6 +224,7 @@ def cube(
             total_roi = arr.roi
         else:
             total_roi = total_roi.union(arr.roi)
+    assert isinstance(total_roi, Roi)
 
     lightsource = mcolors.LightSource(azdeg=light_azdeg, altdeg=light_altdeg)
 
@@ -288,6 +300,9 @@ def cube(
         else:
             transformed_faces[key] = (face_data, face_coords)
     faces = transformed_faces
+
+    t_processed = time.time()
+    print(f"processed data in {t_processed - t_start:.1f}s")
 
     fig, axes = plt.subplots(
         1,
@@ -368,5 +383,11 @@ def cube(
     fig.suptitle(title, fontsize=16)
 
     plt.tight_layout()
+
+    t_drawn = time.time()
+    print(f"drew figure in {t_drawn - t_processed:.1f}s")
+
     plt.savefig(filename, bbox_inches="tight", pad_inches=0.1, dpi=dpi)
     plt.close(fig)
+
+    print(f"Saved cube to {filename} in {time.time() - t_drawn:.1f}s")

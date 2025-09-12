@@ -41,8 +41,8 @@ def nx_to_gp_graph(
                 attrs=attrs,
             )
             for node, attrs in graph.nodes(data=True)
-        ],
-        [gp.Edge(u, v, attrs) for u, v, attrs in graph.edges(data=True)],
+        ],  # type: ignore[arg-type]
+        [gp.Edge(u, v, attrs) for u, v, attrs in graph.edges(data=True)],  # type: ignore[arg-type]
         gp.GraphSpec(Roi((None,) * len(scale), (None,) * len(scale))),
     )
     return graph
