@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "1109d2b7",
+   "id": "195580d7",
    "metadata": {},
    "source": [
     "# Dataset Overview\n",
@@ -28,7 +28,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "fbd84846",
+   "id": "141ee148",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -49,7 +49,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "796fddfb",
+   "id": "25347477",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -64,7 +64,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "6e9765cd",
+   "id": "c545f1c4",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -77,7 +77,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "3562b5dc",
+   "id": "4a08588a",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -89,7 +89,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "1976cfa5",
+   "id": "b4a5454c",
    "metadata": {},
    "source": [
     "You may notice a couple things about the above images.\n",
@@ -107,7 +107,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "4a898738",
+   "id": "d6f359c1",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -123,7 +123,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "833d0529",
+   "id": "113c5b1d",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -136,7 +136,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "1d14e3dd",
+   "id": "33200719",
    "metadata": {
     "lines_to_next_cell": 2
    },
@@ -150,7 +150,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "aad98ce3",
+   "id": "1281c615",
    "metadata": {},
    "source": [
     "Now since we trim, we make sure we only choose samples where the\n",
@@ -165,7 +165,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "bf59f5e1",
+   "id": "8ebd740f",
    "metadata": {
     "lines_to_next_cell": 0
    },
@@ -175,7 +175,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "a0e698ad",
+   "id": "111013f0",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -207,7 +207,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "6c0e1fa1",
+   "id": "1fe98b9b",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -222,7 +222,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "c387fff8",
+   "id": "20f82dd9",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -236,7 +236,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "cde666e2",
+   "id": "283cd881",
    "metadata": {},
    "source": [
     "Lets add a graph to the dataset. We use the `networkx` library\n",
@@ -249,7 +249,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "0d4c5bcb",
+   "id": "a5f6d69c",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -272,7 +272,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "859b9b3d",
+   "id": "fdffa221",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -283,7 +283,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "3f78d5b4",
+   "id": "add508dd",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -312,7 +312,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "0be52b6f",
+   "id": "4a72c968",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -335,7 +335,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "1c61ef3d",
+   "id": "2c4307c9",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -355,7 +355,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "03cd4cdc",
+   "id": "19ed5251",
    "metadata": {},
    "source": [
     "## Augmentations/Transformations\n",
@@ -370,7 +370,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "734a81b9",
+   "id": "40a8c565",
    "metadata": {},
    "source": [
     "### Spatial augmentations\n",
@@ -386,7 +386,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "9a767772",
+   "id": "7fe14f6d",
    "metadata": {
     "lines_to_next_cell": 0
    },
@@ -419,7 +419,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "69915872",
+   "id": "27f1ad80",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -437,7 +437,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "8bbda8e6",
+   "id": "78f2e7ab",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -454,7 +454,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "82fe7180",
+   "id": "59f4cbfd",
    "metadata": {},
    "source": [
     "### Non-spatial augmentations\n",
@@ -479,7 +479,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "f903c466",
+   "id": "ca01d481",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -505,7 +505,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "c46c34d5",
+   "id": "d43ff17f",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -521,7 +521,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "97c23940",
+   "id": "7993bf64",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -536,16 +536,26 @@
   },
   {
    "cell_type": "markdown",
-   "id": "3026a37d",
-   "metadata": {
-    "lines_to_next_cell": 2
-   },
-   "source": []
+   "id": "df623734",
+   "metadata": {},
+   "source": [
+    "The iterable dataset is very flexible and can handle a variety of use cases.\n",
+    "Below is a more complex example showing a dataset with multiple datasets at various\n",
+    "resolutions, using different sampling strategies, spatial and non-spatial augmentations,\n",
+    "and both arrays and graphs as input and output.\n",
+    "\n",
+    "We generate 2 synthetic datasets with different sized blobs. `blobs_a` and `blobs_b`.\n",
+    "We create raw and ground truth arrays in scale pyramid fashion for each dataset.\n",
+    "`blobs_a` two scale levels s0 and s1 with voxel sizes (raw: (1, 1), gt: (2, 2)) and (raw: (2, 2), gt: (4, 4)) respectively.\n",
+    "`blobs_b` two scale levels s0 and s1 with voxel sizes (raw: (1, 1), gt: (2, 2)) and (raw: (2, 2), gt: (4, 4)) respectively.\n",
+    "We also create a mask for each dataset that masks out half the image. The iterable dataset function\n",
+    "has no problem generating samples from a variety of different voxel sizes, different sampling strategies, etc."
+   ]
   },
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "357f5035",
+   "id": "eb44b436",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -560,12 +570,8 @@
     "from funlib.persistence import Array\n",
     "from skimage import data\n",
     "from torchvision.transforms import v2 as transforms\n",
-    "import logging\n",
     "import numpy as np\n",
     "from skimage.measure import label\n",
-    "\n",
-    "logging.basicConfig(level=logging.DEBUG)\n",
-    "# logging.getLogger(\"gunpowder.nodes.random_location\").setLevel(logging.DEBUG)\n",
     "\n",
     "side_length = 2048\n",
     "\n",
@@ -688,19 +694,7 @@
     "    axs[0, 3].set_title(\"Affs Mask\")\n",
     "    axs[0, 4].set_title(\"Mask\")\n",
     "\n",
-    "    plt.savefig(out_ds / f\"affs_batch_{i}.png\")"
-   ]
-  },
-  {
-   "cell_type": "markdown",
-   "id": "e56de690",
-   "metadata": {},
-   "source": [
-    "Visualize the batches:\n",
-    "![Affs Batch 0](_static/dataset_overview/affs_batch_0.png)\n",
-    "![Affs Batch 1](_static/dataset_overview/affs_batch_1.png)\n",
-    "![Affs Batch 2](_static/dataset_overview/affs_batch_2.png)\n",
-    "![Affs Batch 3](_static/dataset_overview/affs_batch_3.png)"
+    "    plt.show()"
    ]
   }
  ],

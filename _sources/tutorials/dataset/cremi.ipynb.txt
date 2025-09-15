@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "fb8d3b88",
+   "id": "e0d91d7f",
    "metadata": {},
    "source": [
     "# Cremi Example\n",
@@ -13,7 +13,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b299541c",
+   "id": "a80c9d67",
    "metadata": {},
    "source": [
     "## Introduction and overview\n",
@@ -27,7 +27,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "84185b1f",
+   "id": "0b3cdcdf",
    "metadata": {},
    "source": [
     "## Environment setup\n",
@@ -45,7 +45,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "513b5bfd",
+   "id": "f8247b27",
    "metadata": {},
    "source": [
     "## Data Preparation\n",
@@ -56,7 +56,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "43a7c72d",
+   "id": "e300567f",
    "metadata": {
     "lines_to_next_cell": 2
    },
@@ -70,6 +70,7 @@
     "dask.config.set(scheduler=\"single-threaded\")\n",
     "\n",
     "from pathlib import Path\n",
+    "from functools import partial\n",
     "from tqdm import tqdm\n",
     "\n",
     "from funlib.persistence import Array\n",
@@ -97,7 +98,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "38cb7954",
+   "id": "002fe4c0",
    "metadata": {},
    "source": [
     "Lets visualize our train and test data"
@@ -105,7 +106,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d69b2293",
+   "id": "af69f878",
    "metadata": {},
    "source": [
     "### Training data"
@@ -114,7 +115,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "686c3757",
+   "id": "cf3a37ea",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -125,7 +126,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "026b89e5",
+   "id": "eac0706c",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -148,7 +149,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "09d78dff",
+   "id": "b7eeb44e",
    "metadata": {},
    "source": [
     "Here we visualize the training data:\n",
@@ -158,7 +159,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "09ea8d87",
+   "id": "47459015",
    "metadata": {},
    "source": [
     "### Testing data"
@@ -167,7 +168,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "ee556912",
+   "id": "ed04d76d",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -188,7 +189,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "7bf597a5",
+   "id": "b8f6daa7",
    "metadata": {},
    "source": [
     "Here we visualize the test data:\n",
@@ -198,7 +199,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d876300c",
+   "id": "728bbb17",
    "metadata": {},
    "source": [
     "### DaCapo\n",
@@ -207,7 +208,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "cbba9594",
+   "id": "00f1af19",
    "metadata": {},
    "source": [
     "### Data Split\n",
@@ -217,7 +218,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "f4b96089",
+   "id": "43d9aee8",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -231,7 +232,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "33a355d6",
+   "id": "b49a04a3",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -260,7 +261,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "7e3f6d84",
+   "id": "5a5ba397",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -288,7 +289,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "667b2512",
+   "id": "c25ed85a",
    "metadata": {
     "lines_to_next_cell": 2
    },
@@ -300,7 +301,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "9ecd7e5a",
+   "id": "689e000f",
    "metadata": {},
    "source": [
     "### Tasks\n",
@@ -312,7 +313,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "7ecec7af",
+   "id": "9933c41d",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -335,7 +336,6 @@
     "    transforms={\n",
     "        (\"gt\", \"affs\"): Affs(neighborhood=neighborhood, concat_dim=0),\n",
     "        (\"gt\", \"affs_mask\"): AffsMask(neighborhood=neighborhood),\n",
-    "        ((\"affs\", \"affs_mask\"), \"weights\"): BalanceLabels((1, -1, -1, -1)),\n",
     "    },\n",
     "    deform_augment_config=DeformAugmentConfig(\n",
     "        p=0.1,\n",
@@ -359,7 +359,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "a7f48db0",
+   "id": "784e921a",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -413,7 +413,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "5afacd0b",
+   "id": "678f85bc",
    "metadata": {},
    "source": [
     "Here we visualize a batch with (raw, gt, target) triplets for the affinities task:\n",
@@ -423,7 +423,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "5ec372bd",
+   "id": "2f3735af",
    "metadata": {},
    "source": [
     "### Models\n",
@@ -433,7 +433,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "35932d07",
+   "id": "abdaebd2",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -468,14 +468,30 @@
     "    activation=\"LeakyReLU\",\n",
     ")\n",
     "\n",
-    "module = torch.nn.Sequential(\n",
-    "    unet, torch.nn.Conv3d(32, len(neighborhood), kernel_size=1), torch.nn.Sigmoid()\n",
+    "# Small sigmoid wrapper to apply sigmoid only when not training\n",
+    "# this is because training BCEWithLogitsLoss is more stable\n",
+    "# than training with a sigmoid followed by BCELoss\n",
+    "class SigmoidWrapper(torch.nn.Module):\n",
+    "    def __init__(self, model):\n",
+    "        super().__init__()\n",
+    "        self.model = model\n",
+    "        self.apply_sigmoid = True\n",
+    "\n",
+    "    def forward(self, x):\n",
+    "        logits = self.model(x)\n",
+    "        if self.apply_sigmoid and not self.training:\n",
+    "            return torch.sigmoid(logits)\n",
+    "        return logits\n",
+    "\n",
+    "\n",
+    "module = SigmoidWrapper(\n",
+    "    torch.nn.Sequential(unet, torch.nn.Conv3d(32, len(neighborhood), kernel_size=1))\n",
     ").to(device)"
    ]
   },
   {
    "cell_type": "markdown",
-   "id": "10c6a845",
+   "id": "4fe50ddf",
    "metadata": {},
    "source": [
     "### Training loop\n",
@@ -485,7 +501,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "d41e56da",
+   "id": "7f98855a",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -502,7 +518,6 @@
     "        \"raw\": torchvision.transforms.Lambda(lambda x: x[None].float() / 255.0),\n",
     "        (\"gt\", \"affs\"): Affs(neighborhood=neighborhood, concat_dim=0),\n",
     "        (\"gt\", \"affs_mask\"): AffsMask(neighborhood=neighborhood),\n",
-    "        ((\"affs\", \"affs_mask\"), \"weights\"): BalanceLabels((1, -1, -1, -1)),\n",
     "    },\n",
     "    deform_augment_config=DeformAugmentConfig(\n",
     "        p=0.1,\n",
@@ -520,8 +535,8 @@
     "    ),\n",
     ")\n",
     "\n",
-    "loss_func = torch.nn.BCELoss(reduction=\"none\")\n",
-    "optimizer = torch.optim.Adam(module.parameters(), lr=1e-4)\n",
+    "loss_func = partial(torchvision.ops.sigmoid_focal_loss, reduction=\"none\")\n",
+    "optimizer = torch.optim.Adam(module.parameters(), lr=5e-5)\n",
     "dataloader = torch.utils.data.DataLoader(\n",
     "    train_dataset,\n",
     "    batch_size=3,\n",
@@ -530,17 +545,17 @@
     "losses = []\n",
     "\n",
     "for iteration, batch in tqdm(enumerate(iter(dataloader))):\n",
-    "    raw, target, weight = (\n",
+    "    raw, target, affs_mask = (\n",
     "        batch[\"raw\"].to(device),\n",
     "        batch[\"affs\"].to(device),\n",
-    "        batch[\"weights\"].to(device),\n",
+    "        batch[\"affs_mask\"].to(device),\n",
     "    )\n",
     "    optimizer.zero_grad()\n",
     "\n",
     "    output = module(raw)\n",
     "\n",
     "    voxel_loss = loss_func(output, target.float())\n",
-    "    loss = (voxel_loss * weight).mean()\n",
+    "    loss = (voxel_loss * affs_mask).sum() / affs_mask.sum()\n",
     "    loss.backward()\n",
     "    optimizer.step()\n",
     "\n",
@@ -553,7 +568,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "736de7fd",
+   "id": "cc072999",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -572,7 +587,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "646982e2",
+   "id": "94dc615c",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -588,7 +603,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "e2829f3a",
+   "id": "c5025267",
    "metadata": {
     "lines_to_next_cell": 0
    },
@@ -619,7 +634,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "9f22132a",
+   "id": "12c42a29",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -661,7 +676,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "dc58def8",
+   "id": "025debb6",
    "metadata": {},
    "source": [
     "Here we visualize the prediction results:\n",
@@ -671,7 +686,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "9ef6e032",
+   "id": "05fa8768",
    "metadata": {},
    "source": [
     "## Blockwise Processing\n",
@@ -684,7 +699,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "cd43fe8a",
+   "id": "993983ce",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -745,7 +760,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "d68e6d35",
+   "id": "4b7004a9",
    "metadata": {},
    "source": [
     "## Visualizing the results"
@@ -754,7 +769,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "47064de3",
+   "id": "15dac640",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -801,7 +816,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "69994dfa",
+   "id": "587ab05f",
    "metadata": {},
    "source": [
     "Here we visualize the prediction results:\n",

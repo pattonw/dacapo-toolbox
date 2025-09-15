@@ -411,12 +411,64 @@ registered hooks while the latter silently ignores them.</p>
 <div><dl class="py function">
 <dt class="sig sig-object py" id="dacapo_toolbox.vis.preview.gif_2d">
 <span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.vis.preview.</span></span><span class="sig-name descname"><span class="pre">gif_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arrays</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">72</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimize_gif</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.vis.preview.gif_2d" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Create a 2D GIF preview of the given arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arrays</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Array</em><em>]</em>) – A dictionary of named arrays to visualize. Each array must be 3D,
+with optional channels.</p></li>
+<li><p><strong>array_types</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – A dictionary specifying the type of each array. Supported types are:
+- “raw”: Grayscale raw data.
+- “labels”: Integer labels, visualized with a random color map.
+- “affs”: Affinity graphs, visualized as RGB images.
+- “pca”: High-dimensional data, visualized using PCA to reduce to 3 channels.</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – The output filename for the GIF.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title to display on the GIF.</p></li>
+<li><p><strong>fps</strong> (<em>int</em><em>, </em><em>optional</em>) – Frames per second for the GIF. Default is 10.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to overwrite the output file if it already exists. Default is True.</p></li>
+<li><p><strong>dpi</strong> (<em>int</em><em>, </em><em>optional</em>) – Dots per inch for the output GIF. Default is 72.</p></li>
+<li><p><strong>max_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum size (in pixels) for the largest dimension of the images. Default is 256.</p></li>
+<li><p><strong>optimize_gif</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to optimize the GIF for smaller file size. Default is False.</p></li>
+<li><p><strong>frame_skip</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of frames to skip when generating the GIF for faster creation. Default is 2.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="dacapo_toolbox.vis.preview.cube">
 <span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.vis.preview.</span></span><span class="sig-name descname"><span class="pre">cube</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arrays</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">light_azdeg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">205</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">light_altdeg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rcount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ccount</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shade</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.vis.preview.cube" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Preview 3D arrays as cubes with matplotlib. Arrays do not need to be the same size
+their relative sizes and shifts will be respected.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arrays</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Array</em><em>]</em>) – A dictionary of named arrays to visualize. Each array must be 3D,
+with optional channels.</p></li>
+<li><p><strong>array_types</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – <p>A dictionary specifying the type of each array. Supported types are:
+- “raw”: Grayscale raw data.
+- “labels”: Integer labels, visualized with a random color map.
+- “affs”: Affinity graphs, visualized as RGB images.
+- “pca”: High-dimensional data, visualized using PCA to reduce to 3</p>
+<blockquote>
+<div><p>channels.</p>
+</div></blockquote>
+</p></li>
+<li><p><strong>filename</strong> (<em>str</em>) – The output filename for the image.</p></li>
+<li><p><strong>title</strong> (<em>str</em>) – The title to display on the image.</p></li>
+<li><p><strong>elev</strong> (<em>float</em><em>, </em><em>optional</em>) – Elevation angle for the 3D view. Default is 30.</p></li>
+<li><p><strong>azim</strong> (<em>float</em><em>, </em><em>optional</em>) – Azimuth angle for the 3D view. Default is -60.</p></li>
+<li><p><strong>light_azdeg</strong> (<em>float</em><em>, </em><em>optional</em>) – Azimuth angle for the light source. Default is 205.</p></li>
+<li><p><strong>light_altdeg</strong> (<em>float</em><em>, </em><em>optional</em>) – Altitude angle for the light source. Default is 20.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to overwrite the output file if it already exists. Default is True.</p></li>
+<li><p><strong>rcount</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of rows for the surface plot. Default is 128.</p></li>
+<li><p><strong>ccount</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of columns for the surface plot. Default is 128.</p></li>
+<li><p><strong>shade</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to shade the surface plot. Default is True.</p></li>
+<li><p><strong>dpi</strong> (<em>int</em><em>, </em><em>optional</em>) – Dots per inch for the output image. Default is 100.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </div></blockquote>
 </section>
