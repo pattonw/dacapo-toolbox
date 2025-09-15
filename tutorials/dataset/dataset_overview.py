@@ -339,7 +339,17 @@ ax[2].imshow(sample["masked_image"].numpy().transpose((1, 2, 0)))
 plt.show()
 
 # %% [markdown]
+# The iterable dataset is very flexible and can handle a variety of use cases.
+# Below is a more complex example showing a dataset with multiple datasets at various
+# resolutions, using different sampling strategies, spatial and non-spatial augmentations,
+# and both arrays and graphs as input and output.
 
+# We generate 2 synthetic datasets with different sized blobs. `blobs_a` and `blobs_b`.
+# We create raw and ground truth arrays in scale pyramid fashion for each dataset.
+# `blobs_a` two scale levels s0 and s1 with voxel sizes (raw: (1, 1), gt: (2, 2)) and (raw: (2, 2), gt: (4, 4)) respectively.
+# `blobs_b` two scale levels s0 and s1 with voxel sizes (raw: (1, 1), gt: (2, 2)) and (raw: (2, 2), gt: (4, 4)) respectively.
+# We also create a mask for each dataset that masks out half the image. The iterable dataset function
+# has no problem generating samples from a variety of different voxel sizes, different sampling strategies, etc.
 
 # %%
 from dacapo_toolbox.dataset import (
@@ -477,11 +487,4 @@ for i, batch in enumerate(iter_ds):
     axs[0, 3].set_title("Affs Mask")
     axs[0, 4].set_title("Mask")
 
-    plt.savefig(out_ds / f"affs_batch_{i}.png")
-
-# %% [markdown]
-# Visualize the batches:
-# ![Affs Batch 0](_static/dataset_overview/affs_batch_0.png)
-# ![Affs Batch 1](_static/dataset_overview/affs_batch_1.png)
-# ![Affs Batch 2](_static/dataset_overview/affs_batch_2.png)
-# ![Affs Batch 3](_static/dataset_overview/affs_batch_3.png)
+    plt.show()
