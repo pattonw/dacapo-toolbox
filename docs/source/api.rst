@@ -74,9 +74,6 @@ Visualizations
 Sample Data
 ===========
 
-    .. automodule:: dacapo_toolbox.sample_datasets
-        :members:
-
     .. autofunction:: dacapo_toolbox.sample_datasets.cremi
 
 
