@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "195580d7",
+   "id": "30ce14bd",
    "metadata": {},
    "source": [
     "# Dataset Overview\n",
@@ -28,7 +28,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "141ee148",
+   "id": "7322a48f",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -49,7 +49,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "25347477",
+   "id": "65500a61",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -64,7 +64,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "c545f1c4",
+   "id": "cca39403",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -77,7 +77,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "4a08588a",
+   "id": "e1de8df2",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -89,7 +89,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b4a5454c",
+   "id": "fd2a7dd1",
    "metadata": {},
    "source": [
     "You may notice a couple things about the above images.\n",
@@ -107,7 +107,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "d6f359c1",
+   "id": "42d1666f",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -123,7 +123,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "113c5b1d",
+   "id": "04a7c476",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -136,7 +136,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "33200719",
+   "id": "7550f93e",
    "metadata": {
     "lines_to_next_cell": 2
    },
@@ -150,7 +150,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "1281c615",
+   "id": "1df7378a",
    "metadata": {},
    "source": [
     "Now since we trim, we make sure we only choose samples where the\n",
@@ -165,7 +165,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "8ebd740f",
+   "id": "9ea40a4c",
    "metadata": {
     "lines_to_next_cell": 0
    },
@@ -175,7 +175,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "111013f0",
+   "id": "bb482b9e",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -207,7 +207,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "1fe98b9b",
+   "id": "7bd579dc",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -222,7 +222,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "20f82dd9",
+   "id": "7f9f6c69",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -236,7 +236,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "283cd881",
+   "id": "e8b43b64",
    "metadata": {},
    "source": [
     "Lets add a graph to the dataset. We use the `networkx` library\n",
@@ -249,7 +249,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "a5f6d69c",
+   "id": "4d5432b6",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -272,7 +272,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "fdffa221",
+   "id": "6d7c7222",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -283,7 +283,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "add508dd",
+   "id": "9c9b33dc",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -312,7 +312,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "4a72c968",
+   "id": "672df5e0",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -335,7 +335,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "2c4307c9",
+   "id": "012b2fab",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -355,7 +355,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "19ed5251",
+   "id": "db039a99",
    "metadata": {},
    "source": [
     "## Augmentations/Transformations\n",
@@ -370,7 +370,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "40a8c565",
+   "id": "784dc998",
    "metadata": {},
    "source": [
     "### Spatial augmentations\n",
@@ -386,7 +386,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "7fe14f6d",
+   "id": "1431ae88",
    "metadata": {
     "lines_to_next_cell": 0
    },
@@ -419,7 +419,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "27f1ad80",
+   "id": "de27852b",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -437,7 +437,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "78f2e7ab",
+   "id": "a2fc3d98",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -454,7 +454,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "59f4cbfd",
+   "id": "54e15433",
    "metadata": {},
    "source": [
     "### Non-spatial augmentations\n",
@@ -479,7 +479,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "ca01d481",
+   "id": "a2c51137",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -505,7 +505,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "d43ff17f",
+   "id": "7ca56c12",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -521,7 +521,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "7993bf64",
+   "id": "b98c4374",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -536,7 +536,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "df623734",
+   "id": "453c875e",
    "metadata": {},
    "source": [
     "The iterable dataset is very flexible and can handle a variety of use cases.\n",
@@ -555,7 +555,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "eb44b436",
+   "id": "e5858b78",
    "metadata": {},
    "outputs": [],
    "source": [

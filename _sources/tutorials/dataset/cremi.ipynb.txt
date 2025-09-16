@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "e0d91d7f",
+   "id": "e4da1197",
    "metadata": {},
    "source": [
     "# Cremi Example\n",
@@ -13,7 +13,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "a80c9d67",
+   "id": "fa54ed00",
    "metadata": {},
    "source": [
     "## Introduction and overview\n",
@@ -27,7 +27,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "0b3cdcdf",
+   "id": "515efb9a",
    "metadata": {},
    "source": [
     "## Environment setup\n",
@@ -45,7 +45,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "f8247b27",
+   "id": "d65f723d",
    "metadata": {},
    "source": [
     "## Data Preparation\n",
@@ -56,7 +56,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "e300567f",
+   "id": "d5126d04",
    "metadata": {
     "lines_to_next_cell": 2
    },
@@ -98,7 +98,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "002fe4c0",
+   "id": "be414419",
    "metadata": {},
    "source": [
     "Lets visualize our train and test data"
@@ -106,7 +106,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "af69f878",
+   "id": "ead5add8",
    "metadata": {},
    "source": [
     "### Training data"
@@ -115,7 +115,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "cf3a37ea",
+   "id": "e7c52801",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -126,7 +126,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "eac0706c",
+   "id": "7a88134f",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -149,7 +149,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b7eeb44e",
+   "id": "9da84b11",
    "metadata": {},
    "source": [
     "Here we visualize the training data:\n",
@@ -159,7 +159,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "47459015",
+   "id": "e7373062",
    "metadata": {},
    "source": [
     "### Testing data"
@@ -168,7 +168,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "ed04d76d",
+   "id": "f91d0ea9",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -189,7 +189,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "b8f6daa7",
+   "id": "901a2f16",
    "metadata": {},
    "source": [
     "Here we visualize the test data:\n",
@@ -199,7 +199,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "728bbb17",
+   "id": "8eb317df",
    "metadata": {},
    "source": [
     "### DaCapo\n",
@@ -208,7 +208,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "00f1af19",
+   "id": "16485d9a",
    "metadata": {},
    "source": [
     "### Data Split\n",
@@ -218,7 +218,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "43d9aee8",
+   "id": "a02ae2e5",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -232,7 +232,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "b49a04a3",
+   "id": "aab855ad",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -261,7 +261,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "5a5ba397",
+   "id": "9d3293db",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -289,7 +289,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "c25ed85a",
+   "id": "3f6fea5a",
    "metadata": {
     "lines_to_next_cell": 2
    },
@@ -301,7 +301,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "689e000f",
+   "id": "e41e2780",
    "metadata": {},
    "source": [
     "### Tasks\n",
@@ -313,7 +313,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "9933c41d",
+   "id": "aa0c70e5",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -359,7 +359,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "784e921a",
+   "id": "40aed112",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -413,7 +413,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "678f85bc",
+   "id": "64cc2cb2",
    "metadata": {},
    "source": [
     "Here we visualize a batch with (raw, gt, target) triplets for the affinities task:\n",
@@ -423,7 +423,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "2f3735af",
+   "id": "eabc86d2",
    "metadata": {},
    "source": [
     "### Models\n",
@@ -433,7 +433,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "abdaebd2",
+   "id": "1e5b0476",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -491,7 +491,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "4fe50ddf",
+   "id": "eb300dc0",
    "metadata": {},
    "source": [
     "### Training loop\n",
@@ -501,7 +501,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "7f98855a",
+   "id": "31a7f62d",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -568,7 +568,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "cc072999",
+   "id": "12ae9bf5",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -587,7 +587,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "94dc615c",
+   "id": "58ecdc30",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -603,7 +603,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "c5025267",
+   "id": "719eaf0d",
    "metadata": {
     "lines_to_next_cell": 0
    },
@@ -634,7 +634,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "12c42a29",
+   "id": "cbc1e91e",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -676,7 +676,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "025debb6",
+   "id": "e71ebbe4",
    "metadata": {},
    "source": [
     "Here we visualize the prediction results:\n",
@@ -686,7 +686,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "05fa8768",
+   "id": "0cabef18",
    "metadata": {},
    "source": [
     "## Blockwise Processing\n",
@@ -699,7 +699,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "993983ce",
+   "id": "dd91a4ba",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -760,7 +760,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "4b7004a9",
+   "id": "f1d59aa5",
    "metadata": {},
    "source": [
     "## Visualizing the results"
@@ -769,7 +769,7 @@
   {
    "cell_type": "code",
    "execution_count": null,
-   "id": "15dac640",
+   "id": "6cb6ab74",
    "metadata": {},
    "outputs": [],
    "source": [
@@ -816,7 +816,7 @@
   },
   {
    "cell_type": "markdown",
-   "id": "587ab05f",
+   "id": "55ec2dd0",
    "metadata": {},
    "source": [
     "Here we visualize the prediction results:\n",
