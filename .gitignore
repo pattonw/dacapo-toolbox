@@ -3,9 +3,9 @@ __pycache__
 docs/build
 docs/source/tutorials
 tutorials/**/*.zarr
+tutorials/**/_static
 *.hdf
 *.gif
-*.png
 *.jpg
 .coverage
 coverage.xml
