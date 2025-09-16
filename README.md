@@ -1,4 +1,4 @@
-![daisy](docs/source/_static/dacapo-toolbox.png)
+![dacapo-toolbox](docs/source/_static/dacapo-toolbox-logo.png)
 [![tests](https://github.com/pattonw/dacapo-toolbox/actions/workflows/tests.yaml/badge.svg)](https://github.com/pattonw/dacapo-toolbox/actions/workflows/tests.yaml)
 [![ruff](https://github.com/pattonw/dacapo-toolbox/actions/workflows/ruff.yaml/badge.svg)](https://github.com/pattonw/dacapo-toolbox/actions/workflows/ruff.yaml)
 [![ty](https://github.com/pattonw/dacapo-toolbox/actions/workflows/ty.yaml/badge.svg)](https://github.com/pattonw/dacapo-toolbox/actions/workflows/ty.yaml)
