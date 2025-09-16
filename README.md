@@ -5,7 +5,7 @@
 [![pypi](https://github.com/pattonw/dacapo-toolbox/actions/workflows/publish.yaml/badge.svg)](https://pypi.org/project/dacapo-toolbox/)
 [![docs](https://github.com/pattonw/dacapo-toolbox/actions/workflows/docs.yaml/badge.svg)](https://github.com/pattonw/dacapo-toolbox/actions/workflows/docs.yaml)
 
-# DaCapo-Toolbox: A set of tools for running ML experiments on large scale microscopy data
+# DaCapo-Toolbox
 
 > A simple interface for large scale microscopy training and post processing
 
