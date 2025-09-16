@@ -1,13 +1,13 @@
 [project]
 name = "dacapo-toolbox"
-version = "0.1.0"
+version = "1.0.0"
 description = "A suite of tools for large scale ND training."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "edt>=3.0.0",
     "funlib-persistence>=0.6",
-    "gunpowder>=1.4.0",
+    "gunpowder>=1.4.2",
     "scikit-learn>=1.7.1",
     "torch>=2.6.0",
 ]
@@ -17,7 +17,7 @@ build-backend = "setuptools.build_meta"
 
 
 [project.optional-dependencies]
-postprocessing = ["volara-torch>=1.0.0", "volara>=1.0.1"]
+postprocessing = ["volara-torch>=1.0.1", "volara>=1.0.2"]
 vis = ["matplotlib>=3.10.5"]
 dev = [
     "pytest>=8.3.4",
@@ -54,8 +54,3 @@ docs = [
 
 [tool.ruff.lint]
 per-file-ignores = { "tutorials/*.py" = ["E402"] }
-
-[tool.uv.sources]
-gunpowder = { git = "https://github.com/funkelab/gunpowder", rev = "patch-1.4.2" }
-volara = { git = "https://github.com/e11bio/volara" }
-volara-torch = { git = "https://github.com/e11bio/volara-torch" }
