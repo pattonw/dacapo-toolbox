@@ -1,4 +1,4 @@
-from funlib.geometry import Coordinate
+from funlib.geometry import FloatCoordinate
 
 
 def int_gcd(a: int, b: int) -> int:
@@ -7,5 +7,5 @@ def int_gcd(a: int, b: int) -> int:
     return a
 
 
-def gcd(a: Coordinate[int], b: Coordinate[int]) -> Coordinate[int]:
-    return Coordinate(int_gcd(x, y) for x, y in zip(a, b))
+def gcd(a: FloatCoordinate[int], b: FloatCoordinate[int]) -> FloatCoordinate[int]:
+    return FloatCoordinate(int_gcd(x, y) for x, y in zip(a, b))

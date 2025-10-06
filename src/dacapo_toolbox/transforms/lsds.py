@@ -1,4 +1,4 @@
-from funlib.geometry import Coordinate
+from funlib.geometry import FloatCoordinate
 import numpy as np
 import logging
 from scipy.ndimage import convolve, gaussian_filter
@@ -102,9 +102,9 @@ def get_local_shape_descriptors(
     )
 
     if voxel_size is None:
-        voxel_size = Coordinate((1,) * dims)
+        voxel_size = FloatCoordinate((1,) * dims)
     else:
-        voxel_size = Coordinate(voxel_size)
+        voxel_size = FloatCoordinate(voxel_size)
 
     assert voxel_size.dims == dims, (
         f"Voxel size {voxel_size} must have the same number of dimensions as "

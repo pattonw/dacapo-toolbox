@@ -140,9 +140,9 @@ plt.show()
 # %% [markdown]
 # Lets add a graph to the dataset. We use the `networkx` library
 # to interface with graphs. Each node in the graph must have a `position`
-# attribute in *world coordinates*, this means accounting for the
+# attribute in *world FloatCoordinates*, this means accounting for the
 # voxel size of the arrays given. In our case voxel size is (1, 1) so
-# we can just use the pixel coordinates. We'll use a simple grid of points as our graph.
+# we can just use the pixel FloatCoordinates. We'll use a simple grid of points as our graph.
 
 # %%
 import networkx as nx
@@ -380,17 +380,20 @@ blobs_b_gt = label(blobs_b, connectivity=2)
 mask = np.ones((side_length, side_length), dtype=bool)
 mask[side_length // 2 : side_length] = 0
 
+s = 1 / 4
 # raw and gt arrays at various voxel sizes
-raw_a_s0 = Array(blobs_a[::1, ::1], offset=(0, 0), voxel_size=(1, 1))
-raw_a_s1 = Array(blobs_a[::2, ::2], offset=(0, 0), voxel_size=(2, 2))
-raw_b_s0 = Array(blobs_b[::1, ::1], offset=(0, 0), voxel_size=(2, 2))
-raw_b_s1 = Array(blobs_b[::2, ::2], offset=(0, 0), voxel_size=(4, 4))
-gt_a_s0 = Array(blobs_a_gt[::2, ::2], offset=(0, 0), voxel_size=(2, 2))
-gt_a_s1 = Array(blobs_a_gt[::4, ::4], offset=(0, 0), voxel_size=(4, 4))
-gt_b_s0 = Array(blobs_b_gt[::2, ::2], offset=(0, 0), voxel_size=(4, 4))
-gt_b_s1 = Array(blobs_b_gt[::4, ::4], offset=(0, 0), voxel_size=(8, 8))
-mask_a = Array(mask, offset=(0, 0), voxel_size=(1, 1))
-mask_b = Array(mask, offset=(0, 0), voxel_size=(2, 2))
+raw_a_s0 = Array(blobs_a[::1, ::1], offset=(0, 0), voxel_size=(1 * s, 1 * s))
+raw_a_s1 = Array(blobs_a[::2, ::2], offset=(0, 0), voxel_size=(2 * s, 2 * s))
+raw_b_s0 = Array(blobs_b[::1, ::1], offset=(0, 0), voxel_size=(2 * s, 2 * s))
+raw_b_s1 = Array(blobs_b[::2, ::2], offset=(0, 0), voxel_size=(4 * s, 4 * s))
+gt_a_s0 = Array(blobs_a_gt[::2, ::2], offset=(0, 0), voxel_size=(2 * s, 2 * s))
+gt_a_s1 = Array(blobs_a_gt[::4, ::4], offset=(0, 0), voxel_size=(4 * s, 4 * s))
+gt_b_s0 = Array(blobs_b_gt[::2, ::2], offset=(0, 0), voxel_size=(4 * s, 4 * s))
+gt_b_s1 = Array(blobs_b_gt[::4, ::4], offset=(0, 0), voxel_size=(8 * s, 8 * s))
+mask_a = Array(mask, offset=(0, 0), voxel_size=(1 * s, 1 * s))
+mask_b = Array(mask, offset=(0, 0), voxel_size=(2 * s, 2 * s))
+
+print(raw_a_s0.voxel_size, raw_a_s1.voxel_size)
 
 g = nx.Graph()
 g.add_nodes_from(
@@ -398,9 +401,9 @@ g.add_nodes_from(
         (i, {"position": position})
         for i, position in enumerate(
             [
-                (side_length * 2 - 0.5, side_length * 2 - 0.5),
-                (0.5, side_length * 2 - 0.5),
-                (side_length * 2 - 0.5, 0.5),
+                ((side_length * 2 - 0.5) * s, (side_length * 2 - 0.5) * s),
+                (0.5, (side_length * 2 - 0.5) * s),
+                ((side_length * 2 - 0.5) * s, 0.5),
                 (0.5, 0.5),
             ]
         )
@@ -458,7 +461,6 @@ iter_ds = iterable_dataset(
 import matplotlib.pyplot as plt
 
 for i, batch in enumerate(iter_ds):
-    print(f"Batch {i}")
     if i >= 4:  # Limit to 4 batches for demonstration
         break
     points = batch["sample_points"]
@@ -488,3 +490,4 @@ for i, batch in enumerate(iter_ds):
     axs[0, 4].set_title("Mask")
 
     plt.show()
+    plt.savefig(out_ds / f"complex_dataset_batch_{i}.png")

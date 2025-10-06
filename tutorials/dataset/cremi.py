@@ -45,7 +45,7 @@ from functools import partial
 from tqdm import tqdm
 
 from funlib.persistence import Array
-from funlib.geometry import Coordinate, Roi
+from funlib.geometry import FloatCoordinate, Roi
 from dacapo_toolbox.sample_datasets import cremi
 
 if not Path("_static/cremi").exists():
@@ -57,13 +57,13 @@ raw_train, labels_train, raw_test, labels_test = cremi(Path("cremi.zarr"))
 # The number of iterations we will train
 NUM_ITERATIONS = 300
 # A reasonable block size for processing image data with a UNet
-blocksize = Coordinate(32, 256, 256)
+blocksize = FloatCoordinate(32, 256, 256)
 # We choose a small and large eval roi for performance evaluation
 # The small roi will be processed in memory, the large will be processed blockwise
-offset = Coordinate(78, 465, 465)
+offset = FloatCoordinate(78, 465, 465)
 small_eval_roi = Roi(offset, blocksize) * raw_test.voxel_size
 large_eval_roi = (
-    Roi(offset - blocksize, blocksize * Coordinate(1, 3, 3)) * raw_test.voxel_size
+    Roi(offset - blocksize, blocksize * FloatCoordinate(1, 3, 3)) * raw_test.voxel_size
 )
 
 
@@ -155,7 +155,7 @@ train_dataset = iterable_dataset(
         mirror_only=(1, 2),
         transpose_only=(1, 2),
     ),
-    trim=Coordinate(5, 5, 5),
+    trim=FloatCoordinate(5, 5, 5),
 )
 batch_gen = iter(train_dataset)
 
@@ -407,7 +407,7 @@ for iteration, batch in tqdm(enumerate(iter(dataloader))):
 
 # %%
 import matplotlib.pyplot as plt
-from funlib.geometry import Coordinate
+from funlib.geometry import FloatCoordinate
 
 plt.plot(losses)
 plt.xlabel("Iteration")
@@ -424,7 +424,7 @@ import numpy as np
 
 module = module.eval()
 unet = unet.eval()
-context = Coordinate(unet.context // 2) * raw_test.voxel_size
+context = FloatCoordinate(unet.context // 2) * raw_test.voxel_size
 
 # %%
 raw_input = raw_test.to_ndarray(small_eval_roi.grow(context, context))
@@ -505,7 +505,7 @@ scripted_unet = torch.jit.script(module)
 torch.jit.save(scripted_unet, "cremi.zarr/affs_unet.pt")
 torch.save(scripted_unet.state_dict(), "cremi.zarr/weights.pth")
 
-blocksize = Coordinate(unet.min_output_shape) + blocksize
+blocksize = FloatCoordinate(unet.min_output_shape) + blocksize
 
 # default biases:
 # interpolate log offset distances to a range of [-0.2, -0.8]
@@ -531,15 +531,15 @@ blockwise_predict_mutex(
         -0.8,
     ],  # optional, TODO: defaults not very good yet
     edge_scores=[  # optional, TODO: defaults not very good yet
-        ("affs_z", [Coordinate(1, 0, 0)], -0.5),
-        ("affs_xy", [Coordinate(0, 1, 0), Coordinate(0, 0, 1)], -0.2),
+        ("affs_z", [FloatCoordinate(1, 0, 0)], -0.5),
+        ("affs_xy", [FloatCoordinate(0, 1, 0), FloatCoordinate(0, 0, 1)], -0.2),
         (
             "affs_long_xy",
             [
-                Coordinate(0, 7, 0),
-                Coordinate(0, 0, 7),
-                Coordinate(0, 23, 0),
-                Coordinate(0, 0, 23),
+                FloatCoordinate(0, 7, 0),
+                FloatCoordinate(0, 0, 7),
+                FloatCoordinate(0, 23, 0),
+                FloatCoordinate(0, 0, 23),
             ],
             -0.8,
         ),

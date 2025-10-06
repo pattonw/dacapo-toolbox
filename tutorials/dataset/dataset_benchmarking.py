@@ -62,7 +62,7 @@ print(f"(iterable_dataset): Time for {ITERATIONS} batches: {t2 - t1:.2f} seconds
 # %%
 import gunpowder as gp
 from funlib.persistence import Array
-from funlib.geometry import Coordinate
+from funlib.geometry import FloatCoordinate
 import dask.array as da
 
 raw_key = gp.ArrayKey("RAW")
@@ -92,9 +92,9 @@ pipeline = (
     + gp.Stack(BATCH_SIZE)
 )
 request = gp.BatchRequest()
-request.add(raw_key, Coordinate(INPUT_SHAPE) * raw_train.voxel_size)
-request.add(labels_key, Coordinate(INPUT_SHAPE) * labels_train.voxel_size)
-request.add(mask_key, Coordinate(2, 2, 2) * labels_train.voxel_size)
+request.add(raw_key, FloatCoordinate(INPUT_SHAPE) * raw_train.voxel_size)
+request.add(labels_key, FloatCoordinate(INPUT_SHAPE) * labels_train.voxel_size)
+request.add(mask_key, FloatCoordinate(2, 2, 2) * labels_train.voxel_size)
 with gp.build(pipeline):
     t1 = time.time()
     for i in tqdm(range(ITERATIONS)):

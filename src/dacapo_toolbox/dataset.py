@@ -8,7 +8,7 @@ import networkx as nx
 import dask.array as da
 import numpy as np
 
-from funlib.geometry import Coordinate, Roi
+from funlib.geometry import FloatCoordinate, Roi, Coordinate
 from funlib.persistence import Array
 
 import torch
@@ -306,7 +306,7 @@ def iterable_dataset(
 
     # type hints since zip seems to get rid of the type info
     # crop_datasets: list[Array | nx.Graph]
-    # crop_scale: Coordinate
+    # crop_scale: FloatCoordinate
     # sampling_strategy: MaskedSampling | PointSampling | None
 
     for crop_datasets, crop_scale, sampling_strategy in zip(
@@ -329,7 +329,7 @@ def iterable_dataset(
         )
         crop_voxel_size = (
             functools.reduce(
-                lambda x, y: Coordinate(*map(min, x, y)),
+                lambda x, y: FloatCoordinate(*map(min, x, y)),
                 [array.voxel_size for array in crop_arrays],
             )
             / crop_scale
@@ -338,7 +338,7 @@ def iterable_dataset(
         if trim is not None:
             if isinstance(trim, int):
                 trim = [trim] * crop_roi.dims()
-            trim = Coordinate(trim)
+            trim = FloatCoordinate(trim)
             crop_roi = crop_roi.grow(-trim * crop_voxel_size, -trim * crop_voxel_size)
 
         crop_graphs = [
@@ -371,7 +371,7 @@ def iterable_dataset(
                     isinstance(sampling_strategy, MaskedSampling)
                     and sampling_strategy.mask_key == str(key)
                 )
-                else Coordinate((0,) * len(crop_scale)),
+                else FloatCoordinate((0,) * len(crop_scale)),
             )
             for key, array in zip(array_keys, crop_arrays)
         ) + tuple(
@@ -462,14 +462,15 @@ def iterable_dataset(
             f"Shape for key {key} not provided. Please provide a shape for all keys."
         )
         request.add(
-            key, Coordinate(data_shape) * datasets[str(key)][0].voxel_size / crop_scale
+            key,
+            FloatCoordinate(data_shape) * datasets[str(key)][0].voxel_size / crop_scale,
         )
     for key in graph_keys:
         data_shape = shapes.get(str(key), None)
         assert data_shape is not None, (
             f"Shape for key {key} not provided. Please provide a shape for all keys."
         )
-        request.add(key, Coordinate(data_shape))
+        request.add(key, FloatCoordinate(data_shape))
 
     # Add mask placeholder to guarantee center voxel is contained in
     # the mask, and to be used for some sampling strategies.

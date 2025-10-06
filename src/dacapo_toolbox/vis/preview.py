@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from funlib.geometry import Coordinate, Roi
+from funlib.geometry import FloatCoordinate, FloatRoi
 from matplotlib import animation
 from matplotlib.colors import ListedColormap
 import numpy as np
@@ -156,8 +156,8 @@ def gif_2d(
         slice_ims = []
         for jj, (key, arr) in enumerate(arrays.items()):
             roi = arr.roi.copy()
-            roi.offset += Coordinate((ii,) + (0,) * (roi.dims - 1)) * arr.voxel_size
-            roi.shape = Coordinate((arr.voxel_size[0], *roi.shape[1:]))
+            roi.offset += FloatCoordinate((ii,) + (0,) * (roi.dims - 1)) * arr.voxel_size
+            roi.shape = FloatCoordinate((arr.voxel_size[0], *roi.shape[1:]))
             # Show the raw data
             x = arr[roi].squeeze(-arr.voxel_size.dims)  # squeeze out z dim
             shape = x.shape
@@ -283,7 +283,7 @@ def cube(
             total_roi = arr.roi
         else:
             total_roi = total_roi.union(arr.roi)
-    assert isinstance(total_roi, Roi)
+    assert isinstance(total_roi, FloatRoi)
 
     lightsource = mcolors.LightSource(azdeg=light_azdeg, altdeg=light_altdeg)
 
@@ -298,7 +298,7 @@ def cube(
             lower = arr.roi.offset
             upper = lower + arr.roi.shape - arr.voxel_size
             shape = arr.roi.shape
-            vshape = shape / arr.voxel_size
+            vshape = (shape / arr.voxel_size).round()
             slice_thickness = arr.voxel_size
 
             z, y, x = tuple(
@@ -306,11 +306,11 @@ def cube(
                 for start, stop, step in zip(arr.roi.begin, arr.roi.end, arr.voxel_size)
             )
 
-            def face(high: bool, axis: int) -> Roi:
-                a = Coordinate(axis == 0, axis == 1, axis == 2)
-                b = Coordinate(axis != 0, axis != 1, axis != 2)
+            def face(high: bool, axis: int) -> FloatRoi:
+                a = FloatCoordinate(axis == 0, axis == 1, axis == 2)
+                b = FloatCoordinate(axis != 0, axis != 1, axis != 2)
                 base = upper if high else lower
-                return Roi(base * a + lower * b, shape * b + slice_thickness * a)
+                return FloatRoi(base * a + lower * b, shape * b + slice_thickness * a)
 
             def face_coords(
                 high: bool, axis: int
@@ -372,7 +372,7 @@ def cube(
     def draw_cube(
         ax,
         faces: tuple[list[np.ndarray], list[tuple[np.ndarray, np.ndarray, np.ndarray]]],
-        roi: Roi,
+        roi: FloatRoi,
         cmap=None,
         interpolation=None,
     ):

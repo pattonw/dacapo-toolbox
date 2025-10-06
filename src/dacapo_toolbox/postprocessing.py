@@ -10,7 +10,7 @@ from volara_torch.blockwise import Predict
 from volara_torch.models import TorchModel
 from volara.workers import Worker
 
-from funlib.geometry import Roi, Coordinate
+from funlib.geometry import Roi, FloatCoordinate
 
 import numpy as np
 
@@ -52,8 +52,8 @@ def blockwise_predict_mutex(
     num_extract_frag_workers: int = 1,
     extract_frag_worker: Worker | None = None,
     edge_scores: Sequence[
-        tuple[Sequence[Coordinate] | Coordinate, float]
-        | tuple[str, Sequence[Coordinate] | Coordinate, float]
+        tuple[Sequence[FloatCoordinate] | FloatCoordinate, float]
+        | tuple[str, Sequence[FloatCoordinate] | FloatCoordinate, float]
     ]
     | None = None,
     num_aff_agglom_workers: int = 1,
@@ -80,7 +80,7 @@ def blockwise_predict_mutex(
         Path to the labels store.
     neighborhood : list[tuple[int, int, int]]
         List of tuples defining the neighborhood for affinity prediction.
-    blocksize : Coordinate
+    blocksize : FloatCoordinate
         The size of the blocks to process.
     model_path : str | bytes | os.PathLike
         Path to save the trained model.
@@ -119,7 +119,7 @@ def blockwise_predict_mutex(
         Worker configuration for the fragment extraction step. If `None`, processing is done
         in a subprocess or in the main thread in the case of running blockwise with
         `multiprocessing=False`.
-    edge_scores : Sequence[tuple[Sequence[Coordinate] | Coordinate, float] | tuple[str, Sequence[Coordinate] | Coordinate, float]] | None, optional
+    edge_scores : Sequence[tuple[Sequence[FloatCoordinate] | FloatCoordinate, float] | tuple[str, Sequence[FloatCoordinate] | FloatCoordinate, float]] | None, optional
         List of tuples defining the edges to agglomerate and their associated biases.
         Each tuple can be either (offsets, bias) or (name, offsets, bias).
         If `None`, all edges in the neighborhood are used with a default bias of -0.5.
@@ -162,15 +162,15 @@ def blockwise_predict_mutex(
         edge_coords = []
         edge_biases = []
         if edge_scores is None:
-            edge_scores = [([Coordinate(offset)], -0.5) for offset in neighborhood]
+            edge_scores = [([FloatCoordinate(offset)], -0.5) for offset in neighborhood]
         for i, edge_def in enumerate(edge_scores):
             if len(edge_def) == 2:
                 name = f"affs_{i}"
-                coords: Coordinate | Sequence[Coordinate] = edge_def[0]
+                coords: FloatCoordinate | Sequence[FloatCoordinate] = edge_def[0]
                 bias: float = edge_def[1]
             elif len(edge_def) == 3:
                 name: str = edge_def[0]
-                coords: Coordinate | Sequence[Coordinate] = edge_def[1]
+                coords: FloatCoordinate | Sequence[FloatCoordinate] = edge_def[1]
                 bias: float = edge_def[2]
             else:
                 raise ValueError(
@@ -179,7 +179,7 @@ def blockwise_predict_mutex(
                 )
             edge_names.append(name)
             edge_coords.append(
-                list(coords) if isinstance(coords, Coordinate) else coords
+                list(coords) if isinstance(coords, FloatCoordinate) else coords
             )
             edge_biases.append(bias)
 
@@ -197,9 +197,9 @@ def blockwise_predict_mutex(
 
         affs_model = TorchModel(
             in_channels=in_channels,
-            min_input_shape=Coordinate(blocksize) + Coordinate(model_context) * 2,
-            min_output_shape=Coordinate(blocksize),
-            min_step_shape=Coordinate(model_context) * 0 + 1,
+            min_input_shape=FloatCoordinate(blocksize) + FloatCoordinate(model_context) * 2,
+            min_output_shape=FloatCoordinate(blocksize),
+            min_step_shape=FloatCoordinate(model_context) * 0 + 1,
             out_channels=len(neighborhood),
             out_range=(0.0, 1.0),
             save_path=Path(model_path),
