@@ -100,33 +100,32 @@ def gif_2d(
     """
     Create a 2D GIF preview of the given arrays.
 
-    Parameters
-    ----------
-    arrays : dict[str, Array]
-        A dictionary of named arrays to visualize. Each array must be 3D,
-        with optional channels.
-    array_types : dict[str, str]
-        A dictionary specifying the type of each array. Supported types are:
-        - "raw": Grayscale raw data.
-        - "labels": Integer labels, visualized with a random color map.
-        - "affs": Affinity graphs, visualized as RGB images.
-        - "pca": High-dimensional data, visualized using PCA to reduce to 3 channels.
-    filename : str
-        The output filename for the GIF.
-    title : str
-        The title to display on the GIF.
-    fps : int, optional
-        Frames per second for the GIF. Default is 10.
-    overwrite : bool, optional
-        Whether to overwrite the output file if it already exists. Default is True.
-    dpi : int, optional
-        Dots per inch for the output GIF. Default is 72.
-    max_size : int, optional
-        Maximum size (in pixels) for the largest dimension of the images. Default is 256.
-    optimize_gif : bool, optional
-        Whether to optimize the GIF for smaller file size. Default is False.
-    frame_skip : int, optional
-        Number of frames to skip when generating the GIF for faster creation. Default is 2.
+    Parameters:
+        arrays:
+            A dictionary of named arrays to visualize. Each array must be 3D,
+            with optional channels.
+        array_types:
+            A dictionary specifying the type of each array. Supported types are:
+            - "raw": Grayscale raw data.
+            - "labels": Integer labels, visualized with a random color map.
+            - "affs": Affinity graphs, visualized as RGB images.
+            - "pca": High-dimensional data, visualized using PCA to reduce to 3 channels.
+        filename:
+            The output filename for the GIF.
+        title:
+            The title to display on the GIF.
+        fps:
+            Frames per second for the GIF. Default is 10.
+        overwrite:
+            Whether to overwrite the output file if it already exists. Default is True.
+        dpi:
+            Dots per inch for the output GIF. Default is 72.
+        max_size:
+            Maximum size (in pixels) for the largest dimension of the images. Default is 256.
+        optimize_gif:
+            Whether to optimize the GIF for smaller file size. Default is False.
+        frame_skip:
+            Number of frames to skip when generating the GIF for faster creation. Default is 2.
     """
     if Path(filename).exists() and not overwrite:
         return
@@ -239,40 +238,39 @@ def cube(
     Preview 3D arrays as cubes with matplotlib. Arrays do not need to be the same size
     their relative sizes and shifts will be respected.
 
-    Parameters
-    ----------
-    arrays : dict[str, Array]
-        A dictionary of named arrays to visualize. Each array must be 3D,
-        with optional channels.
-    array_types : dict[str, str]
-        A dictionary specifying the type of each array. Supported types are:
-        - "raw": Grayscale raw data.
-        - "labels": Integer labels, visualized with a random color map.
-        - "affs": Affinity graphs, visualized as RGB images.
-        - "pca": High-dimensional data, visualized using PCA to reduce to 3
-            channels.
-    filename : str
-        The output filename for the image.
-    title : str
-        The title to display on the image.
-    elev : float, optional
-        Elevation angle for the 3D view. Default is 30.
-    azim : float, optional
-        Azimuth angle for the 3D view. Default is -60.
-    light_azdeg : float, optional
-        Azimuth angle for the light source. Default is 205.
-    light_altdeg : float, optional
-        Altitude angle for the light source. Default is 20.
-    overwrite : bool, optional
-        Whether to overwrite the output file if it already exists. Default is True.
-    rcount : int, optional
-        Number of rows for the surface plot. Default is 128.
-    ccount : int, optional
-        Number of columns for the surface plot. Default is 128.
-    shade : bool, optional
-        Whether to shade the surface plot. Default is True.
-    dpi : int, optional
-        Dots per inch for the output image. Default is 100.
+    Parameters:
+        arrays
+            A dictionary of named arrays to visualize. Each array must be 3D,
+            with optional channels.
+        array_types
+            A dictionary specifying the type of each array. Supported types are:
+            - "raw": Grayscale raw data.
+            - "labels": Integer labels, visualized with a random color map.
+            - "affs": Affinity graphs, visualized as RGB images.
+            - "pca": High-dimensional data, visualized using PCA to reduce to 3
+                channels.
+        filename:
+            The output filename for the image.
+        title:
+            The title to display on the image.
+        elev:
+            Elevation angle for the 3D view. Default is 30.
+        azim:
+            Azimuth angle for the 3D view. Default is -60.
+        light_azdeg:
+            Azimuth angle for the light source. Default is 205.
+        light_altdeg:
+            Altitude angle for the light source. Default is 20.
+        overwrite:
+            Whether to overwrite the output file if it already exists. Default is True.
+        rcount:
+            Number of rows for the surface plot. Default is 128.
+        ccount:
+            Number of columns for the surface plot. Default is 128.
+        shade:
+            Whether to shade the surface plot. Default is True.
+        dpi:
+            Dots per inch for the output image. Default is 100.
     """
     if Path(filename).exists() and not overwrite:
         return

@@ -74,6 +74,20 @@ def balance_weights(
 
 
 class BalanceLabels(torch.nn.Module):
+    """
+    Computes per-voxel weights to balance the contribution of each class to the loss.
+    The weights are computed per-slab, which can be set with the `slab` parameter.
+    If `slab` is None, the entire volume is used to compute the weights.
+    The weights are clipped to the range [clipmin, clipmax] to avoid extreme weights.
+
+    Parameters:
+        slab: The shape of the slab to use for computing the weights. If -1 is
+              provided for a dimension, the entire dimension is used. If None is
+              provided, the entire volume is used. Default is None.
+        num_classes: The number of classes in the labels. Default is 2.
+        clipmin: The minimum weight to use. Default is 0.05.
+        clipmax: The maximum weight to use. Default is 0.95.
+    """
     def __init__(
         self,
         slab=None,

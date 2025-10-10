@@ -148,12 +148,12 @@ class SimpleAugmentConfig:
     for more details.
 
     Parameters:
-        :param p: Probability of applying the augmentations.
-        :param mirror_only: List of axes to mirror. If None, all axes may be mirrored.
-        :param transpose_only: List of axes to transpose. If None, all axes may be transposed.
-        :param mirror_probs: List of probabilities for each axis in `mirror_only`.
+        p: Probability of applying the augmentations.
+        mirror_only: List of axes to mirror. If None, all axes may be mirrored.
+        transpose_only: List of axes to transpose. If None, all axes may be transposed.
+        mirror_probs: List of probabilities for each axis in `mirror_only`.
             If None, uses equal probability for all axes.
-        :param transpose_probs: Dictionary mapping tuples of axes to probabilities for transposing.
+        transpose_probs: Dictionary mapping tuples of axes to probabilities for transposing.
             If None, uses equal probability for all axes.
     """
 
@@ -173,14 +173,14 @@ class DeformAugmentConfig:
     for more details.
 
     Parameters:
-        :param p: Probability of applying the augmentations.
-        :param control_point_spacing: Spacing of the control points for the elastic deformation.
-        :param jitter_sigma: Standard deviation of the Gaussian noise added to the control points.
-        :param scale_interval: Interval for scaling the input data.
-        :param rotate: Whether to apply random rotations.
-        :param subsample: Subsampling factor for the control points.
-        :param spatial_dims: Number of spatial dimensions.
-        :param rotation_axes: Axes around which to rotate. If None, rotates around all axes.
+        p: Probability of applying the augmentations.
+        control_point_spacing: Spacing of the control points for the elastic deformation.
+        jitter_sigma: Standard deviation of the Gaussian noise added to the control points.
+        scale_interval: Interval for scaling the input data.
+        rotate: Whether to apply random rotations.
+        subsample: Subsampling factor for the control points.
+        spatial_dims: Number of spatial dimensions.
+        rotation_axes: Axes around which to rotate. If None, rotates around all axes.
     """
 
     p: float = 0.0
@@ -198,12 +198,13 @@ class MaskedSampling:
     """
     Sampling strategy that uses a mask to determine which samples to include.
 
-    :param mask_key: The key of the mask array in the dataset.
-    :param min_masked: Minimum fraction of samples that must be masked in to include the
-        sample. If less than this fraction is masked in, the sample is skipped.
-    :param strategy: Optional strategy to apply to the mask. by default generates an integral
-        mask for quick sampling at the cost of extra memory usage. If your dataset is large, you
-        may want to use "reject".
+    Parameters:
+        mask_key: The key of the mask array in the dataset.
+        min_masked: Minimum fraction of samples that must be masked in to include the
+            sample. If less than this fraction is masked in, the sample is skipped.
+        strategy: Optional strategy to apply to the mask. by default generates an integral
+            mask for quick sampling at the cost of extra memory usage. If your dataset is large, you
+            may want to use "reject".
     """
 
     mask_key: str
@@ -242,6 +243,54 @@ def iterable_dataset(
     """
     Builds a gunpowder pipeline and wraps it in a torch IterableDataset.
     See https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset for more info
+
+    Parameters:
+        datasets: A dictionary mapping dataset names to their corresponding data arrays or graphs.
+            Each key can correspond to a single Array/Graph or a sequence of Arrays/Graphs. If a sequence
+            is provided, the datasets will be paired together during sampling based on ordering. I.e.
+            if you have `"raw": [raw1, raw2]` and `"gt": [gt1, gt2]`, then raw1 will always be paired with gt1
+            and raw2 with gt2. All arrays must have the same relative voxel size (i.e. raw1 with voxel size (4,4,40),
+            raw2 with voxel size (2,2,20), and gt1 with voxel_size (2,2,20) would mean gt2 must have voxel size
+            (1,1,10)) since gt1 has half the voxel size of raw1, gt2 must have half the voxel size of raw2.
+        shapes: A dictionary mapping dataset names to their corresponding shapes. The output of the
+            dataset will be batches of arrays with these shapes, regardless of the original array shapes
+            and voxel sizes.
+        weights: An optional list of weights defining the sampling rate for entrees in a dataset.
+            I.e. if you have `"raw": [raw1, raw2]` and `weights=[0.8, 0.2]`, then 80% of the time
+            raw1 will be sampled and 20% of the time raw2 will be sampled.
+        transforms: An optional dictionary mapping operations to be called on arrays during batch
+            generation. The keys have the form `(("in_key_a", "in_key_b", ...), ("out_key_a", "out_key_b", ...))`.
+            with support for the following shorthands:
+                - `"key"` is shorthand for `(("key"), ("key"))` (i.e. in-place transform)
+                - `("key_a", "key_b")` is shorthand for `(("key_a",),("key_b",))` (i.e. one-to-one transform)
+                    Similarly `("key_a", ("key_b", "key_c"))` and `(("key_a", "key_b"), "key_c")` are supported.
+        sampling_strategies: An optional list of sampling strategies to be applied to each dataset.
+            If a single strategy is provided, it will be applied to all datasets. If None, no sampling
+            strategy will be applied and random sampling will be used. The recommended strategies are as follows:
+                - `None` - Random sampling, best for densely or almost densely annotated crops.
+                - `PointSampling` - Best for large sparse annotations, requires a graph of points to sample from.
+                  Points should be provided as a networkx graph with node attribute "position" containing the
+                  coordinates of the points in world units.
+                - `MaskedSampling` - Best for small sparse annotations. Will build an integral mask for quickly
+                  computing the fraction of the crop that would be contained for any given location, trading
+                  memory for speed. If you dataset is large, this may not be feasible, in which case you can
+                  use the "reject" strategy, which will randomly sample locations and reject those that do not
+                  meet the minimal fraction of mask coverage required. This is extremely inefficient for very
+                  sparse annotations.
+        trim: We generally guarantee that the center voxel of the requested shape will be contained
+            in the valid region of the dataset, meaning in the worst case scenario, half of the volume could
+            contain padding. If you want to avoid this you can pass in the `trim` parameter, which will
+            ensure the center voxel is at least `trim` voxels from the edge of the valid region, limiting
+            the amount of padding that can be introduced.
+        simple_augment_config: An optional SimpleAugmentConfig object defining the parameters
+            for simple augmentations (mirroring and transposing).
+        deform_augment_config: An optional DeformAugmentConfig object defining the parameters
+            for deform augmentations (scaling, rotation, elastic deformations).
+        interpolatable: An optional dictionary mapping dataset names to a boolean indicating
+            whether the dataset should be interpolated during augmentations. If not provided, defaults to
+            True for float arrays, uint8, and uint16 arrays (commonly used for raw data), and False
+            for 32/64 bit signed and unsigned ints (commonly used for labels).
+    :return: A torch IterableDataset that can be used with a DataLoader to provide batches of data.
     """
 
     # Check the validity of the inputs

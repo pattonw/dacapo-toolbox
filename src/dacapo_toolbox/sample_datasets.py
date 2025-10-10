@@ -13,8 +13,10 @@ def cremi(zarr_path: Path) -> tuple[Array, Array, Array, Array]:
     Downloads a subset of the CREMI data and returns the raw and label
     arrays for train and testing.
 
-    params:
-        :param zarr_path: The path to the directory where the zarr files will be stored.
+    Parameters:
+        zarr_path: The path to the directory where the zarr files will be stored.
+
+    :return: A tuple of four arrays (raw_train, labels_train, raw_test, labels_test).
     """
     # Download some cremi data
     # immediately convert it to zarr for convenience

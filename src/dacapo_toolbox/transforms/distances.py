@@ -7,6 +7,10 @@ class SignedDistanceTransform(torch.nn.Module):
     """
     Computes the signed distance transform of a label mask.
     The output is normalized to the range [-1, 1] using `tanh(dist/sigma)`.
+
+    Parameters:
+        sigma: Controls the steepness of the tanh function. Higher values result in a
+               gentler slope. Default is 10.0.
     """
 
     def __init__(self, sigma: float = 10.0):
@@ -28,9 +32,8 @@ class SDTBoundaryMask(torch.nn.Module):
     object is not known.
     """
 
-    def __init__(self, sigma: float = 10.0):
+    def __init__(self):
         super(SDTBoundaryMask, self).__init__()
-        self.sigma = sigma
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x.numpy()

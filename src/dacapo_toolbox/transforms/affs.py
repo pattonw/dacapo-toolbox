@@ -2,6 +2,7 @@ import torch
 from collections.abc import Sequence
 import itertools
 from typing import Callable
+import warnings
 
 
 def compute_affs(
@@ -68,6 +69,31 @@ def no_bg_dist_func(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
 
 
 class Affs(torch.nn.Module):
+    """
+    A torch module to compute affinities from a label tensor using a specified neighborhood
+    and distance function.
+
+    Parameters:
+        neighborhood: A sequence of offsets defining the neighborhood for which to compute affinities.
+            Each offset should be a sequence of integers with length equal to the number of spatial dimensions
+            in the input tensor.
+        dist_func: A string or callable defining the distance function to use for computing affinities.
+            If a string is provided, it should be one of the following:
+                - "equality": Affinity is 1 if the labels are equal, 0 otherwise.
+                - "equality-no-bg": Affinity is 1 if the labels are equal and non-zero, 0 otherwise.
+            Alternatively, a callable can be provided that takes two tensors as input and returns a tensor
+            of the same shape with affinity values. If a list of callables is provided, each callable will be
+            applied to the corresponding offset in the neighborhood.
+            Finally the callable can be a torch.nn.Module or a list of torch.nn.Modules, allowing for
+            learnable distance functions.
+        pad: If True, the input tensor will be padded such that the output tensor has the same shape
+            as the input tensor. If False, the output tensor will be smaller than the input tensor
+            depending on the offsets in the neighborhood.
+        concat_dim: The dimension along which to concatenate the output affinities. Default is 0,
+            but when working with batched data, you may want to set this to 1 to get an output of
+            shape (batch, channels, ...).
+    """
+
     def __init__(
         self,
         neighborhood: Sequence[Sequence[int]],
@@ -128,6 +154,12 @@ class Affs(torch.nn.Module):
 
 
 class AffsMask(torch.nn.Module):
+    """
+    Deprecated, just use Affs with the appropriate distance function to get your mask.
+    It is a dataset specific decision whether you want to mask affinities between
+    fg/bg pairs, bg/bg pairs, both, or neither.
+    """
+
     def __init__(
         self,
         neighborhood: Sequence[Sequence[int]],
@@ -137,6 +169,11 @@ class AffsMask(torch.nn.Module):
         self.neighborhood = neighborhood
         self.dist_func = no_bg_dist_func
         self.pad = pad
+        # Deprication warning
+        warnings.warn(
+            "AffsMask is deprecated, just use Affs with the appropriate distance function to get your mask.",
+            DeprecationWarning,
+        )
 
     def forward(self, mask: torch.Tensor) -> torch.Tensor:
         y = mask.int() > 0

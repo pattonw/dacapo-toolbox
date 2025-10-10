@@ -17,11 +17,11 @@ class LSD(torch.nn.Module):
 
 
     Parameters:
-        :param sigma: The gaussian kernel sigma to consider for the local shape descriptor.
-        :param voxel_size: The voxel size of the segmentation. Defaults to 1 per axis.
-        :param labels: Restrict the computation to the given labels. Defaults to all
+        sigma: The gaussian kernel sigma to consider for the local shape descriptor.
+        voxel_size: The voxel size of the segmentation. Defaults to 1 per axis.
+        labels: Restrict the computation to the given labels. Defaults to all
             labels inside the ROI of the segmentation.
-        :param downsample: Compute the local shape descriptor on a downsampled volume for
+        downsample: Compute the local shape descriptor on a downsampled volume for
             faster processing. Defaults to 1 (no downsampling).
 
     """
@@ -62,27 +62,17 @@ def get_local_shape_descriptors(
     """
     Compute local shape descriptors for the given segmentation.
 
-    Args:
-
-        segmentation (``np.array`` of ``int``):
-
+    Parameters:
+        segmentation:
             A label array to compute the local shape descriptors for.
-
-        sigma (``tuple`` of ``float``):
-
+        sigma:
             The radius to consider for the local shape descriptor.
-
-        voxel_size (``tuple`` of ``int``, optional):
-
+        voxel_size:
             The voxel size of ``segmentation``. Defaults to 1.
-
-        labels (array-like of ``int``, optional):
-
+        labels:
             Restrict the computation to the given labels. Defaults to all
             labels inside the ``roi`` of ``segmentation``.
-
-        downsample (``int``, optional):
-
+        downsample:
             Compute the local shape descriptor on a downsampled volume for
             faster processing. Defaults to 1 (no downsampling).
     """
