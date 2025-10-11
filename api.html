@@ -147,8 +147,73 @@
 <dd><p>Builds a gunpowder pipeline and wraps it in a torch IterableDataset.
 See <a class="reference external" href="https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset">https://pytorch.org/docs/stable/data.html#torch.utils.data.IterableDataset</a> for more info</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">IterableDataset</span></code></span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>datasets</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code>] | <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Graph</span></code>]]</span>) – A dictionary mapping dataset names to their corresponding data arrays or graphs.
+Each key can correspond to a single Array/Graph or a sequence of Arrays/Graphs. If a sequence
+is provided, the datasets will be paired together during sampling based on ordering. I.e.
+if you have <cite>“raw”: [raw1, raw2]</cite> and <cite>“gt”: [gt1, gt2]</cite>, then raw1 will always be paired with gt1
+and raw2 with gt2. All arrays must have the same relative voxel size (i.e. raw1 with voxel size (4,4,40),
+raw2 with voxel size (2,2,20), and gt1 with voxel_size (2,2,20) would mean gt2 must have voxel size
+(1,1,10)) since gt1 has half the voxel size of raw1, gt2 must have half the voxel size of raw2.</p></li>
+<li><p><strong>shapes</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</span>) – A dictionary mapping dataset names to their corresponding shapes. The output of the
+dataset will be batches of arrays with these shapes, regardless of the original array shapes
+and voxel sizes.</p></li>
+<li><p><strong>weights</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – An optional list of weights defining the sampling rate for entrees in a dataset.
+I.e. if you have <cite>“raw”: [raw1, raw2]</cite> and <cite>weights=[0.8, 0.2]</cite>, then 80% of the time
+raw1 will be sampled and 20% of the time raw2 will be sampled.</p></li>
+<li><p><strong>transforms</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>]], <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – <p>An optional dictionary mapping operations to be called on arrays during batch
+generation. The keys have the form <cite>((“in_key_a”, “in_key_b”, …), (“out_key_a”, “out_key_b”, …))</cite>.
+with support for the following shorthands:</p>
+<blockquote>
+<div><ul>
+<li><p><cite>”key”</cite> is shorthand for <cite>((“key”), (“key”))</cite> (i.e. in-place transform)</p></li>
+<li><dl class="simple">
+<dt><cite>(“key_a”, “key_b”)</cite> is shorthand for <cite>((“key_a”,),(“key_b”,))</cite> (i.e. one-to-one transform)</dt><dd><p>Similarly <cite>(“key_a”, (“key_b”, “key_c”))</cite> and <cite>((“key_a”, “key_b”), “key_c”)</cite> are supported.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>sampling_strategies</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#dacapo_toolbox.dataset.MaskedSampling" title="dacapo_toolbox.dataset.MaskedSampling"><code class="xref py py-class docutils literal notranslate"><span class="pre">MaskedSampling</span></code></a> | <a class="reference internal" href="#dacapo_toolbox.dataset.PointSampling" title="dacapo_toolbox.dataset.PointSampling"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointSampling</span></code></a> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<a class="reference internal" href="#dacapo_toolbox.dataset.MaskedSampling" title="dacapo_toolbox.dataset.MaskedSampling"><code class="xref py py-class docutils literal notranslate"><span class="pre">MaskedSampling</span></code></a> | <a class="reference internal" href="#dacapo_toolbox.dataset.PointSampling" title="dacapo_toolbox.dataset.PointSampling"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointSampling</span></code></a>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – <p>An optional list of sampling strategies to be applied to each dataset.
+If a single strategy is provided, it will be applied to all datasets. If None, no sampling
+strategy will be applied and random sampling will be used. The recommended strategies are as follows:</p>
+<blockquote>
+<div><ul>
+<li><p><cite>None</cite> - Random sampling, best for densely or almost densely annotated crops.</p></li>
+<li><p><cite>PointSampling</cite> - Best for large sparse annotations, requires a graph of points to sample from.
+Points should be provided as a networkx graph with node attribute “position” containing the
+coordinates of the points in world units.</p></li>
+<li><p><cite>MaskedSampling</cite> - Best for small sparse annotations. Will build an integral mask for quickly
+computing the fraction of the crop that would be contained for any given location, trading
+memory for speed. If you dataset is large, this may not be feasible, in which case you can
+use the “reject” strategy, which will randomly sample locations and reject those that do not
+meet the minimal fraction of mask coverage required. This is extremely inefficient for very
+sparse annotations.</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>trim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – We generally guarantee that the center voxel of the requested shape will be contained
+in the valid region of the dataset, meaning in the worst case scenario, half of the volume could
+contain padding. If you want to avoid this you can pass in the <cite>trim</cite> parameter, which will
+ensure the center voxel is at least <cite>trim</cite> voxels from the edge of the valid region, limiting
+the amount of padding that can be introduced.</p></li>
+<li><p><strong>simple_augment_config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#dacapo_toolbox.dataset.SimpleAugmentConfig" title="dacapo_toolbox.dataset.SimpleAugmentConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleAugmentConfig</span></code></a> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – An optional SimpleAugmentConfig object defining the parameters
+for simple augmentations (mirroring and transposing).</p></li>
+<li><p><strong>deform_augment_config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#dacapo_toolbox.dataset.DeformAugmentConfig" title="dacapo_toolbox.dataset.DeformAugmentConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeformAugmentConfig</span></code></a> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – An optional DeformAugmentConfig object defining the parameters
+for deform augmentations (scaling, rotation, elastic deformations).</p></li>
+<li><p><strong>interpolatable</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – An optional dictionary mapping dataset names to a boolean indicating
+whether the dataset should be interpolated during augmentations. If not provided, defaults to
+True for float arrays, uint8, and uint16 arrays (commonly used for raw data), and False
+for 32/64 bit signed and unsigned ints (commonly used for labels).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">IterableDataset</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A torch IterableDataset that can be used with a DataLoader to provide batches of data.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -160,15 +225,17 @@ See <a class="reference external" href="https://pytorch.org/docs/stable/data.htm
 This includes mirroring and transposing in n-dimensional space.
 See <a class="reference external" href="https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/simple_augment.py">https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/simple_augment.py</a>
 for more details.</p>
-<p>:param : param p: Probability of applying the augmentations.
-:param : param mirror_only: List of axes to mirror. If None, all axes may be mirrored.
-:param : param transpose_only: List of axes to transpose. If None, all axes may be transposed.
-:param : param mirror_probs: List of probabilities for each axis in <cite>mirror_only</cite>.</p>
-<blockquote>
-<div><p>If None, uses equal probability for all axes.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>:param<span class="classifier">param transpose_probs: Dictionary mapping tuples of axes to probabilities for transposing.</span></dt><dd><p>If None, uses equal probability for all axes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Probability of applying the augmentations.</p></li>
+<li><p><strong>mirror_only</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – List of axes to mirror. If None, all axes may be mirrored.</p></li>
+<li><p><strong>transpose_only</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – List of axes to transpose. If None, all axes may be transposed.</p></li>
+<li><p><strong>mirror_probs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – List of probabilities for each axis in <cite>mirror_only</cite>.
+If None, uses equal probability for all axes.</p></li>
+<li><p><strong>transpose_probs</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>] | <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Dictionary mapping tuples of axes to probabilities for transposing.
+If None, uses equal probability for all axes.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -180,14 +247,20 @@ for more details.</p>
 This includes scaling, rotation, and elastic deformations.
 See <a class="reference external" href="https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/deform_augment.py">https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/deform_augment.py</a>
 for more details.</p>
-<p>:param : param p: Probability of applying the augmentations.
-:param : param control_point_spacing: Spacing of the control points for the elastic deformation.
-:param : param jitter_sigma: Standard deviation of the Gaussian noise added to the control points.
-:param : param scale_interval: Interval for scaling the input data.
-:param : param rotate: Whether to apply random rotations.
-:param : param subsample: Subsampling factor for the control points.
-:param : param spatial_dims: Number of spatial dimensions.
-:param : param rotation_axes: Axes around which to rotate. If None, rotates around all axes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Probability of applying the augmentations.</p></li>
+<li><p><strong>control_point_spacing</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Spacing of the control points for the elastic deformation.</p></li>
+<li><p><strong>jitter_sigma</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Standard deviation of the Gaussian noise added to the control points.</p></li>
+<li><p><strong>scale_interval</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Interval for scaling the input data.</p></li>
+<li><p><strong>rotate</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Whether to apply random rotations.</p></li>
+<li><p><strong>subsample</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Subsampling factor for the control points.</p></li>
+<li><p><strong>spatial_dims</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of spatial dimensions.</p></li>
+<li><p><strong>rotation_axes</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Axes around which to rotate. If None, rotates around all axes.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
@@ -229,7 +302,38 @@ may want to use “reject”.</p></li>
 <div><dl class="py class">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.affs.Affs">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.affs.</span></span><span class="sig-name descname"><span class="pre">Affs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neighborhood</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'equality'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concat_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.affs.Affs" title="Link to this definition"></a></dt>
-<dd><dl class="py method">
+<dd><p>A torch module to compute affinities from a label tensor using a specified neighborhood
+and distance function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>neighborhood</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</span>) – A sequence of offsets defining the neighborhood for which to compute affinities.
+Each offset should be a sequence of integers with length equal to the number of spatial dimensions
+in the input tensor.</p></li>
+<li><p><strong>dist_func</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>]]</span>) – <p>A string or callable defining the distance function to use for computing affinities.
+If a string is provided, it should be one of the following:</p>
+<blockquote>
+<div><ul>
+<li><p>”equality”: Affinity is 1 if the labels are equal, 0 otherwise.</p></li>
+<li><p>”equality-no-bg”: Affinity is 1 if the labels are equal and non-zero, 0 otherwise.</p></li>
+</ul>
+</div></blockquote>
+<p>Alternatively, a callable can be provided that takes two tensors as input and returns a tensor
+of the same shape with affinity values. If a list of callables is provided, each callable will be
+applied to the corresponding offset in the neighborhood.
+Finally the callable can be a torch.nn.Module or a list of torch.nn.Modules, allowing for
+learnable distance functions.</p>
+</p></li>
+<li><p><strong>pad</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – If True, the input tensor will be padded such that the output tensor has the same shape
+as the input tensor. If False, the output tensor will be smaller than the input tensor
+depending on the offsets in the neighborhood.</p></li>
+<li><p><strong>concat_dim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – The dimension along which to concatenate the output affinities. Default is 0,
+but when working with batched data, you may want to set this to 1 to get an output of
+shape (batch, channels, …).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.affs.Affs.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.affs.Affs.forward" title="Link to this definition"></a></dt>
 <dd><p>Define the computation performed at every call.</p>
@@ -249,7 +353,10 @@ registered hooks while the latter silently ignores them.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.affs.AffsMask">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.affs.</span></span><span class="sig-name descname"><span class="pre">AffsMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neighborhood</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.affs.AffsMask" title="Link to this definition"></a></dt>
-<dd><dl class="py method">
+<dd><p>Deprecated, just use Affs with the appropriate distance function to get your mask.
+It is a dataset specific decision whether you want to mask affinities between
+fg/bg pairs, bg/bg pairs, both, or neither.</p>
+<dl class="py method">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.affs.AffsMask.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.affs.AffsMask.forward" title="Link to this definition"></a></dt>
 <dd><p>Define the computation performed at every call.</p>
@@ -276,6 +383,12 @@ registered hooks while the latter silently ignores them.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.distances.</span></span><span class="sig-name descname"><span class="pre">SignedDistanceTransform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.distances.SignedDistanceTransform" title="Link to this definition"></a></dt>
 <dd><p>Computes the signed distance transform of a label mask.
 The output is normalized to the range [-1, 1] using <cite>tanh(dist/sigma)</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sigma</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Controls the steepness of the tanh function. Higher values result in a
+gentler slope. Default is 10.0.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.distances.SignedDistanceTransform.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.distances.SignedDistanceTransform.forward" title="Link to this definition"></a></dt>
@@ -295,7 +408,7 @@ registered hooks while the latter silently ignores them.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.distances.SDTBoundaryMask">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.distances.</span></span><span class="sig-name descname"><span class="pre">SDTBoundaryMask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.distances.SDTBoundaryMask" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.distances.</span></span><span class="sig-name descname"><span class="pre">SDTBoundaryMask</span></span><a class="headerlink" href="#dacapo_toolbox.transforms.distances.SDTBoundaryMask" title="Link to this definition"></a></dt>
 <dd><p>Computes a binary mask of regions where the distance to the nearest boundary
 is less than the distance to the border of the image. This is useful to avoid
 training on the ambiguous boundary regions where the true distance to the nearest
@@ -326,14 +439,16 @@ registered hooks while the latter silently ignores them.</p>
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.lsds.LSD">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.lsds.</span></span><span class="sig-name descname"><span class="pre">LSD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voxel_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">downsample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.lsds.LSD" title="Link to this definition"></a></dt>
 <dd><p>Compute local shape descriptors (LSD) for a segmentation.</p>
-<p>:param : param sigma: The gaussian kernel sigma to consider for the local shape descriptor.
-:param : param voxel_size: The voxel size of the segmentation. Defaults to 1 per axis.
-:param : param labels: Restrict the computation to the given labels. Defaults to all</p>
-<blockquote>
-<div><p>labels inside the ROI of the segmentation.</p>
-</div></blockquote>
-<dl class="simple">
-<dt>:param<span class="classifier">param downsample: Compute the local shape descriptor on a downsampled volume for</span></dt><dd><p>faster processing. Defaults to 1 (no downsampling).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sigma</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – The gaussian kernel sigma to consider for the local shape descriptor.</p></li>
+<li><p><strong>voxel_size</strong> – The voxel size of the segmentation. Defaults to 1 per axis.</p></li>
+<li><p><strong>labels</strong> – Restrict the computation to the given labels. Defaults to all
+labels inside the ROI of the segmentation.</p></li>
+<li><p><strong>downsample</strong> – Compute the local shape descriptor on a downsampled volume for
+faster processing. Defaults to 1 (no downsampling).</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py method">
@@ -360,12 +475,12 @@ registered hooks while the latter silently ignores them.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>segmentation</strong> (<code class="docutils literal notranslate"><span class="pre">np.array</span></code> of <code class="docutils literal notranslate"><span class="pre">int</span></code>) – A label array to compute the local shape descriptors for.</p></li>
-<li><p><strong>sigma</strong> (<code class="docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="docutils literal notranslate"><span class="pre">float</span></code>) – The radius to consider for the local shape descriptor.</p></li>
-<li><p><strong>voxel_size</strong> (<code class="docutils literal notranslate"><span class="pre">tuple</span></code> of <code class="docutils literal notranslate"><span class="pre">int</span></code>, optional) – The voxel size of <code class="docutils literal notranslate"><span class="pre">segmentation</span></code>. Defaults to 1.</p></li>
-<li><p><strong>labels</strong> (array-like of <code class="docutils literal notranslate"><span class="pre">int</span></code>, optional) – Restrict the computation to the given labels. Defaults to all
+<li><p><strong>segmentation</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span>) – A label array to compute the local shape descriptors for.</p></li>
+<li><p><strong>sigma</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code> | <code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span>) – The radius to consider for the local shape descriptor.</p></li>
+<li><p><strong>voxel_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – The voxel size of <code class="docutils literal notranslate"><span class="pre">segmentation</span></code>. Defaults to 1.</p></li>
+<li><p><strong>labels</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span>) – Restrict the computation to the given labels. Defaults to all
 labels inside the <code class="docutils literal notranslate"><span class="pre">roi</span></code> of <code class="docutils literal notranslate"><span class="pre">segmentation</span></code>.</p></li>
-<li><p><strong>downsample</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>, optional) – Compute the local shape descriptor on a downsampled volume for
+<li><p><strong>downsample</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Compute the local shape descriptor on a downsampled volume for
 faster processing. Defaults to 1 (no downsampling).</p></li>
 </ul>
 </dd>
@@ -380,7 +495,23 @@ faster processing. Defaults to 1 (no downsampling).</p></li>
 <div><dl class="py class">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.weight_balancing.BalanceLabels">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dacapo_toolbox.transforms.weight_balancing.</span></span><span class="sig-name descname"><span class="pre">BalanceLabels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clipmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clipmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.weight_balancing.BalanceLabels" title="Link to this definition"></a></dt>
-<dd><dl class="py method">
+<dd><p>Computes per-voxel weights to balance the contribution of each class to the loss.
+The weights are computed per-slab, which can be set with the <cite>slab</cite> parameter.
+If <cite>slab</cite> is None, the entire volume is used to compute the weights.
+The weights are clipped to the range [clipmin, clipmax] to avoid extreme weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slab</strong> – The shape of the slab to use for computing the weights. If -1 is
+provided for a dimension, the entire dimension is used. If None is
+provided, the entire volume is used. Default is None.</p></li>
+<li><p><strong>num_classes</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – The number of classes in the labels. Default is 2.</p></li>
+<li><p><strong>clipmin</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – The minimum weight to use. Default is 0.05.</p></li>
+<li><p><strong>clipmax</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – The maximum weight to use. Default is 0.95.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="dacapo_toolbox.transforms.weight_balancing.BalanceLabels.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#dacapo_toolbox.transforms.weight_balancing.BalanceLabels.forward" title="Link to this definition"></a></dt>
 <dd><p>Define the computation performed at every call.</p>
@@ -414,21 +545,21 @@ registered hooks while the latter silently ignores them.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>arrays</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Array</em><em>]</em>) – A dictionary of named arrays to visualize. Each array must be 3D,
+<li><p><strong>arrays</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code>]</span>) – A dictionary of named arrays to visualize. Each array must be 3D,
 with optional channels.</p></li>
-<li><p><strong>array_types</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – A dictionary specifying the type of each array. Supported types are:
+<li><p><strong>array_types</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – A dictionary specifying the type of each array. Supported types are:
 - “raw”: Grayscale raw data.
 - “labels”: Integer labels, visualized with a random color map.
 - “affs”: Affinity graphs, visualized as RGB images.
 - “pca”: High-dimensional data, visualized using PCA to reduce to 3 channels.</p></li>
-<li><p><strong>filename</strong> (<em>str</em>) – The output filename for the GIF.</p></li>
-<li><p><strong>title</strong> (<em>str</em>) – The title to display on the GIF.</p></li>
-<li><p><strong>fps</strong> (<em>int</em><em>, </em><em>optional</em>) – Frames per second for the GIF. Default is 10.</p></li>
-<li><p><strong>overwrite</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to overwrite the output file if it already exists. Default is True.</p></li>
-<li><p><strong>dpi</strong> (<em>int</em><em>, </em><em>optional</em>) – Dots per inch for the output GIF. Default is 72.</p></li>
-<li><p><strong>max_size</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum size (in pixels) for the largest dimension of the images. Default is 256.</p></li>
-<li><p><strong>optimize_gif</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to optimize the GIF for smaller file size. Default is False.</p></li>
-<li><p><strong>frame_skip</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of frames to skip when generating the GIF for faster creation. Default is 2.</p></li>
+<li><p><strong>filename</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The output filename for the GIF.</p></li>
+<li><p><strong>title</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The title to display on the GIF.</p></li>
+<li><p><strong>fps</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Frames per second for the GIF. Default is 10.</p></li>
+<li><p><strong>overwrite</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Whether to overwrite the output file if it already exists. Default is True.</p></li>
+<li><p><strong>dpi</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Dots per inch for the output GIF. Default is 72.</p></li>
+<li><p><strong>max_size</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Maximum size (in pixels) for the largest dimension of the images. Default is 256.</p></li>
+<li><p><strong>optimize_gif</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Whether to optimize the GIF for smaller file size. Default is False.</p></li>
+<li><p><strong>frame_skip</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of frames to skip when generating the GIF for faster creation. Default is 2.</p></li>
 </ul>
 </dd>
 </dl>
@@ -442,9 +573,9 @@ their relative sizes and shifts will be respected.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>arrays</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Array</em><em>]</em>) – A dictionary of named arrays to visualize. Each array must be 3D,
+<li><p><strong>arrays</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code>]</span>) – A dictionary of named arrays to visualize. Each array must be 3D,
 with optional channels.</p></li>
-<li><p><strong>array_types</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – <p>A dictionary specifying the type of each array. Supported types are:
+<li><p><strong>array_types</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span>) – <p>A dictionary specifying the type of each array. Supported types are:
 - “raw”: Grayscale raw data.
 - “labels”: Integer labels, visualized with a random color map.
 - “affs”: Affinity graphs, visualized as RGB images.
@@ -453,17 +584,17 @@ with optional channels.</p></li>
 <div><p>channels.</p>
 </div></blockquote>
 </p></li>
-<li><p><strong>filename</strong> (<em>str</em>) – The output filename for the image.</p></li>
-<li><p><strong>title</strong> (<em>str</em>) – The title to display on the image.</p></li>
-<li><p><strong>elev</strong> (<em>float</em><em>, </em><em>optional</em>) – Elevation angle for the 3D view. Default is 30.</p></li>
-<li><p><strong>azim</strong> (<em>float</em><em>, </em><em>optional</em>) – Azimuth angle for the 3D view. Default is -60.</p></li>
-<li><p><strong>light_azdeg</strong> (<em>float</em><em>, </em><em>optional</em>) – Azimuth angle for the light source. Default is 205.</p></li>
-<li><p><strong>light_altdeg</strong> (<em>float</em><em>, </em><em>optional</em>) – Altitude angle for the light source. Default is 20.</p></li>
-<li><p><strong>overwrite</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to overwrite the output file if it already exists. Default is True.</p></li>
-<li><p><strong>rcount</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of rows for the surface plot. Default is 128.</p></li>
-<li><p><strong>ccount</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of columns for the surface plot. Default is 128.</p></li>
-<li><p><strong>shade</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to shade the surface plot. Default is True.</p></li>
-<li><p><strong>dpi</strong> (<em>int</em><em>, </em><em>optional</em>) – Dots per inch for the output image. Default is 100.</p></li>
+<li><p><strong>filename</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The output filename for the image.</p></li>
+<li><p><strong>title</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The title to display on the image.</p></li>
+<li><p><strong>elev</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Elevation angle for the 3D view. Default is 30.</p></li>
+<li><p><strong>azim</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Azimuth angle for the 3D view. Default is -60.</p></li>
+<li><p><strong>light_azdeg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Azimuth angle for the light source. Default is 205.</p></li>
+<li><p><strong>light_altdeg</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Altitude angle for the light source. Default is 20.</p></li>
+<li><p><strong>overwrite</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Whether to overwrite the output file if it already exists. Default is True.</p></li>
+<li><p><strong>rcount</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of rows for the surface plot. Default is 128.</p></li>
+<li><p><strong>ccount</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Number of columns for the surface plot. Default is 128.</p></li>
+<li><p><strong>shade</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – Whether to shade the surface plot. Default is True.</p></li>
+<li><p><strong>dpi</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – Dots per inch for the output image. Default is 100.</p></li>
 </ul>
 </dd>
 </dl>
@@ -480,19 +611,16 @@ with optional channels.</p></li>
 <dd><p>Downloads a subset of the CREMI data and returns the raw and label
 arrays for train and testing.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code>]</span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>zarr_path</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span>) – The path to the directory where the zarr files will be stored.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Array</span></code>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A tuple of four arrays (raw_train, labels_train, raw_test, labels_test).</p>
 </dd>
 </dl>
-<p>params:
-:type zarr_path: <span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span></p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param zarr_path<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The path to the directory where the zarr files will be stored.</p>
-</dd>
-</dl>
-</div></blockquote>
 </dd></dl>
 
 </div></blockquote>
