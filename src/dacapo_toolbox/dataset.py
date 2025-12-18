@@ -477,6 +477,14 @@ def iterable_dataset(
 
     pipeline = tuple(dataset_sources) + gp.RandomProvider(weights)
 
+    if simple_augment_config is not None:
+        pipeline += gp.SimpleAugment(
+            mirror_only=simple_augment_config.mirror_only,
+            transpose_only=simple_augment_config.transpose_only,
+            mirror_probs=simple_augment_config.mirror_probs,
+            transpose_probs=simple_augment_config.transpose_probs,
+            p=simple_augment_config.p,
+        )
     if deform_augment_config is not None:
         pipeline += gp.DeformAugment(
             control_point_spacing=Coordinate(
@@ -492,14 +500,6 @@ def iterable_dataset(
             rotation_axes=deform_augment_config.rotation_axes,
             use_fast_points_transform=True,
             p=deform_augment_config.p,
-        )
-    if simple_augment_config is not None:
-        pipeline += gp.SimpleAugment(
-            mirror_only=simple_augment_config.mirror_only,
-            transpose_only=simple_augment_config.transpose_only,
-            mirror_probs=simple_augment_config.mirror_probs,
-            transpose_probs=simple_augment_config.transpose_probs,
-            p=simple_augment_config.p,
         )
 
     # generate request for all necessary inputs to training
