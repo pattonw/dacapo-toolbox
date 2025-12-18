@@ -233,6 +233,8 @@ def cube(
     ccount: int = 128,
     shade: bool = True,
     dpi: int = 100,
+    cmap: ListedColormap | None = None,
+    layout: str = "line",
 ):
     """
     Preview 3D arrays as cubes with matplotlib. Arrays do not need to be the same size
@@ -358,14 +360,31 @@ def cube(
             transformed_faces[key] = (face_data, face_coords)
     faces = transformed_faces
 
-    fig, axes = plt.subplots(
-        1,
-        len(arrays),
-        figsize=(2 + 5 * len(arrays), 6),
-        subplot_kw={"projection": "3d"},
-    )
+    if layout == "line":
+        fig, axes = plt.subplots(
+            1,
+            len(arrays),
+            figsize=(2 + 5 * len(arrays), 6),
+            subplot_kw={"projection": "3d"},
+        )
+    elif layout == "square":
+        fig, axes = plt.subplots(
+            int(np.ceil(len(arrays) ** 0.5)),
+            int(np.ceil(len(arrays) ** 0.5)),
+            figsize=(
+                5 * int(np.ceil(len(arrays) ** 0.5)),
+                5 * int(np.ceil(len(arrays) ** 0.5)),
+            ),
+            subplot_kw={"projection": "3d"},
+        )
 
     label_cmap = get_cmap()
+    if cmap is not None:
+        label_cmap = ListedColormap(
+            np.concatenate(
+                (cmap.colors, label_cmap.colors[: -len(cmap.colors)]), axis=0
+            )
+        )
 
     def draw_cube(
         ax,
@@ -380,12 +399,6 @@ def cube(
             [xxyyzz[1] for xxyyzz in face_coords],
             [xxyyzz[2] for xxyyzz in face_coords],
         )
-        kwargs = {
-            "interpolation": interpolation,
-            "cmap": cmap,
-            "vmin": 0,
-            "vmax": 1,
-        }
 
         face_colors = [
             cmap(fc) if cmap is not None else fc.transpose(1, 2, 0)
@@ -414,7 +427,12 @@ def cube(
         ax.axis("off")
 
     for jj, (key, face_data) in enumerate(faces.items()):
-        ax = axes[jj] if len(arrays) > 1 else axes
+        if layout == "square":
+            ax = axes[jj // int(np.ceil(len(arrays) ** 0.5))][
+                jj % int(np.ceil(len(arrays) ** 0.5))
+            ]
+        else:
+            ax = axes[jj] if len(arrays) > 1 else axes
         face_colors = face_data[0]
 
         if array_types[key] == "labels":
