@@ -194,6 +194,23 @@ class DeformAugmentConfig:
 
 
 @dataclass
+class DefectAugmentConfig:
+    """
+    The defect augment handles augmenting for missing or low contrast slices as well as
+    unexpected shifts.
+    See https://github.com/funkelab/gunpowder/blob/main/gunpowder/nodes/defect_augment.py
+    for more details.
+
+    Parameters:
+        :param intensities_key: The key of the intensities array in the dataset.
+        :param p: Probability of applying the augmentations.
+    """
+
+    intensities_key: str
+    p: float = 0.0
+
+
+@dataclass
 class MaskedSampling:
     """
     Sampling strategy that uses a mask to determine which samples to include.
@@ -238,6 +255,7 @@ def iterable_dataset(
     trim: int | Sequence[int] | None = None,
     simple_augment_config: SimpleAugmentConfig | None = None,
     deform_augment_config: DeformAugmentConfig | None = None,
+    defect_augment_config: DefectAugmentConfig | None = None,
     interpolatable: dict[str, bool] | None = None,
 ) -> torch.utils.data.IterableDataset:
     """
@@ -352,11 +370,6 @@ def iterable_dataset(
 
     # Get source nodes
     dataset_sources = []
-
-    # type hints since zip seems to get rid of the type info
-    # crop_datasets: list[Array | nx.Graph]
-    # crop_scale: Coordinate
-    # sampling_strategy: MaskedSampling | PointSampling | None
 
     for crop_datasets, crop_scale, sampling_strategy in zip(
         crops_datasets, crops_scale, sampling_strategies
@@ -500,6 +513,11 @@ def iterable_dataset(
             rotation_axes=deform_augment_config.rotation_axes,
             use_fast_points_transform=True,
             p=deform_augment_config.p,
+        )
+    if defect_augment_config is not None:
+        pipeline += gp.DefectAugment(
+            intensities=gp.ArrayKey(defect_augment_config.intensities_key),
+            p=defect_augment_config.p,
         )
 
     # generate request for all necessary inputs to training
