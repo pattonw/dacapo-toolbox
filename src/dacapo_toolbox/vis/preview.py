@@ -458,3 +458,176 @@ def cube(
 
     plt.savefig(filename, bbox_inches="tight", pad_inches=0.1, dpi=dpi)
     plt.close(fig)
+
+
+def graph_cube(
+    graph,
+    roi: Roi,
+    filename: str,
+    title: str,
+    position_attribute: str = "position",
+    color_by: str | None = None,
+    max_nodes: int = 50_000,
+    draw_edges: bool = True,
+    node_size: float = 1.0,
+    face_alpha: float = 0.08,
+    elev: float = 30,
+    azim: float = -60,
+    overwrite: bool = True,
+    dpi: int = 100,
+    seed: int = 1,
+    ax=None,
+):
+    """
+    Preview a spatial graph (skeletons, points) as a 3D scatter inside a
+    slightly opaque cuboid marking the image boundaries. The view, axis order
+    and box aspect match :func:`cube`, so a graph preview sits beside an array
+    preview of the same region without surprises.
+
+    Parameters:
+        graph:
+            A ``networkx`` graph whose nodes carry a world-space position
+            under ``position_attribute`` in ``(z, y, x)`` order, as
+            ``funlib.persistence`` graph databases return them.
+        roi:
+            The region to draw the cuboid for, in the same world units as the
+            node positions; usually the image or ground-truth ROI. Nodes
+            outside it are still drawn.
+        filename:
+            The output filename for the image.
+        title:
+            The title to display on the image.
+        position_attribute:
+            The node attribute holding the position. Default is ``position``.
+        color_by:
+            A node attribute to colour nodes by (``skeleton_id``, ``label``);
+            each distinct value gets one colour from the label colormap. None
+            draws every node in one colour.
+        max_nodes:
+            When the graph has more nodes than this, a subset of at most this
+            size is drawn, and edges only between drawn nodes: whole groups of
+            ``color_by`` in random order when it is given (so each drawn
+            skeleton keeps its shape), else random nodes. Default 50000.
+        draw_edges:
+            Whether to draw edges between drawn nodes. Default is True.
+        node_size:
+            Marker size for the nodes. Default is 1.
+        face_alpha:
+            Opacity of the cuboid faces. Default is 0.08.
+        elev, azim:
+            View angles, as for :func:`cube`.
+        overwrite:
+            Whether to overwrite the output file if it already exists.
+        dpi:
+            Dots per inch for the output image. Default is 100.
+        seed:
+            Seed for the node subsample and the colour map.
+        ax:
+            An existing 3D axes to draw on instead of a new figure; the file is
+            then not written and the axes are returned.
+    """
+    from mpl_toolkits.mplot3d.art3d import Line3DCollection, Poly3DCollection
+
+    if ax is None and Path(filename).exists() and not overwrite:
+        return None
+
+    nodes = [n for n, data in graph.nodes(data=True) if position_attribute in data]
+    rng = np.random.default_rng(seed)
+    if len(nodes) > max_nodes:
+        if color_by is not None:
+            # Keep whole groups (skeletons) so the subsample still shows their
+            # shape, adding groups in random order until the budget is spent.
+            groups: dict = {}
+            for n in nodes:
+                groups.setdefault(graph.nodes[n].get(color_by), []).append(n)
+            keys = list(groups)
+            rng.shuffle(keys)
+            kept: list = []
+            for key in keys:
+                if len(kept) + len(groups[key]) > max_nodes:
+                    continue
+                kept.extend(groups[key])
+            nodes = kept
+        else:
+            chosen = rng.choice(len(nodes), size=max_nodes, replace=False)
+            nodes = [nodes[i] for i in sorted(chosen)]
+    index = {n: i for i, n in enumerate(nodes)}
+    positions = np.array(
+        [graph.nodes[n][position_attribute] for n in nodes], dtype=np.float64
+    ).reshape(-1, 3)
+
+    if color_by is not None:
+        values = [graph.nodes[n].get(color_by) for n in nodes]
+        distinct = {v: i for i, v in enumerate(dict.fromkeys(values))}
+        cmap = get_cmap(seed)
+        colors = cmap(np.array([1 + distinct[v] % 255 for v in values]))
+    else:
+        colors = np.tile(np.array([[0.1, 0.4, 0.8, 1.0]]), (len(nodes), 1))
+
+    own_figure = ax is None
+    if own_figure:
+        fig = plt.figure(figsize=(7, 6))
+        ax = fig.add_subplot(111, projection="3d")
+
+    # x, y, z axes take roi dims 2, 1, 0, as cube() does.
+    if len(positions):
+        ax.scatter(
+            positions[:, 2],
+            positions[:, 1],
+            positions[:, 0],
+            s=node_size,
+            c=colors,
+            depthshade=False,
+            linewidths=0,
+        )
+    if draw_edges and len(positions):
+        segments = [
+            [positions[index[u]][::-1], positions[index[v]][::-1]]
+            for u, v in graph.edges()
+            if u in index and v in index
+        ]
+        if segments:
+            edge_colors = [
+                colors[index[u]] for u, v in graph.edges() if u in index and v in index
+            ]
+            ax.add_collection3d(
+                Line3DCollection(segments, colors=edge_colors, linewidths=0.5)
+            )
+
+    # The cuboid: six faces of the roi, lightly filled, edges drawn.
+    b, e = roi.begin, roi.end
+    corners = np.array(
+        [[x, y, z] for z in (b[0], e[0]) for y in (b[1], e[1]) for x in (b[2], e[2])],
+        dtype=np.float64,
+    )
+    faces = [
+        [0, 1, 3, 2],
+        [4, 5, 7, 6],
+        [0, 1, 5, 4],
+        [2, 3, 7, 6],
+        [0, 2, 6, 4],
+        [1, 3, 7, 5],
+    ]
+    ax.add_collection3d(
+        Poly3DCollection(
+            [corners[f] for f in faces],
+            facecolors=(0.5, 0.5, 0.5, face_alpha),
+            edgecolors=(0.2, 0.2, 0.2, 0.6),
+            linewidths=0.8,
+        )
+    )
+
+    ax.set_xlim(b[2], e[2])
+    ax.set_ylim(b[1], e[1])
+    ax.set_zlim(b[0], e[0])
+    ax.set_box_aspect(roi.shape[::-1])
+    ax.axis("off")
+    ax.set_title(title)
+    ax.view_init(elev=elev, azim=azim)
+
+    if not own_figure:
+        return ax
+    plt.tight_layout()
+    plt.savefig(filename, bbox_inches="tight", pad_inches=0.1, dpi=dpi)
+    plt.close(fig)
+    return None
