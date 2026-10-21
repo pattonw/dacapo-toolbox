@@ -126,7 +126,7 @@ def test_cube_draws_label_meshes(tmp_path):
 
 def test_mesh_box_is_the_label_roi(monkeypatch):
     # labels smaller than the raw: the box marks the labels, the axes the union
-    import dacapo_toolbox.vis.preview as preview
+    from dacapo_toolbox.vis import preview
 
     raw = Array(np.zeros((20, 40, 40), np.uint8), voxel_size=Coordinate(4, 2, 2))
     labels = np.zeros((10, 20, 20), dtype=np.uint32)
