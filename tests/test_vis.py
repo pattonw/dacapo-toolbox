@@ -7,7 +7,7 @@ from funlib.persistence import Array
 
 pytest.importorskip("matplotlib")
 
-from dacapo_toolbox.vis.preview import cube, graph_cube
+from dacapo_toolbox.vis.preview import _mesh_strides, cube, graph_cube, label_meshes
 
 
 def test_cube_writes_an_image(tmp_path):
@@ -96,3 +96,22 @@ def test_graph_cube_thins_every_skeleton():
     assert len(points) == 7 * 14
     segments = ax.collections[1]._segments3d
     assert len(segments) == 7 * 13
+
+
+def test_cube_draws_label_meshes(tmp_path):
+    # two boxes in a mostly empty volume: one mesh each, inside the roi
+    labels = np.zeros((10, 20, 20), dtype=np.uint64)
+    labels[2:5, 3:8, 3:8] = 7
+    labels[5:9, 10:18, 12:19] = 2**40
+    arr = Array(labels, offset=Coordinate(40, 0, 0), voxel_size=Coordinate(4, 2, 2))
+    meshes = label_meshes(arr)
+    assert sorted(label for label, _, _ in meshes) == [7, 2**40]
+    for _, verts, faces in meshes:
+        assert len(faces)
+        assert (verts >= np.array(arr.roi.begin) - 4).all()
+        assert (verts <= np.array(arr.roi.end) + 4).all()
+    # a budget smaller than the array strides it, finest axes first
+    assert _mesh_strides(arr, 1000) == (1, 2, 2)
+    out = tmp_path / "mesh.png"
+    cube({"labels": arr}, {"labels": "mesh"}, str(out), "mesh", dpi=40)
+    assert out.exists() and out.stat().st_size > 0

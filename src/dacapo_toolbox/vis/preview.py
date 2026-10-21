@@ -235,6 +235,7 @@ def cube(
     dpi: int = 100,
     cmap: ListedColormap | None = None,
     layout: str = "line",
+    mesh_voxels: int = 2_000_000,
 ):
     """
     Preview 3D arrays as cubes with matplotlib. Arrays do not need to be the same size
@@ -251,6 +252,10 @@ def cube(
             - "affs": Affinity graphs, visualized as RGB images.
             - "pca": High-dimensional data, visualized using PCA to reduce to 3
                 channels.
+            - "mesh": Integer labels drawn as one surface mesh per label
+                (background 0 left out) inside a translucent box marking the
+                roi, so it shows how much of the volume is labelled. The
+                whole array is read, strided down to ``mesh_voxels``.
         filename:
             The output filename for the image.
         title:
@@ -273,6 +278,10 @@ def cube(
             Whether to shade the surface plot. Default is True.
         dpi:
             Dots per inch for the output image. Default is 100.
+        mesh_voxels:
+            Voxel budget for each "mesh" array: it is read with a stride per
+            axis (keeping voxels near isotropic) so at most about this many
+            voxels are meshed. Default 2000000.
     """
     if Path(filename).exists() and not overwrite:
         return
@@ -292,6 +301,8 @@ def cube(
     ) -> dict[str, tuple[list[np.ndarray], list[np.ndarray]]]:
         faces = {}
         for name, arr in arrays.items():
+            if array_types[name] == "mesh":
+                continue
             assert arr.voxel_size.dims == 3, (
                 f"Array {name} must be 3D, got {arr.voxel_size.dims}D"
             )
@@ -426,13 +437,27 @@ def cube(
 
         ax.axis("off")
 
-    for jj, (key, face_data) in enumerate(faces.items()):
+    for jj, key in enumerate(arrays):
         if layout == "square":
             ax = axes[jj // int(np.ceil(len(arrays) ** 0.5))][
                 jj % int(np.ceil(len(arrays) ** 0.5))
             ]
         else:
             ax = axes[jj] if len(arrays) > 1 else axes
+
+        if array_types[key] == "mesh":
+            draw_label_meshes(
+                ax,
+                arrays[key],
+                total_roi,
+                label_cmap,
+                mesh_voxels,
+                lightsource=lightsource,
+            )
+            ax.set_title(key)
+            ax.view_init(elev=elev, azim=azim)
+            continue
+        face_data = faces[key]
         face_colors = face_data[0]
 
         if array_types[key] == "labels":
@@ -458,6 +483,130 @@ def cube(
 
     plt.savefig(filename, bbox_inches="tight", pad_inches=0.1, dpi=dpi)
     plt.close(fig)
+
+
+def _mesh_strides(arr: Array, max_voxels: int) -> tuple[int, int, int]:
+    """Per-axis strides that bring ``arr`` to at most about ``max_voxels``
+    voxels, coarsening the finest axes first so voxels approach isotropic."""
+    voxel = np.array(arr.voxel_size, dtype=np.float64)
+    shape = np.array(arr.roi.shape / arr.voxel_size, dtype=np.float64)
+    if np.prod(shape) <= max_voxels:
+        return (1, 1, 1)
+    # the world step s at which prod(shape * voxel / max(s, voxel)) fits
+    lo, hi = float(voxel.min()), float((shape * voxel).max())
+    for _ in range(60):
+        step = (lo + hi) / 2
+        strides = np.maximum(1, np.round(step / voxel))
+        if np.prod(np.ceil(shape / strides)) > max_voxels:
+            lo = step
+        else:
+            hi = step
+    strides = np.maximum(1, np.round(hi / voxel)).astype(int)
+    return (int(strides[0]), int(strides[1]), int(strides[2]))
+
+
+def label_meshes(
+    arr: Array, max_voxels: int = 2_000_000
+) -> list[tuple[int, np.ndarray, np.ndarray]]:
+    """One marching-cubes surface per non-zero label of ``arr``, read with the
+    strides of :func:`_mesh_strides`. Returns ``(label, vertices, faces)``
+    with vertices in world units, ``(z, y, x)`` order."""
+    from scipy import ndimage
+    from skimage.measure import marching_cubes
+
+    strides = _mesh_strides(arr, max_voxels)
+    data = np.asarray(arr.data[tuple(slice(None, None, s) for s in strides)])
+    ids, compact = np.unique(data, return_inverse=True)
+    # find_objects numbers from 1, so label ids[i] becomes i + 1
+    compact = compact.reshape(data.shape) + 1
+    spacing = np.array(arr.voxel_size, dtype=np.float64) * strides
+    offset = np.array(arr.roi.offset, dtype=np.float64)
+    meshes = []
+    for index, box in enumerate(ndimage.find_objects(compact), start=1):
+        if box is None or ids[index - 1] == 0:
+            continue
+        # pad by one voxel so labels touching the box edge close their surface
+        start = [max(b.start - 1, 0) for b in box]
+        stop = [min(b.stop + 1, n) for b, n in zip(box, data.shape)]
+        mask = compact[tuple(slice(a, b) for a, b in zip(start, stop))] == index
+        mask = np.pad(mask, 1)
+        verts, faces, _, _ = marching_cubes(
+            mask.astype(np.uint8), 0.5, spacing=tuple(spacing)
+        )
+        verts += offset + (np.array(start) - 1) * spacing
+        meshes.append((int(ids[index - 1]), verts, faces))
+    return meshes
+
+
+def draw_label_meshes(
+    ax,
+    arr: Array,
+    roi: Roi,
+    cmap: ListedColormap,
+    max_voxels: int = 2_000_000,
+    face_alpha: float = 0.08,
+    lightsource: mcolors.LightSource | None = None,
+):
+    """Draw :func:`label_meshes` of ``arr`` on a 3D axes inside a translucent
+    cuboid marking ``roi``, each label coloured as the "labels" cube colours
+    it and shaded by its surface normals."""
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
+    if lightsource is None:
+        lightsource = mcolors.LightSource(azdeg=205, altdeg=20)
+    triangles, colors, normals = [], [], []
+    for label, verts, faces in label_meshes(arr, max_voxels):
+        tri = verts[faces][:, :, ::-1]  # x, y, z axes take dims 2, 1, 0
+        triangles.append(tri)
+        normals.append(np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0]))
+        colors.append(np.tile(cmap(label % 256 / 255.0), (len(tri), 1)))
+    if triangles:
+        tri = np.concatenate(triangles)
+        normal = np.concatenate(normals)
+        normal /= np.linalg.norm(normal, axis=1, keepdims=True) + 1e-12
+        # matplotlib's own shading: brightness from the light source
+        light = lightsource.direction
+        shade = 0.45 + 0.55 * np.abs(normal @ np.asarray(light))
+        color = np.concatenate(colors)
+        color[:, :3] *= shade[:, None]
+        ax.add_collection3d(
+            Poly3DCollection(tri, facecolors=color, edgecolors="none", linewidths=0)
+        )
+    _draw_cuboid(ax, roi, face_alpha)
+
+
+def _draw_cuboid(ax, roi: Roi, face_alpha: float):
+    """Six lightly filled faces of ``roi`` with drawn edges, and the axes
+    limits and aspect set to it, as :func:`graph_cube` and :func:`cube`
+    lay out their views."""
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+
+    b, e = roi.begin, roi.end
+    corners = np.array(
+        [[x, y, z] for z in (b[0], e[0]) for y in (b[1], e[1]) for x in (b[2], e[2])],
+        dtype=np.float64,
+    )
+    faces = [
+        [0, 1, 3, 2],
+        [4, 5, 7, 6],
+        [0, 1, 5, 4],
+        [2, 3, 7, 6],
+        [0, 2, 6, 4],
+        [1, 3, 7, 5],
+    ]
+    ax.add_collection3d(
+        Poly3DCollection(
+            [corners[f] for f in faces],
+            facecolors=(0.5, 0.5, 0.5, face_alpha),
+            edgecolors=(0.2, 0.2, 0.2, 0.6),
+            linewidths=0.8,
+        )
+    )
+    ax.set_xlim(b[2], e[2])
+    ax.set_ylim(b[1], e[1])
+    ax.set_zlim(b[0], e[0])
+    ax.set_box_aspect(roi.shape[::-1])
+    ax.axis("off")
 
 
 def _thin_along_edges(graph, nodes: list, stride: int) -> tuple[list, list]:
@@ -562,7 +711,7 @@ def graph_cube(
             An existing 3D axes to draw on instead of a new figure; the file is
             then not written and the axes are returned.
     """
-    from mpl_toolkits.mplot3d.art3d import Line3DCollection, Poly3DCollection
+    from mpl_toolkits.mplot3d.art3d import Line3DCollection
 
     if ax is None and Path(filename).exists() and not overwrite:
         return None
@@ -618,34 +767,7 @@ def graph_cube(
                 Line3DCollection(segments, colors=edge_colors, linewidths=0.5)
             )
 
-    # The cuboid: six faces of the roi, lightly filled, edges drawn.
-    b, e = roi.begin, roi.end
-    corners = np.array(
-        [[x, y, z] for z in (b[0], e[0]) for y in (b[1], e[1]) for x in (b[2], e[2])],
-        dtype=np.float64,
-    )
-    faces = [
-        [0, 1, 3, 2],
-        [4, 5, 7, 6],
-        [0, 1, 5, 4],
-        [2, 3, 7, 6],
-        [0, 2, 6, 4],
-        [1, 3, 7, 5],
-    ]
-    ax.add_collection3d(
-        Poly3DCollection(
-            [corners[f] for f in faces],
-            facecolors=(0.5, 0.5, 0.5, face_alpha),
-            edgecolors=(0.2, 0.2, 0.2, 0.6),
-            linewidths=0.8,
-        )
-    )
-
-    ax.set_xlim(b[2], e[2])
-    ax.set_ylim(b[1], e[1])
-    ax.set_zlim(b[0], e[0])
-    ax.set_box_aspect(roi.shape[::-1])
-    ax.axis("off")
+    _draw_cuboid(ax, roi, face_alpha)
     ax.set_title(title)
     ax.view_init(elev=elev, azim=azim)
 
