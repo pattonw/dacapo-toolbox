@@ -7,7 +7,14 @@ from funlib.persistence import Array
 
 pytest.importorskip("matplotlib")
 
-from dacapo_toolbox.vis.preview import _mesh_strides, cube, graph_cube, label_meshes
+from dacapo_toolbox.vis.preview import (
+    _mesh_strides,
+    cube,
+    draw_label_meshes,
+    get_cmap,
+    graph_cube,
+    label_meshes,
+)
 
 
 def test_cube_writes_an_image(tmp_path):
@@ -115,3 +122,27 @@ def test_cube_draws_label_meshes(tmp_path):
     out = tmp_path / "mesh.png"
     cube({"labels": arr}, {"labels": "mesh"}, str(out), "mesh", dpi=40)
     assert out.exists() and out.stat().st_size > 0
+
+
+def test_mesh_box_is_the_label_roi(monkeypatch):
+    # labels smaller than the raw: the box marks the labels, the axes the union
+    import dacapo_toolbox.vis.preview as preview
+
+    raw = Array(np.zeros((20, 40, 40), np.uint8), voxel_size=Coordinate(4, 2, 2))
+    labels = np.zeros((10, 20, 20), dtype=np.uint32)
+    labels[2:8, 5:15, 5:15] = 3
+    arr = Array(labels, offset=Coordinate(20, 20, 20), voxel_size=Coordinate(4, 2, 2))
+    drawn = []
+    original = preview._draw_cuboid
+    monkeypatch.setattr(
+        preview,
+        "_draw_cuboid",
+        lambda ax, roi, alpha, frame=None: (
+            drawn.append(roi),
+            original(ax, roi, alpha, frame=frame),
+        ),
+    )
+    ax = plt.figure().add_subplot(111, projection="3d")
+    draw_label_meshes(ax, arr, raw.roi.union(arr.roi), get_cmap())
+    assert drawn == [arr.roi]
+    assert ax.get_xlim() == (0, 80) and ax.get_zlim() == (0, 80)

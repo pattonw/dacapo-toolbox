@@ -548,8 +548,9 @@ def draw_label_meshes(
     lightsource: mcolors.LightSource | None = None,
 ):
     """Draw :func:`label_meshes` of ``arr`` on a 3D axes inside a translucent
-    cuboid marking ``roi``, each label coloured as the "labels" cube colours
-    it and shaded by its surface normals."""
+    cuboid marking the roi of ``arr``, each label coloured as the "labels"
+    cube colours it and shaded by its surface normals. The axes span ``roi``
+    (usually the union of all arrays drawn, so panels share one frame)."""
     from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
     if lightsource is None:
@@ -572,13 +573,13 @@ def draw_label_meshes(
         ax.add_collection3d(
             Poly3DCollection(tri, facecolors=color, edgecolors="none", linewidths=0)
         )
-    _draw_cuboid(ax, roi, face_alpha)
+    _draw_cuboid(ax, arr.roi, face_alpha, frame=roi)
 
 
-def _draw_cuboid(ax, roi: Roi, face_alpha: float):
+def _draw_cuboid(ax, roi: Roi, face_alpha: float, frame: Roi | None = None):
     """Six lightly filled faces of ``roi`` with drawn edges, and the axes
-    limits and aspect set to it, as :func:`graph_cube` and :func:`cube`
-    lay out their views."""
+    limits and aspect set to ``frame`` (default ``roi``), as
+    :func:`graph_cube` and :func:`cube` lay out their views."""
     from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
     b, e = roi.begin, roi.end
@@ -602,10 +603,11 @@ def _draw_cuboid(ax, roi: Roi, face_alpha: float):
             linewidths=0.8,
         )
     )
-    ax.set_xlim(b[2], e[2])
-    ax.set_ylim(b[1], e[1])
-    ax.set_zlim(b[0], e[0])
-    ax.set_box_aspect(roi.shape[::-1])
+    frame = roi if frame is None else frame
+    ax.set_xlim(frame.begin[2], frame.end[2])
+    ax.set_ylim(frame.begin[1], frame.end[1])
+    ax.set_zlim(frame.begin[0], frame.end[0])
+    ax.set_box_aspect(frame.shape[::-1])
     ax.axis("off")
 
 
