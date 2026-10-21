@@ -18,7 +18,7 @@ build-backend = "setuptools.build_meta"
 
 [project.optional-dependencies]
 postprocessing = ["volara-torch>=1.0.1", "volara>=1.0.2"]
-vis = ["matplotlib>=3.10.5"]
+vis = ["matplotlib>=3.10.5", "scikit-image>=0.24", "scipy>=1.13"]
 dev = [
     "pytest>=8.3.4",
     "pytest-cov>=6.0.0",
