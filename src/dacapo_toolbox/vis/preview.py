@@ -460,6 +460,40 @@ def cube(
     plt.close(fig)
 
 
+def _thin_along_edges(graph, nodes: list, stride: int) -> tuple[list, list]:
+    """Keep every ``stride``-th node along each path of ``graph`` plus every
+    leaf and branch point, joining each kept node to its nearest kept
+    ancestor in a breadth-first tree, so thinned skeletons keep their shape."""
+    undirected = graph.to_undirected(as_view=True) if graph.is_directed() else graph
+    allowed = set(nodes)
+    kept: list = []
+    edges: list = []
+    seen: set = set()
+    for root in nodes:
+        if root in seen:
+            continue
+        seen.add(root)
+        kept.append(root)
+        # (node, nearest kept ancestor, steps since that ancestor)
+        frontier = [(root, root, 0)]
+        while frontier:
+            next_frontier = []
+            for node, anchor, steps in frontier:
+                for child in undirected.neighbors(node):
+                    if child in seen or child not in allowed:
+                        continue
+                    seen.add(child)
+                    depth = steps + 1
+                    if depth >= stride or undirected.degree(child) != 2:
+                        kept.append(child)
+                        edges.append((anchor, child))
+                        next_frontier.append((child, child, 0))
+                    else:
+                        next_frontier.append((child, anchor, depth))
+            frontier = next_frontier
+    return kept, edges
+
+
 def graph_cube(
     graph,
     roi: Roi,
@@ -504,10 +538,12 @@ def graph_cube(
             each distinct value gets one colour from the label colormap. None
             draws every node in one colour.
         max_nodes:
-            When the graph has more nodes than this, a subset of at most this
-            size is drawn, and edges only between drawn nodes: whole groups of
-            ``color_by`` in random order when it is given (so each drawn
-            skeleton keeps its shape), else random nodes. Default 50000.
+            When the graph has more nodes than this, a subset of about this
+            size is drawn. With ``color_by`` every group is kept and thinned
+            along its edges (every n-th node plus leaves and branch points,
+            each joined to its nearest kept ancestor), so all skeletons are
+            drawn with their shape; otherwise random nodes are drawn, with
+            edges only between drawn nodes. Default 50000.
         draw_edges:
             Whether to draw edges between drawn nodes. Default is True.
         node_size:
@@ -533,21 +569,12 @@ def graph_cube(
 
     nodes = [n for n, data in graph.nodes(data=True) if position_attribute in data]
     rng = np.random.default_rng(seed)
+    edges = list(graph.edges())
     if len(nodes) > max_nodes:
         if color_by is not None:
-            # Keep whole groups (skeletons) so the subsample still shows their
-            # shape, adding groups in random order until the budget is spent.
-            groups: dict = {}
-            for n in nodes:
-                groups.setdefault(graph.nodes[n].get(color_by), []).append(n)
-            keys = list(groups)
-            rng.shuffle(keys)
-            kept: list = []
-            for key in keys:
-                if len(kept) + len(groups[key]) > max_nodes:
-                    continue
-                kept.extend(groups[key])
-            nodes = kept
+            # Thin every skeleton along its length rather than dropping whole
+            # skeletons, so all of them are drawn with their shape intact.
+            nodes, edges = _thin_along_edges(graph, nodes, -(-len(nodes) // max_nodes))
         else:
             chosen = rng.choice(len(nodes), size=max_nodes, replace=False)
             nodes = [nodes[i] for i in sorted(chosen)]
@@ -581,15 +608,12 @@ def graph_cube(
             linewidths=0,
         )
     if draw_edges and len(positions):
+        drawn = [(u, v) for u, v in edges if u in index and v in index]
         segments = [
-            [positions[index[u]][::-1], positions[index[v]][::-1]]
-            for u, v in graph.edges()
-            if u in index and v in index
+            [positions[index[u]][::-1], positions[index[v]][::-1]] for u, v in drawn
         ]
         if segments:
-            edge_colors = [
-                colors[index[u]] for u, v in graph.edges() if u in index and v in index
-            ]
+            edge_colors = [colors[index[u]] for u, v in drawn]
             ax.add_collection3d(
                 Line3DCollection(segments, colors=edge_colors, linewidths=0.5)
             )

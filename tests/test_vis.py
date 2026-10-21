@@ -57,7 +57,6 @@ def test_graph_cube_writes_an_image(tmp_path, color_by):
         dpi=40,
     )
     assert out.exists() and out.stat().st_size > 0
-    # whole groups are kept when subsampling by color_by
     ax = graph_cube(
         graph,
         Roi((0, 0, 0), (100, 100, 100)),
@@ -67,10 +66,33 @@ def test_graph_cube_writes_an_image(tmp_path, color_by):
         max_nodes=100,
         ax=plt.figure().add_subplot(111, projection="3d"),
     )
-    n_drawn = ax.collections[0].get_offsets().shape[0]
-    # 7 groups of 42 or 43 nodes: two whole groups fit the budget of 100
-    assert n_drawn in (85, 86) if color_by is not None else n_drawn == 100
+    if color_by is None:
+        assert ax.collections[0].get_offsets().shape[0] == 100
     # overwrite=False leaves the file alone
     before = out.stat().st_mtime_ns
     graph_cube(graph, Roi((0, 0, 0), (100, 100, 100)), str(out), "x", overwrite=False)
     assert out.stat().st_mtime_ns == before
+
+
+def test_graph_cube_thins_every_skeleton():
+    # seven chains of 40 nodes with a budget of 100: every chain is drawn,
+    # thinned to every third node plus its ends, and stays connected
+    graph = nx.Graph()
+    for s in range(7):
+        for i in range(40):
+            graph.add_node((s, i), position=(s * 10.0, i * 2.0, 0.0), skeleton_id=s)
+            if i:
+                graph.add_edge((s, i - 1), (s, i))
+    ax = graph_cube(
+        graph,
+        Roi((0, 0, 0), (100, 100, 100)),
+        "unused.png",
+        "x",
+        color_by="skeleton_id",
+        max_nodes=100,
+        ax=plt.figure().add_subplot(111, projection="3d"),
+    )
+    points = ax.collections[0].get_offsets()
+    assert len(points) == 7 * 14
+    segments = ax.collections[1]._segments3d
+    assert len(segments) == 7 * 13
