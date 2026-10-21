@@ -88,6 +88,7 @@ class BalanceLabels(torch.nn.Module):
         clipmin: The minimum weight to use. Default is 0.05.
         clipmax: The maximum weight to use. Default is 0.95.
     """
+
     def __init__(
         self,
         slab=None,
