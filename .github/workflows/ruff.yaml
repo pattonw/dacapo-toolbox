@@ -19,4 +19,4 @@ jobs:
         uses: astral-sh/setup-uv@v5
       - name: ruff
         run: |
-          uv run --extra dev ruff check src tests
+          uv run ruff check src tests

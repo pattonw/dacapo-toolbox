@@ -19,16 +19,21 @@ build-backend = "setuptools.build_meta"
 [project.optional-dependencies]
 postprocessing = ["volara-torch>=1.0.1", "volara>=1.0.2"]
 vis = ["matplotlib>=3.10.5", "scikit-image>=0.24", "scipy>=1.13"]
-dev = [
-    "pytest>=8.3.4",
-    "pytest-cov>=6.0.0",
-    "ruff>=0.9.6",
-    "pytest-xdist>=3.6.1",
-    "ty>=0.0.1a18",
-]
 accelerators = ["accelerate>=1.10.0", "lightning>=2.5.3"]
 sample-datasets = ["wget>=3.2"]
 examples = ["torchvision>=0.22.0"]
+
+[dependency-groups]
+# Installed by `uv sync` (PEP 735); not part of the published package.
+# ruff and ty are pinned with == until uv.lock is committed: both change
+# their rule sets between releases.
+dev = [
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "ruff==0.17.3",
+    "pytest-xdist>=3.6.1",
+    "ty==0.0.96",
+]
 docs = [
     "h5py>=3.13.0",
     "ipykernel>=6.29.5",
