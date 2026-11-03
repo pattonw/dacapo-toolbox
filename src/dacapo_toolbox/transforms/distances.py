@@ -1,5 +1,5 @@
-import torch
 import numpy as np
+import torch
 from edt import edt  # ty: ignore[unresolved-import]
 
 
@@ -14,7 +14,7 @@ class SignedDistanceTransform(torch.nn.Module):
     """
 
     def __init__(self, sigma: float = 10.0):
-        super(SignedDistanceTransform, self).__init__()
+        super().__init__()
         self.sigma = sigma
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -33,7 +33,7 @@ class SDTBoundaryMask(torch.nn.Module):
     """
 
     def __init__(self):
-        super(SDTBoundaryMask, self).__init__()
+        super().__init__()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x.numpy()

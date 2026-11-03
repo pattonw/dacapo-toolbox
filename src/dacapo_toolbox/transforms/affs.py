@@ -1,8 +1,8 @@
-import torch
-from collections.abc import Sequence
 import itertools
-from typing import Callable
 import warnings
+from collections.abc import Callable, Sequence
+
+import torch
 
 
 def compute_affs(
@@ -34,14 +34,14 @@ def compute_affs(
             max(0, -offset[h]),
             min(arr_shape[h], arr_shape[h] - offset[h]),
         )
-        for h in range(0, offset_dim)
+        for h in range(offset_dim)
     )
     slice_ops_upper = tuple(
         slice(
             max(0, offset[h]),
             min(arr_shape[h], arr_shape[h] + offset[h]),
         )
-        for h in range(0, offset_dim)
+        for h in range(offset_dim)
     )
 
     # handle arbitrary number of leading dimensions (can be batch, channel, etc.)
@@ -101,7 +101,7 @@ class Affs(torch.nn.Module):
         pad: bool = True,
         concat_dim: int = 0,
     ):
-        super(Affs, self).__init__()
+        super().__init__()
         self.neighborhood = neighborhood
         self.ndim = len(neighborhood[0])
         self.pad = pad
@@ -165,7 +165,7 @@ class AffsMask(torch.nn.Module):
         neighborhood: Sequence[Sequence[int]],
         pad=True,
     ):
-        super(AffsMask, self).__init__()
+        super().__init__()
         self.neighborhood = neighborhood
         self.dist_func = no_bg_dist_func
         self.pad = pad

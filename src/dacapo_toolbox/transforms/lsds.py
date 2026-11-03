@@ -1,12 +1,12 @@
-from funlib.geometry import Coordinate
-import numpy as np
-import logging
-from scipy.ndimage import convolve, gaussian_filter
-from numpy.lib.stride_tricks import as_strided
-
-from collections.abc import Sequence
-import torch
 import functools
+import logging
+from collections.abc import Sequence
+
+import numpy as np
+import torch
+from funlib.geometry import Coordinate
+from numpy.lib.stride_tricks import as_strided
+from scipy.ndimage import convolve, gaussian_filter
 
 logger = logging.getLogger(__name__)
 

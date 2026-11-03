@@ -1,15 +1,13 @@
-import matplotlib.pyplot as plt
-from funlib.geometry import Coordinate, Roi
-from matplotlib import animation
-from matplotlib.colors import ListedColormap
-import numpy as np
-from funlib.persistence import Array
-from sklearn.decomposition import PCA
-
 from pathlib import Path
 
+import matplotlib.pyplot as plt
+import numpy as np
+from funlib.geometry import Coordinate, Roi
+from funlib.persistence import Array
+from matplotlib import animation, cm
 from matplotlib import colors as mcolors
-from matplotlib import cm
+from matplotlib.colors import ListedColormap
+from sklearn.decomposition import PCA
 
 SKIP_PLOTS = True
 

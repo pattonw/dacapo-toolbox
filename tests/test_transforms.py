@@ -1,7 +1,7 @@
-from dacapo_toolbox.transforms.weight_balancing import BalanceLabels
-
-import torch
 import pytest
+import torch
+
+from dacapo_toolbox.transforms.weight_balancing import BalanceLabels
 
 
 @pytest.mark.parametrize("masked", [True, False])

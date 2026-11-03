@@ -1,23 +1,20 @@
-import random
+import functools
 import logging
-from collections.abc import Sequence
+import random
+import time
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 
-import gunpowder as gp
-from gunpowder.nodes.gp_graph_source import GraphSource as GPGraphSource
-import networkx as nx
 import dask.array as da
+import gunpowder as gp
+import networkx as nx
 import numpy as np
-
+import torch
 from funlib.geometry import Coordinate, Roi
 from funlib.persistence import Array
+from gunpowder.nodes.gp_graph_source import GraphSource as GPGraphSource
 
-import torch
-
-import time
-import functools
-from dataclasses import dataclass
 from .tmp import gcd
-from typing import Callable
 
 logger = logging.getLogger(__name__)
 

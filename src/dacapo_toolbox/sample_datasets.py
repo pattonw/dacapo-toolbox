@@ -1,11 +1,10 @@
-from pathlib import Path
 from itertools import product
+from pathlib import Path
 
-import wget
 import h5py
-
-from funlib.persistence import open_ds, prepare_ds, Array
+import wget
 from funlib.geometry import Coordinate
+from funlib.persistence import Array, open_ds, prepare_ds
 
 
 def cremi(zarr_path: Path) -> tuple[Array, Array, Array, Array]:
