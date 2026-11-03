@@ -255,7 +255,10 @@ def blockwise_predict_mutex(
             frags_data=frags_dataset,
             block_size=blocksize,
             context=neighborhood_context,
-            scores={name: coords for name, coords in zip(edge_names, edge_coords)},
+            scores={
+                name: coords
+                for name, coords in zip(edge_names, edge_coords, strict=False)
+            },
             roi=roi,
             num_workers=num_aff_agglom_workers,
             worker_config=aff_agglom_worker,
@@ -263,7 +266,10 @@ def blockwise_predict_mutex(
         graph_mws = GraphMWS(
             db=frag_db,
             lut=segment_lut,
-            weights={name: (1, bias) for name, bias in zip(edge_names, edge_biases)},
+            weights={
+                name: (1, bias)
+                for name, bias in zip(edge_names, edge_biases, strict=False)
+            },
             roi=roi or raw_dataset.array("r").roi,
             worker_config=graph_mws_worker,
         )

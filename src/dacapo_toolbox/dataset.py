@@ -128,7 +128,9 @@ class PipelineDataset(torch.utils.data.IterableDataset):
                     else:
                         out_keys = out_key
                         out_tensors = out_tensor
-                        for out_key, out_tensor in zip(out_keys, out_tensors):
+                        for out_key, out_tensor in zip(
+                            out_keys, out_tensors, strict=False
+                        ):
                             torch_batch[out_key] = out_tensor
 
             t2 = time.time()
@@ -335,7 +337,9 @@ def iterable_dataset(
     roi_mask_key = gp.ArrayKey("ROI_MASK")
 
     # reorganize from raw: [a,b,c], gt: [a,b,c] to (raw,gt): [(a,a), (b,b), (c,c)]
-    crops_datasets: list[tuple[Array | nx.Graph, ...]] = list(zip(*datasets.values()))
+    crops_datasets: list[tuple[Array | nx.Graph, ...]] = list(
+        zip(*datasets.values(), strict=False)
+    )
     crops_scale = [
         functools.reduce(
             lambda x, y: gcd(x, y),
@@ -351,7 +355,7 @@ def iterable_dataset(
             lambda x, y: x * 0 if x != y else x,
             [
                 array.voxel_size / scale
-                for array, scale in zip(datasets[key], crops_scale)
+                for array, scale in zip(datasets[key], crops_scale, strict=False)
                 if isinstance(array, Array)
             ],
         )
@@ -369,7 +373,7 @@ def iterable_dataset(
     dataset_sources = []
 
     for crop_datasets, crop_scale, sampling_strategy in zip(
-        crops_datasets, crops_scale, sampling_strategies
+        crops_datasets, crops_scale, sampling_strategies, strict=False
     ):
         crop_arrays = [array for array in crop_datasets if isinstance(array, Array)]
 
@@ -432,9 +436,10 @@ def iterable_dataset(
                 )
                 else Coordinate((0,) * len(crop_scale)),
             )
-            for key, array in zip(array_keys, crop_arrays)
+            for key, array in zip(array_keys, crop_arrays, strict=False)
         ) + tuple(
-            GPGraphSource(key, graph) for key, graph in zip(graph_keys, crop_graphs)
+            GPGraphSource(key, graph)
+            for key, graph in zip(graph_keys, crop_graphs, strict=False)
         )
 
         crop_sources += (

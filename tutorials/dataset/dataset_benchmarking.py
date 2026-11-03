@@ -53,7 +53,7 @@ dataloader = torch.utils.data.DataLoader(
 batch_gen = iter(dataloader)
 
 t1 = time.time()
-for i in tqdm(range(ITERATIONS)):
+for _i in tqdm(range(ITERATIONS)):
     batch = next(batch_gen)
 t2 = time.time()
 print(f"(iterable_dataset): Time for {ITERATIONS} batches: {t2 - t1:.2f} seconds")
@@ -99,7 +99,7 @@ request.add(labels_key, Coordinate(INPUT_SHAPE) * labels_train.voxel_size)
 request.add(mask_key, Coordinate(2, 2, 2) * labels_train.voxel_size)
 with gp.build(pipeline):
     t1 = time.time()
-    for i in tqdm(range(ITERATIONS)):
+    for _i in tqdm(range(ITERATIONS)):
         batch = pipeline.request_batch(request)
     t2 = time.time()
 print(f"(gunpowder): Time for {ITERATIONS} batches: {t2 - t1:.2f} seconds")
@@ -179,7 +179,7 @@ batch_gen = iter(training_dataloader)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 t1 = time.time()
-for i in tqdm(range(ITERATIONS)):
+for _i in tqdm(range(ITERATIONS)):
     batch = next(batch_gen)
     optimizer.zero_grad()
     inputs, targets = batch["raw"].float(), batch["labels"].float()

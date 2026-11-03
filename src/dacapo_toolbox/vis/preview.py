@@ -312,7 +312,9 @@ def cube(
 
             z, y, x = tuple(
                 range(start, stop, step)
-                for start, stop, step in zip(arr.roi.begin, arr.roi.end, arr.voxel_size)
+                for start, stop, step in zip(
+                    arr.roi.begin, arr.roi.end, arr.voxel_size, strict=False
+                )
             )
 
             def face(high: bool, axis: int) -> Roi:
@@ -531,8 +533,11 @@ def label_meshes(
             continue
         # pad by one voxel so labels touching the box edge close their surface
         start = [max(b.start - 1, 0) for b in box]
-        stop = [min(b.stop + 1, n) for b, n in zip(box, data.shape)]
-        mask = compact[tuple(slice(a, b) for a, b in zip(start, stop))] == index
+        stop = [min(b.stop + 1, n) for b, n in zip(box, data.shape, strict=False)]
+        mask = (
+            compact[tuple(slice(a, b) for a, b in zip(start, stop, strict=False))]
+            == index
+        )
         mask = np.pad(mask, 1)
         verts, faces, _, _ = marching_cubes(
             mask.astype(np.uint8), 0.5, spacing=tuple(spacing)

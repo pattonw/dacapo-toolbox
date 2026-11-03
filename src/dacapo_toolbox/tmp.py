@@ -8,4 +8,4 @@ def int_gcd(a: int, b: int) -> int:
 
 
 def gcd(a: Coordinate[int], b: Coordinate[int]) -> Coordinate[int]:
-    return Coordinate(int_gcd(x, y) for x, y in zip(a, b))
+    return Coordinate(int_gcd(x, y) for x, y in zip(a, b, strict=False))

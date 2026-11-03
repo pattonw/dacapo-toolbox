@@ -39,9 +39,13 @@ def balance_weights(
         slab = error_scale.shape
     else:
         # slab with -1 replaced by shape
-        slab = tuple(m if s == -1 else s for m, s in zip(error_scale.shape, slab))
+        slab = tuple(
+            m if s == -1 else s for m, s in zip(error_scale.shape, slab, strict=False)
+        )
 
-    slab_ranges = (range(0, m, s) for m, s in zip(error_scale.shape, slab))
+    slab_ranges = (
+        range(0, m, s) for m, s in zip(error_scale.shape, slab, strict=False)
+    )
 
     for start in itertools.product(*slab_ranges):
         slices = tuple(slice(start[d], start[d] + slab[d]) for d in range(len(slab)))

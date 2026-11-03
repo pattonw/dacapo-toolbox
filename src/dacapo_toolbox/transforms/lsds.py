@@ -116,7 +116,7 @@ def get_local_shape_descriptors(
 
     sub_shape = segmentation.shape
     sub_voxel_size = tuple(v * df for v in voxel_size)
-    sub_sigma_voxel = tuple(s / v for s, v in zip(sigma, sub_voxel_size))
+    sub_sigma_voxel = tuple(s / v for s, v in zip(sigma, sub_voxel_size, strict=False))
 
     grid = np.meshgrid(
         *[

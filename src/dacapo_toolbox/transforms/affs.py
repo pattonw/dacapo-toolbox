@@ -138,7 +138,7 @@ class Affs(torch.nn.Module):
 
         affs = [
             compute_affs(x, offset, dist_func, pad=self.pad)
-            for offset, dist_func in zip(self.neighborhood, dist_funcs)
+            for offset, dist_func in zip(self.neighborhood, dist_funcs, strict=False)
         ]
         if self.pad:
             out = torch.stack(affs, dim=self.concat_dim)
