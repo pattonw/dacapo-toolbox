@@ -15,6 +15,10 @@ jobs:
         # requires-python floor and newest
         python-version: ["3.11", "3.14"]
         resolution: ["highest", "lowest-direct"]
+        exclude:
+          # lowest-direct on the newest interpreter: the torch 2.7 floor has no 3.14 wheels
+          - python-version: "3.14"
+            resolution: lowest-direct
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
