@@ -66,8 +66,7 @@ def test_graph_cube_writes_an_image(tmp_path, color_by):
         max_nodes=100,
         ax=plt.figure().add_subplot(111, projection="3d"),
     )
-    if color_by is None:
-        assert ax.collections[0].get_offsets().shape[0] == 100
+    assert len(ax.collections[0].get_offsets()) > 0
     # overwrite=False leaves the file alone
     before = out.stat().st_mtime_ns
     graph_cube(graph, Roi((0, 0, 0), (100, 100, 100)), str(out), "x", overwrite=False)
@@ -96,3 +95,67 @@ def test_graph_cube_thins_every_skeleton():
     assert len(points) == 7 * 14
     segments = ax.collections[1]._segments3d
     assert len(segments) == 7 * 13
+
+
+def _draw(graph, max_nodes, color_by=None):
+    return graph_cube(
+        graph,
+        Roi((0, 0, 0), (100, 100, 100)),
+        "unused.png",
+        "x",
+        color_by=color_by,
+        max_nodes=max_nodes,
+        ax=plt.figure().add_subplot(111, projection="3d"),
+    )
+
+
+def test_graph_cube_thins_without_color_by():
+    # thinning follows the edges whether or not nodes are coloured
+    graph = nx.path_graph(120)
+    for i in graph.nodes:
+        graph.nodes[i]["position"] = (float(i), 0.0, 0.0)
+    ax = _draw(graph, max_nodes=40)
+    # stride 3 along a 120-node chain: nodes 0, 3, ..., 117 and the end 119
+    assert len(ax.collections[0].get_offsets()) == 41
+    assert len(ax.collections[1]._segments3d) == 40
+
+
+def test_graph_cube_points_are_sampled_to_max_nodes():
+    graph = nx.Graph()
+    for i in range(300):
+        graph.add_node(i, position=(float(i % 100), float(i // 100), 0.0))
+    ax = _draw(graph, max_nodes=100)
+    assert len(ax.collections[0].get_offsets()) == 100
+
+
+def test_graph_cube_keeps_leaves_and_branch_points():
+    # a star of 30 arms of length 2: every arm end is a leaf and the centre a
+    # branch point, so all 31 survive although they exceed max_nodes
+    graph = nx.Graph()
+    graph.add_node("c", position=(50.0, 50.0, 50.0))
+    for a in range(30):
+        graph.add_node((a, 1), position=(50.0, 50.0 + a, 51.0))
+        graph.add_node((a, 2), position=(50.0, 50.0 + a, 52.0))
+        graph.add_edge("c", (a, 1))
+        graph.add_edge((a, 1), (a, 2))
+    ax = _draw(graph, max_nodes=10)
+    xs = sorted(ax.collections[0]._offsets3d[0])
+    # the plot x axis is the last position component: the centre (x 50) and
+    # every arm end (x 52) are kept
+    assert xs.count(50.0) == 1
+    assert xs.count(52.0) == 30
+
+
+def test_graph_cube_splits_paths_at_nodes_without_position():
+    # a chain whose middle node has no position: both halves are drawn and
+    # no segment jumps across the gap
+    graph = nx.path_graph(41)
+    for i in graph.nodes:
+        if i != 20:
+            graph.nodes[i]["position"] = (0.0, 0.0, float(i))
+    ax = _draw(graph, max_nodes=10)
+    xs = set(ax.collections[0]._offsets3d[0])
+    assert {0.0, 19.0, 21.0, 40.0} <= xs
+    for seg in ax.collections[1]._segments3d:
+        lo, hi = sorted(p[0] for p in seg)
+        assert not (lo < 20 < hi)

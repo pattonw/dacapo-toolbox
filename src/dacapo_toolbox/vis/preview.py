@@ -463,9 +463,13 @@ def cube(
 def _thin_along_edges(graph, nodes: list, stride: int) -> tuple[list, list]:
     """Keep every ``stride``-th node along each path of ``graph`` plus every
     leaf and branch point, joining each kept node to its nearest kept
-    ancestor in a breadth-first tree, so thinned skeletons keep their shape."""
+    ancestor in a breadth-first tree, so thinned skeletons keep their shape.
+
+    Only ``nodes`` take part: the walk runs on the subgraph they induce, so a
+    node left out (one without a position) splits its path in two and its
+    neighbours count as leaves."""
     undirected = graph.to_undirected(as_view=True) if graph.is_directed() else graph
-    allowed = set(nodes)
+    undirected = undirected.subgraph(nodes)
     kept: list = []
     edges: list = []
     seen: set = set()
@@ -480,7 +484,7 @@ def _thin_along_edges(graph, nodes: list, stride: int) -> tuple[list, list]:
             next_frontier = []
             for node, anchor, steps in frontier:
                 for child in undirected.neighbors(node):
-                    if child in seen or child not in allowed:
+                    if child in seen:
                         continue
                     seen.add(child)
                     depth = steps + 1
@@ -539,11 +543,13 @@ def graph_cube(
             draws every node in one colour.
         max_nodes:
             When the graph has more nodes than this, a subset of about this
-            size is drawn. With ``color_by`` every group is kept and thinned
-            along its edges (every n-th node plus leaves and branch points,
-            each joined to its nearest kept ancestor), so all skeletons are
-            drawn with their shape; otherwise random nodes are drawn, with
-            edges only between drawn nodes. Default 50000.
+            size is drawn. A graph with edges is thinned along them: every
+            n-th node plus every leaf and branch point, each joined to its
+            nearest kept ancestor, so every skeleton is drawn with its shape.
+            Leaves and branch points are always kept, so a very branchy graph
+            can still draw more than ``max_nodes``. A graph without edges
+            (points) is subsampled at random to exactly ``max_nodes``.
+            Default 50000.
         draw_edges:
             Whether to draw edges between drawn nodes. Default is True.
         node_size:
@@ -571,9 +577,9 @@ def graph_cube(
     rng = np.random.default_rng(seed)
     edges = list(graph.edges())
     if len(nodes) > max_nodes:
-        if color_by is not None:
-            # Thin every skeleton along its length rather than dropping whole
-            # skeletons, so all of them are drawn with their shape intact.
+        if graph.subgraph(nodes).number_of_edges() > 0:
+            # Thin every skeleton along its length rather than dropping random
+            # nodes, so all of them are drawn with their shape intact.
             nodes, edges = _thin_along_edges(graph, nodes, -(-len(nodes) // max_nodes))
         else:
             chosen = rng.choice(len(nodes), size=max_nodes, replace=False)
