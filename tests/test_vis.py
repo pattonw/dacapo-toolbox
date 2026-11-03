@@ -7,7 +7,14 @@ from funlib.persistence import Array
 
 pytest.importorskip("matplotlib")
 
-from dacapo_toolbox.vis.preview import cube, graph_cube
+from dacapo_toolbox.vis.preview import (
+    _mesh_strides,
+    cube,
+    draw_label_meshes,
+    get_cmap,
+    graph_cube,
+    label_meshes,
+)
 
 
 def test_cube_writes_an_image(tmp_path):
@@ -159,3 +166,49 @@ def test_graph_cube_splits_paths_at_nodes_without_position():
     for seg in ax.collections[1]._segments3d:
         lo, hi = sorted(p[0] for p in seg)
         assert not (lo < 20 < hi)
+
+
+def test_cube_draws_label_meshes(tmp_path):
+    # two boxes in a mostly empty volume, one touching the far end of the
+    # roi: each mesh spans exactly its label's voxels in world units
+    labels = np.zeros((10, 20, 20), dtype=np.uint64)
+    labels[2:5, 3:8, 3:8] = 7
+    labels[5:10, 10:20, 12:20] = 2**40
+    arr = Array(labels, offset=Coordinate(40, 0, 0), voxel_size=Coordinate(4, 2, 2))
+    meshes = label_meshes(arr)
+    assert sorted(label for label, _, _ in meshes) == [7, 2**40]
+    bounds = {7: ((48, 6, 6), (60, 16, 16)), 2**40: ((60, 20, 24), (80, 40, 40))}
+    for label, verts, faces in meshes:
+        assert len(faces)
+        np.testing.assert_allclose(verts.min(axis=0), bounds[label][0])
+        np.testing.assert_allclose(verts.max(axis=0), bounds[label][1])
+    assert bounds[2**40][1] == tuple(arr.roi.end)
+    # a budget smaller than the array strides it, finest axes first
+    assert _mesh_strides(arr, 1000) == (1, 2, 2)
+    out = tmp_path / "mesh.png"
+    cube({"labels": arr}, {"labels": "mesh"}, str(out), "mesh", dpi=40)
+    assert out.exists() and out.stat().st_size > 0
+
+
+def test_mesh_box_is_the_label_roi(monkeypatch):
+    # labels smaller than the raw: the box marks the labels, the axes the union
+    from dacapo_toolbox.vis import preview
+
+    raw = Array(np.zeros((20, 40, 40), np.uint8), voxel_size=Coordinate(4, 2, 2))
+    labels = np.zeros((10, 20, 20), dtype=np.uint32)
+    labels[2:8, 5:15, 5:15] = 3
+    arr = Array(labels, offset=Coordinate(20, 20, 20), voxel_size=Coordinate(4, 2, 2))
+    drawn = []
+    original = preview._draw_cuboid
+    monkeypatch.setattr(
+        preview,
+        "_draw_cuboid",
+        lambda ax, roi, alpha, frame=None: (
+            drawn.append(roi),
+            original(ax, roi, alpha, frame=frame),
+        ),
+    )
+    ax = plt.figure().add_subplot(111, projection="3d")
+    draw_label_meshes(ax, arr, raw.roi.union(arr.roi), get_cmap())
+    assert drawn == [arr.roi]
+    assert ax.get_xlim() == (0, 80) and ax.get_zlim() == (0, 80)
