@@ -119,7 +119,7 @@ class Affs(torch.nn.Module):
             try:
                 dist_iterator = iter(dist_func)  # type: ignore
             except TypeError:
-                raise ValueError(f"Unknown distance function: {dist_func}")
+                raise ValueError(f"Unknown distance function: {dist_func}") from None
             iterable_dist_func = list(dist_iterator)
             if all(isinstance(func, torch.nn.Module) for func in iterable_dist_func):
                 self.dist_func = torch.nn.ModuleList(iterable_dist_func)
@@ -173,6 +173,7 @@ class AffsMask(torch.nn.Module):
         warnings.warn(
             "AffsMask is deprecated, just use Affs with the appropriate distance function to get your mask.",
             DeprecationWarning,
+            stacklevel=2,
         )
 
     def forward(self, mask: torch.Tensor) -> torch.Tensor:

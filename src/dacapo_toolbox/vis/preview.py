@@ -317,14 +317,30 @@ def cube(
                 )
             )
 
-            def face(high: bool, axis: int) -> Roi:
+            def face(
+                high: bool,
+                axis: int,
+                *,
+                lower=lower,
+                upper=upper,
+                shape=shape,
+                slice_thickness=slice_thickness,
+            ) -> Roi:
                 a = Coordinate(axis == 0, axis == 1, axis == 2)
                 b = Coordinate(axis != 0, axis != 1, axis != 2)
                 base = upper if high else lower
                 return Roi(base * a + lower * b, shape * b + slice_thickness * a)
 
             def face_coords(
-                high: bool, axis: int
+                high: bool,
+                axis: int,
+                *,
+                lower=lower,
+                upper=upper,
+                vshape=vshape,
+                z=z,
+                y=y,
+                x=x,
             ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
                 if axis == 0:
                     zz = np.ones((vshape[1], vshape[2])) * (
