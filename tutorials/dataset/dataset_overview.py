@@ -21,12 +21,13 @@
 # %%
 # ## A simple dataset
 
-from dacapo_toolbox.dataset import iterable_dataset
+from pathlib import Path
+
+import matplotlib.pyplot as plt
 from funlib.persistence import Array
 from skimage.data import astronaut
-import matplotlib.pyplot as plt
 
-from pathlib import Path
+from dacapo_toolbox.dataset import iterable_dataset
 
 out_ds = Path("_static/dataset_overview")
 if not out_ds.exists():
@@ -145,8 +146,9 @@ plt.show()
 # we can just use the pixel coordinates. We'll use a simple grid of points as our graph.
 
 # %%
-import networkx as nx
 from itertools import product
+
+import networkx as nx
 
 
 def gen_graphs():
@@ -239,7 +241,6 @@ plt.show()
 
 # %%
 from dacapo_toolbox.dataset import DeformAugmentConfig, SimpleAugmentConfig
-
 
 dataset = iterable_dataset(
     {
@@ -352,19 +353,20 @@ plt.show()
 # has no problem generating samples from a variety of different voxel sizes, different sampling strategies, etc.
 
 # %%
+import numpy as np
+from funlib.persistence import Array
+from skimage import data
+from skimage.measure import label
+from torchvision.transforms import v2 as transforms
+
 from dacapo_toolbox.dataset import (
-    iterable_dataset,
-    SimpleAugmentConfig,
     DeformAugmentConfig,
     MaskedSampling,
     PointSampling,
+    SimpleAugmentConfig,
+    iterable_dataset,
 )
 from dacapo_toolbox.transforms.affs import Affs, AffsMask
-from funlib.persistence import Array
-from skimage import data
-from torchvision.transforms import v2 as transforms
-import numpy as np
-from skimage.measure import label
 
 side_length = 2048
 

@@ -13,12 +13,13 @@ import dask
 
 dask.config.set(scheduler="single-threaded")
 
+import time
+from pathlib import Path
+
 from tqdm import tqdm
 
 # %%
 from dacapo_toolbox.sample_datasets import cremi
-from pathlib import Path
-import time
 
 ITERATIONS = 100
 BATCH_SIZE = 10
@@ -34,8 +35,9 @@ labels_train.lazy_op(lambda x: x / x.max())
 # ## DaCapo-toolbox plain
 
 # %%
-from dacapo_toolbox.dataset import iterable_dataset
 import torch
+
+from dacapo_toolbox.dataset import iterable_dataset
 
 dataset = iterable_dataset(
     datasets={"raw": raw_train, "labels": labels_train},
@@ -60,10 +62,10 @@ print(f"(iterable_dataset): Time for {ITERATIONS} batches: {t2 - t1:.2f} seconds
 # ## gunpowder
 
 # %%
-import gunpowder as gp
-from funlib.persistence import Array
-from funlib.geometry import Coordinate
 import dask.array as da
+import gunpowder as gp
+from funlib.geometry import Coordinate
+from funlib.persistence import Array
 
 raw_key = gp.ArrayKey("RAW")
 labels_key = gp.ArrayKey("LABELS")
@@ -106,8 +108,8 @@ print(f"(gunpowder): Time for {ITERATIONS} batches: {t2 - t1:.2f} seconds")
 # ## dacapo-toolbox with pytorch lightning
 
 # %%
-import torch
 import lightning as L
+import torch
 
 # define any number of nn.Modules (or use your current ones)
 model = torch.nn.Sequential(

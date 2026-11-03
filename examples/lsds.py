@@ -1,15 +1,17 @@
-from dacapo_toolbox.dataset import (
-    iterable_dataset,
-    SimpleAugmentConfig,
-    DeformAugmentConfig,
-)
-from dacapo_toolbox.transforms.lsds import LSD
+import logging
+
+import numpy as np
 from funlib.persistence import Array
 from skimage import data
-from torchvision.transforms import v2 as transforms
-import logging
-import numpy as np
 from skimage.measure import label
+from torchvision.transforms import v2 as transforms
+
+from dacapo_toolbox.dataset import (
+    DeformAugmentConfig,
+    SimpleAugmentConfig,
+    iterable_dataset,
+)
+from dacapo_toolbox.transforms.lsds import LSD
 
 logging.basicConfig(level=logging.DEBUG)
 # logging.getLogger("gunpowder.nodes.random_location").setLevel(logging.DEBUG)

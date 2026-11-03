@@ -1,23 +1,25 @@
+import os
+import tempfile
+from collections.abc import Sequence
+from pathlib import Path
+
+import numpy as np
+from funlib.geometry import Coordinate, Roi
+from volara.blockwise import AffAgglom, ExtractFrags, GraphMWS, Relabel
+from volara.datasets import (
+    Affs as AffsDataset,
+)
+from volara.datasets import (
+    Labels as LabelsDataset,
+)
 from volara.datasets import (
     Raw as RawDataset,
-    Affs as AffsDataset,
-    Labels as LabelsDataset,
 )
 from volara.dbs import SQLite
 from volara.lut import LUT
-from volara.blockwise import ExtractFrags, AffAgglom, GraphMWS, Relabel
+from volara.workers import Worker
 from volara_torch.blockwise import Predict
 from volara_torch.models import TorchModel
-from volara.workers import Worker
-
-from funlib.geometry import Roi, Coordinate
-
-import numpy as np
-
-import os
-from pathlib import Path
-import tempfile
-from collections.abc import Sequence
 
 
 def mutex_pipeline():

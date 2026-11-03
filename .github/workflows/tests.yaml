@@ -1,36 +1,29 @@
-name: Test
-
+name: tests
 on:
-  pull_request:
-    branches:
-      - main
-      - dev/main
   push:
-    branches:
-      - main
-      - dev/main
+    branches: [main]
+  pull_request:
   workflow_dispatch:
-
 jobs:
   test:
-    name: ${{ matrix.platform }} py${{ matrix.python-version }}
-    runs-on: ${{ matrix.platform }}
+    name: py${{ matrix.python-version }} ${{ matrix.resolution }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        # platform: [ubuntu-latest, windows-latest, macos-latest]
-        platform: [ubuntu-latest]
-        python-version: ['3.11', '3.12']
-    timeout-minutes: 20
-
+        # requires-python floor and newest
+        python-version: ["3.11", "3.14"]
+        resolution: ["highest", "lowest-direct"]
+        exclude:
+          # lowest-direct on the newest interpreter: the torch 2.7 floor has no 3.14 wheels
+          - python-version: "3.14"
+            resolution: lowest-direct
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-
-      - name: Test
-        run: uv run --pre --extra vis --python ${{ matrix.python-version }} pytest --color=yes --cov --cov-report=xml --cov-report=term-missing
-      
-      - name: Coverage
-        uses: codecov/codecov-action@v3
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: uv sync --extra vis --resolution ${{ matrix.resolution }}
+      - run: uv run pytest --cov=dacapo_toolbox --cov-report=term-missing --cov-report=xml
+      - uses: codecov/codecov-action@v5

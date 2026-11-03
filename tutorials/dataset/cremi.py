@@ -40,12 +40,13 @@ import dask
 
 dask.config.set(scheduler="single-threaded")
 
-from pathlib import Path
 from functools import partial
+from pathlib import Path
+
+from funlib.geometry import Coordinate, Roi
+from funlib.persistence import Array
 from tqdm import tqdm
 
-from funlib.persistence import Array
-from funlib.geometry import Coordinate, Roi
 from dacapo_toolbox.sample_datasets import cremi
 
 if not Path("_static/cremi").exists():
@@ -75,7 +76,7 @@ large_eval_roi = (
 
 # %%
 
-from dacapo_toolbox.vis.preview import gif_2d, cube
+from dacapo_toolbox.vis.preview import cube, gif_2d
 
 # %%
 
@@ -132,9 +133,9 @@ cube(
 
 # %%
 from dacapo_toolbox.dataset import (
-    iterable_dataset,
     DeformAugmentConfig,
     SimpleAugmentConfig,
+    iterable_dataset,
 )
 
 # %%
@@ -194,9 +195,9 @@ cube(
 # Next we will define the task that encapsulates this process.
 
 # %%
-from dacapo_toolbox.transforms.affs import Affs, AffsMask
-from dacapo_toolbox.transforms.weight_balancing import BalanceLabels
 import torchvision
+
+from dacapo_toolbox.transforms.affs import Affs, AffsMask
 
 neighborhood = [
     (1, 0, 0),
@@ -293,7 +294,6 @@ cube(
 import tems
 import torch
 
-
 if torch.cuda.is_available():
     device = torch.device("cuda")
 elif torch.backends.mps.is_available():
@@ -320,6 +320,7 @@ unet = tems.UNet.funlib_api(
     ],
     activation="LeakyReLU",
 )
+
 
 # Small sigmoid wrapper to apply sigmoid only when not training
 # this is because training BCEWithLogitsLoss is more stable
@@ -419,8 +420,8 @@ plt.close()
 
 # %%
 import mwatershed as mws
-from funlib.geometry import Roi
 import numpy as np
+from funlib.geometry import Roi
 
 module = module.eval()
 unet = unet.eval()
@@ -496,9 +497,9 @@ cube(
 # module to wrap our trained model and use it in a blockwise pipeline.
 
 # %%
-from dacapo_toolbox.postprocessing import blockwise_predict_mutex
 from volara.workers import LocalWorker
 
+from dacapo_toolbox.postprocessing import blockwise_predict_mutex
 
 unet = unet.eval()
 scripted_unet = torch.jit.script(module)
