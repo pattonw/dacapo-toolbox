@@ -520,7 +520,13 @@ def label_meshes(
     # find_objects numbers from 1, so label ids[i] becomes i + 1
     compact = compact.reshape(data.shape) + 1
     spacing = np.array(arr.voxel_size, dtype=np.float64) * strides
-    offset = np.array(arr.roi.offset, dtype=np.float64)
+    # a voxel's value sits at its centre, so sample i (original voxel i * s)
+    # is at roi.offset + (i * s + 1/2) * voxel_size; the 0.5 iso-surface then
+    # falls on voxel boundaries rather than half a voxel short of them
+    offset = (
+        np.array(arr.roi.offset, dtype=np.float64)
+        + np.array(arr.voxel_size, dtype=np.float64) / 2
+    )
     meshes = []
     for index, box in enumerate(ndimage.find_objects(compact), start=1):
         if box is None or ids[index - 1] == 0:

@@ -169,17 +169,20 @@ def test_graph_cube_splits_paths_at_nodes_without_position():
 
 
 def test_cube_draws_label_meshes(tmp_path):
-    # two boxes in a mostly empty volume: one mesh each, inside the roi
+    # two boxes in a mostly empty volume, one touching the far end of the
+    # roi: each mesh spans exactly its label's voxels in world units
     labels = np.zeros((10, 20, 20), dtype=np.uint64)
     labels[2:5, 3:8, 3:8] = 7
-    labels[5:9, 10:18, 12:19] = 2**40
+    labels[5:10, 10:20, 12:20] = 2**40
     arr = Array(labels, offset=Coordinate(40, 0, 0), voxel_size=Coordinate(4, 2, 2))
     meshes = label_meshes(arr)
     assert sorted(label for label, _, _ in meshes) == [7, 2**40]
-    for _, verts, faces in meshes:
+    bounds = {7: ((48, 6, 6), (60, 16, 16)), 2**40: ((60, 20, 24), (80, 40, 40))}
+    for label, verts, faces in meshes:
         assert len(faces)
-        assert (verts >= np.array(arr.roi.begin) - 4).all()
-        assert (verts <= np.array(arr.roi.end) + 4).all()
+        np.testing.assert_allclose(verts.min(axis=0), bounds[label][0])
+        np.testing.assert_allclose(verts.max(axis=0), bounds[label][1])
+    assert bounds[2**40][1] == tuple(arr.roi.end)
     # a budget smaller than the array strides it, finest axes first
     assert _mesh_strides(arr, 1000) == (1, 2, 2)
     out = tmp_path / "mesh.png"
