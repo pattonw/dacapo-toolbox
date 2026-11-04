@@ -22,6 +22,11 @@ accelerators = ["accelerate>=1.10.0", "lightning>=2.5.3"]
 sample-datasets = ["wget>=3.2"]
 examples = ["torchvision>=0.22.0"]
 
+[project.urls]
+Documentation = "https://pattonw.github.io/dacapo-toolbox"
+Source = "https://github.com/pattonw/dacapo-toolbox"
+Issues = "https://github.com/pattonw/dacapo-toolbox/issues"
+
 [dependency-groups]
 # Installed by `uv sync` (PEP 735); not part of the published package.
 # ruff and ty are pinned with == until uv.lock is committed: both change
@@ -31,7 +36,7 @@ dev = [
     "pytest-cov>=6.0.0",
     "ruff==0.17.3",
     "pytest-xdist>=3.6.1",
-    "ty==0.0.96",
+    "ty>=0.0.96",
 ]
 docs = [
     "h5py>=3.13.0",
