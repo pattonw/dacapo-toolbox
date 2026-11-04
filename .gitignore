@@ -9,7 +9,6 @@ tutorials/**/_static
 *.jpg
 .coverage
 coverage.xml
-uv.lock
 .vscode
 build
 volara_logs
