@@ -1,6 +1,6 @@
 import functools
 import logging
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 
 import numpy as np
 import torch
@@ -56,7 +56,7 @@ def get_local_shape_descriptors(
     segmentation: np.ndarray,
     sigma: float | Sequence[float],
     voxel_size: Sequence[int] | None = None,
-    labels: Sequence[int] | None = None,
+    labels: Iterable[int] | None = None,
     downsample: int = 1,
 ):
     """

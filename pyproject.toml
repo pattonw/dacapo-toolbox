@@ -55,6 +55,19 @@ docs = [
 [tool.setuptools.package-data]
 "dacapo_toolbox" = ["py.typed"]
 
+[tool.ty.src]
+include = ["src", "tests"]
+exclude = []  # only ever shrinks
+
+[tool.ty.rules]
+# torch.nn.Module declares `forward` as a Callable attribute; overriding it with a
+# def trips invalid-mutable-override on every module. Recorded as a warning.
+invalid-mutable-override = "warn"
+
+[tool.ty.terminal]
+# warn-level rules are recorded counters, not failures
+error-on-warning = false
+
 [tool.ruff]
 line-length = 88
 extend-exclude = ["docs/build"]

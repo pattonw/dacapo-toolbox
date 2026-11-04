@@ -11,6 +11,9 @@ from sklearn.decomposition import PCA
 
 SKIP_PLOTS = True
 
+# Per array: the six face images and the (xx, yy, zz) grids they are drawn on.
+FaceData = tuple[list[np.ndarray], list[tuple[np.ndarray, np.ndarray, np.ndarray]]]
+
 
 def pca_nd(emb: Array, n_components: int = 3) -> Array:
     emb_data = emb[:]
@@ -294,10 +297,8 @@ def cube(
 
     lightsource = mcolors.LightSource(azdeg=light_azdeg, altdeg=light_altdeg)
 
-    def read_faces(
-        arrays: dict[str, Array],
-    ) -> dict[str, tuple[list[np.ndarray], list[np.ndarray]]]:
-        faces = {}
+    def read_faces(arrays: dict[str, Array]) -> dict[str, FaceData]:
+        faces: dict[str, FaceData] = {}
         for name, arr in arrays.items():
             if array_types[name] == "mesh":
                 continue
@@ -373,7 +374,7 @@ def cube(
 
     faces = read_faces(arrays)
 
-    transformed_faces = {}
+    transformed_faces: dict[str, FaceData] = {}
     for key, (face_data, face_coords) in faces.items():
         if array_types[key] == "pca":
             transformed_faces[key] = (pca_nd_faces(face_data), face_coords)
@@ -407,15 +408,17 @@ def cube(
 
     label_cmap = get_cmap()
     if cmap is not None:
+        cmap_colors = np.asarray(cmap.colors)
+        label_cmap_colors = np.asarray(label_cmap.colors)
         label_cmap = ListedColormap(
             np.concatenate(
-                (cmap.colors, label_cmap.colors[: -len(cmap.colors)]), axis=0
+                (cmap_colors, label_cmap_colors[: -len(cmap_colors)]), axis=0
             )
         )
 
     def draw_cube(
         ax,
-        faces: tuple[list[np.ndarray], list[tuple[np.ndarray, np.ndarray, np.ndarray]]],
+        faces: FaceData,
         roi: Roi,
         cmap=None,
         interpolation=None,
@@ -482,7 +485,7 @@ def cube(
             )
         elif array_types[key] == "raw" or array_types[key] == "pca":
             if face_colors[0].ndim == 2:
-                draw_cube(ax, face_data, roi=total_roi, cmap=cm.gray)  # type: ignore
+                draw_cube(ax, face_data, roi=total_roi, cmap=cm.gray)
             elif face_colors[0].ndim == 3:
                 draw_cube(ax, face_data, roi=total_roi)
         elif array_types[key] == "affs":

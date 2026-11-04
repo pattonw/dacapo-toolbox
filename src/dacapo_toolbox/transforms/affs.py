@@ -117,14 +117,16 @@ class Affs(torch.nn.Module):
             self.dist_func = dist_func
         else:
             try:
-                dist_iterator = iter(dist_func)  # type: ignore
+                dist_iterator = iter(dist_func)
             except TypeError:
                 raise ValueError(f"Unknown distance function: {dist_func}") from None
             iterable_dist_func = list(dist_iterator)
-            if all(isinstance(func, torch.nn.Module) for func in iterable_dist_func):
-                self.dist_func = torch.nn.ModuleList(iterable_dist_func)
-            elif all(callable(func) for func in iterable_dist_func):
-                self.dist_func = iterable_dist_func
+            modules = [f for f in iterable_dist_func if isinstance(f, torch.nn.Module)]
+            callables = [f for f in iterable_dist_func if callable(f)]
+            if len(modules) == len(iterable_dist_func):
+                self.dist_func = torch.nn.ModuleList(modules)
+            elif len(callables) == len(iterable_dist_func):
+                self.dist_func = callables
             else:
                 raise ValueError(f"Unknown distance function: {dist_func}")
 

@@ -4,6 +4,7 @@ import random
 import time
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from typing import Any, TypeVar
 
 import dask.array as da
 import gunpowder as gp
@@ -69,7 +70,7 @@ class PipelineDataset(torch.utils.data.IterableDataset):
         self,
         pipeline: gp.Pipeline,
         request: gp.BatchRequest,
-        keys: list[gp.ArrayKey],
+        keys: list[gp.ArrayKey | gp.GraphKey],
         transforms: dict[
             str | tuple[str | tuple[str, ...], str | tuple[str, ...]], Callable
         ]
@@ -87,7 +88,7 @@ class PipelineDataset(torch.utils.data.IterableDataset):
             batch_request._random_seed = random.randint(0, 2**32 - 1)
             batch = self.pipeline.request_batch(batch_request)
             # TODO: Throw warning on incorrect byteorder!
-            torch_batch = {
+            torch_batch: dict[str, Any] = {
                 str(key): torch.from_numpy(
                     batch[key]
                     .data.astype(batch[key].data.dtype.newbyteorder("="))
@@ -239,6 +240,13 @@ class PointSampling:
     sample_points_key: str
 
 
+T = TypeVar("T")
+
+
+def _as_list(values: Sequence[T] | None) -> list[T] | None:
+    return None if values is None else list(values)
+
+
 def iterable_dataset(
     datasets: dict[str, Array | nx.Graph | Sequence[Array] | Sequence[nx.Graph]],
     shapes: dict[str, Sequence[int]],
@@ -321,7 +329,7 @@ def iterable_dataset(
         interpolatable = {}
 
     # convert single arrays to lists
-    datasets: dict[str, list[Array] | list[nx.Graph]] = {
+    datasets: dict[str, list[Array | nx.Graph]] = {
         name: [ds] if isinstance(ds, (Array, nx.Graph)) else list(ds)
         for name, ds in datasets.items()
     }
@@ -350,30 +358,35 @@ def iterable_dataset(
 
     # check that for each key, all arrays have the same voxel size when scaled
     # by the crop scale
-    assert all(
-        functools.reduce(
-            lambda x, y: x * 0 if x != y else x,
-            [
-                array.voxel_size / scale
-                for array, scale in zip(datasets[key], crops_scale, strict=False)
-                if isinstance(array, Array)
-            ],
+    for key_datasets in datasets.values():
+        first = key_datasets[0]
+        if not isinstance(first, Array):
+            continue
+        assert (
+            functools.reduce(
+                lambda x, y: x * 0 if x != y else x,
+                [
+                    array.voxel_size / scale
+                    for array, scale in zip(key_datasets, crops_scale, strict=False)
+                    if isinstance(array, Array)
+                ],
+            )
+            == first.voxel_size / crops_scale[0]
         )
-        == datasets[key][0].voxel_size / crops_scale[0]
-        for key in datasets
-        if isinstance(datasets[key][0], Array)
-    )
 
+    crop_strategies: list[MaskedSampling | PointSampling | None]
     if isinstance(sampling_strategies, (MaskedSampling, PointSampling)):
-        sampling_strategies = [sampling_strategies] * len(crops_datasets)
+        crop_strategies = [sampling_strategies] * len(crops_datasets)
     elif sampling_strategies is None:
-        sampling_strategies = [None] * len(crops_datasets)
+        crop_strategies = [None] * len(crops_datasets)
+    else:
+        crop_strategies = list(sampling_strategies)
 
     # Get source nodes
     dataset_sources = []
 
     for crop_datasets, crop_scale, sampling_strategy in zip(
-        crops_datasets, crops_scale, sampling_strategies, strict=False
+        crops_datasets, crops_scale, crop_strategies, strict=False
     ):
         crop_arrays = [array for array in crop_datasets if isinstance(array, Array)]
 
@@ -493,11 +506,15 @@ def iterable_dataset(
     pipeline = tuple(dataset_sources) + gp.RandomProvider(weights)
 
     if simple_augment_config is not None:
+        # gunpowder annotates these as lists; copy any sequence into one.
+        transpose_probs = simple_augment_config.transpose_probs
         pipeline += gp.SimpleAugment(
-            mirror_only=simple_augment_config.mirror_only,
-            transpose_only=simple_augment_config.transpose_only,
-            mirror_probs=simple_augment_config.mirror_probs,
-            transpose_probs=simple_augment_config.transpose_probs,
+            mirror_only=_as_list(simple_augment_config.mirror_only),
+            transpose_only=_as_list(simple_augment_config.transpose_only),
+            mirror_probs=_as_list(simple_augment_config.mirror_probs),
+            transpose_probs=transpose_probs
+            if transpose_probs is None or isinstance(transpose_probs, dict)
+            else list(transpose_probs),
             p=simple_augment_config.p,
         )
     if deform_augment_config is not None:
@@ -530,9 +547,9 @@ def iterable_dataset(
         assert data_shape is not None, (
             f"Shape for key {key} not provided. Please provide a shape for all keys."
         )
-        request.add(
-            key, Coordinate(data_shape) * datasets[str(key)][0].voxel_size / crop_scale
-        )
+        first = datasets[str(key)][0]
+        assert isinstance(first, Array)
+        request.add(key, Coordinate(data_shape) * first.voxel_size / crop_scale)
     for key in graph_keys:
         data_shape = shapes.get(str(key), None)
         assert data_shape is not None, (
