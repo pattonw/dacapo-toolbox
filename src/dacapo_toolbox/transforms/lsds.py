@@ -1,6 +1,6 @@
 import functools
 import logging
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 
 import numpy as np
 import torch
@@ -56,7 +56,7 @@ def get_local_shape_descriptors(
     segmentation: np.ndarray,
     sigma: float | Sequence[float],
     voxel_size: Sequence[int] | None = None,
-    labels: Sequence[int] | None = None,
+    labels: Iterable[int] | None = None,
     downsample: int = 1,
 ):
     """
@@ -116,7 +116,7 @@ def get_local_shape_descriptors(
 
     sub_shape = segmentation.shape
     sub_voxel_size = tuple(v * df for v in voxel_size)
-    sub_sigma_voxel = tuple(s / v for s, v in zip(sigma, sub_voxel_size))
+    sub_sigma_voxel = tuple(s / v for s, v in zip(sigma, sub_voxel_size, strict=False))
 
     grid = np.meshgrid(
         *[

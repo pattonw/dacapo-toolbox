@@ -34,19 +34,19 @@ def blockwise_mutex(
 
 
 def blockwise_predict_mutex(
-    raw_store: str | bytes | os.PathLike,
-    labels_store: str | bytes | os.PathLike,
+    raw_store: str | os.PathLike[str],
+    labels_store: str | os.PathLike[str],
     neighborhood: list[tuple[int, int, int]],
     blocksize: Sequence[int],
-    model_path: str | bytes | os.PathLike,
+    model_path: str | os.PathLike[str],
     in_channels: int,
     model_context: Sequence[int],
     roi: Roi | None = None,
-    affs_store: str | bytes | os.PathLike | None = None,
-    frags_store: str | bytes | os.PathLike | None = None,
-    sqlite_db_path: str | bytes | os.PathLike | None = None,
-    lut_path: str | bytes | os.PathLike | None = None,
-    weights_path: str | bytes | os.PathLike | None = None,
+    affs_store: str | os.PathLike[str] | None = None,
+    frags_store: str | os.PathLike[str] | None = None,
+    sqlite_db_path: str | os.PathLike[str] | None = None,
+    lut_path: str | os.PathLike[str] | None = None,
+    weights_path: str | os.PathLike[str] | None = None,
     drop: bool = True,
     predict_worker: Worker | None = None,
     extract_frag_bias: Sequence[float] | None = None,
@@ -76,27 +76,27 @@ def blockwise_predict_mutex(
 
     Parameters
     ----------
-    raw_store : str | bytes | os.PathLike
+    raw_store : str | os.PathLike[str]
         Path to the raw data store.
-    labels_store : str | bytes | os.PathLike
+    labels_store : str | os.PathLike[str]
         Path to the labels store.
     neighborhood : list[tuple[int, int, int]]
         List of tuples defining the neighborhood for affinity prediction.
     blocksize : Coordinate
         The size of the blocks to process.
-    model_path : str | bytes | os.PathLike
+    model_path : str | os.PathLike[str]
         Path to save the trained model.
     roi : Roi | None, optional
         Region of interest to process. If `None`, the entire dataset is processed.
-    affs_store : str | bytes | os.PathLike | None, optional
+    affs_store : str | os.PathLike[str] | None, optional
         Path to save the predicted affinities. If `None`, a temporary directory is used.
-    frags_store : str | bytes | os.PathLike | None, optional
+    frags_store : str | os.PathLike[str] | None, optional
         Path to save the extracted fragments. If `None`, a temporary directory is used.
-    sqlite_db_path : str | bytes | os.PathLike | None, optional
+    sqlite_db_path : str | os.PathLike[str] | None, optional
         Path to save the SQLite database for fragments. If `None`, a temporary directory is used.
-    lut_path : str | bytes | os.PathLike | None, optional
+    lut_path : str | os.PathLike[str] | None, optional
         Path to save the LUT for segment IDs. If `None`, a temporary directory is used.
-    weights_path : str | bytes | os.PathLike | None, optional
+    weights_path : str | os.PathLike[str] | None, optional
         Path from which to load the model state dict. If `None` it is assumed that the model
         loaded from `model_path` is already initialized with the desired weights.
     drop : bool, optional
@@ -229,7 +229,7 @@ def blockwise_predict_mutex(
             min_bias: float = -0.7
             max_bias: float = -0.3
 
-            extract_frag_bias: list[float] = np.interp(  # type: ignore
+            extract_frag_bias: list[float] = np.interp(
                 neighborhood_log_distances,
                 [log_min_dist, log_max_dist],
                 [min_bias, max_bias],
@@ -255,7 +255,10 @@ def blockwise_predict_mutex(
             frags_data=frags_dataset,
             block_size=blocksize,
             context=neighborhood_context,
-            scores={name: coords for name, coords in zip(edge_names, edge_coords)},
+            scores={
+                name: coords
+                for name, coords in zip(edge_names, edge_coords, strict=False)
+            },
             roi=roi,
             num_workers=num_aff_agglom_workers,
             worker_config=aff_agglom_worker,
@@ -263,7 +266,10 @@ def blockwise_predict_mutex(
         graph_mws = GraphMWS(
             db=frag_db,
             lut=segment_lut,
-            weights={name: (1, bias) for name, bias in zip(edge_names, edge_biases)},
+            weights={
+                name: (1, bias)
+                for name, bias in zip(edge_names, edge_biases, strict=False)
+            },
             roi=roi or raw_dataset.array("r").roi,
             worker_config=graph_mws_worker,
         )

@@ -15,7 +15,6 @@ dependencies = [
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
-
 [project.optional-dependencies]
 postprocessing = ["volara-torch>=1.0.1", "volara>=1.0.2"]
 vis = ["matplotlib>=3.10.5", "scikit-image>=0.24", "scipy>=1.13"]
@@ -53,9 +52,31 @@ docs = [
     "myst-parser>=4.0",
 ]
 
-
 [tool.setuptools.package-data]
 "dacapo_toolbox" = ["py.typed"]
 
+[tool.ty.src]
+include = ["src", "tests"]
+exclude = []  # only ever shrinks
+
+[tool.ty.rules]
+# torch.nn.Module declares `forward` as a Callable attribute; overriding it with a
+# def trips invalid-mutable-override on every module. Recorded as a warning.
+invalid-mutable-override = "warn"
+
+[tool.ty.terminal]
+# warn-level rules are recorded counters, not failures
+error-on-warning = false
+
+[tool.ruff]
+line-length = 88
+extend-exclude = ["docs/build"]
+
 [tool.ruff.lint]
-per-file-ignores = { "tutorials/*.py" = ["E402"] }
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501"]  # the formatter owns line length
+
+[tool.ruff.lint.per-file-ignores]
+"tutorials/**/*.py" = ["E402"]  # jupytext cells import mid-file
+"examples/**/*.py" = ["E402"]
+"__init__.py" = ["F401"]  # re-exports

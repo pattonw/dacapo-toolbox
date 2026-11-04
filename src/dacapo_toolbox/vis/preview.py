@@ -11,6 +11,9 @@ from sklearn.decomposition import PCA
 
 SKIP_PLOTS = True
 
+# Per array: the six face images and the (xx, yy, zz) grids they are drawn on.
+FaceData = tuple[list[np.ndarray], list[tuple[np.ndarray, np.ndarray, np.ndarray]]]
+
 
 def pca_nd(emb: Array, n_components: int = 3) -> Array:
     emb_data = emb[:]
@@ -294,10 +297,8 @@ def cube(
 
     lightsource = mcolors.LightSource(azdeg=light_azdeg, altdeg=light_altdeg)
 
-    def read_faces(
-        arrays: dict[str, Array],
-    ) -> dict[str, tuple[list[np.ndarray], list[np.ndarray]]]:
-        faces = {}
+    def read_faces(arrays: dict[str, Array]) -> dict[str, FaceData]:
+        faces: dict[str, FaceData] = {}
         for name, arr in arrays.items():
             if array_types[name] == "mesh":
                 continue
@@ -312,17 +313,35 @@ def cube(
 
             z, y, x = tuple(
                 range(start, stop, step)
-                for start, stop, step in zip(arr.roi.begin, arr.roi.end, arr.voxel_size)
+                for start, stop, step in zip(
+                    arr.roi.begin, arr.roi.end, arr.voxel_size, strict=False
+                )
             )
 
-            def face(high: bool, axis: int) -> Roi:
+            def face(
+                high: bool,
+                axis: int,
+                *,
+                lower=lower,
+                upper=upper,
+                shape=shape,
+                slice_thickness=slice_thickness,
+            ) -> Roi:
                 a = Coordinate(axis == 0, axis == 1, axis == 2)
                 b = Coordinate(axis != 0, axis != 1, axis != 2)
                 base = upper if high else lower
                 return Roi(base * a + lower * b, shape * b + slice_thickness * a)
 
             def face_coords(
-                high: bool, axis: int
+                high: bool,
+                axis: int,
+                *,
+                lower=lower,
+                upper=upper,
+                vshape=vshape,
+                z=z,
+                y=y,
+                x=x,
             ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
                 if axis == 0:
                     zz = np.ones((vshape[1], vshape[2])) * (
@@ -355,7 +374,7 @@ def cube(
 
     faces = read_faces(arrays)
 
-    transformed_faces = {}
+    transformed_faces: dict[str, FaceData] = {}
     for key, (face_data, face_coords) in faces.items():
         if array_types[key] == "pca":
             transformed_faces[key] = (pca_nd_faces(face_data), face_coords)
@@ -389,15 +408,17 @@ def cube(
 
     label_cmap = get_cmap()
     if cmap is not None:
+        cmap_colors = np.asarray(cmap.colors)
+        label_cmap_colors = np.asarray(label_cmap.colors)
         label_cmap = ListedColormap(
             np.concatenate(
-                (cmap.colors, label_cmap.colors[: -len(cmap.colors)]), axis=0
+                (cmap_colors, label_cmap_colors[: -len(cmap_colors)]), axis=0
             )
         )
 
     def draw_cube(
         ax,
-        faces: tuple[list[np.ndarray], list[tuple[np.ndarray, np.ndarray, np.ndarray]]],
+        faces: FaceData,
         roi: Roi,
         cmap=None,
         interpolation=None,
@@ -464,7 +485,7 @@ def cube(
             )
         elif array_types[key] == "raw" or array_types[key] == "pca":
             if face_colors[0].ndim == 2:
-                draw_cube(ax, face_data, roi=total_roi, cmap=cm.gray)  # type: ignore
+                draw_cube(ax, face_data, roi=total_roi, cmap=cm.gray)
             elif face_colors[0].ndim == 3:
                 draw_cube(ax, face_data, roi=total_roi)
         elif array_types[key] == "affs":
@@ -531,8 +552,11 @@ def label_meshes(
             continue
         # pad by one voxel so labels touching the box edge close their surface
         start = [max(b.start - 1, 0) for b in box]
-        stop = [min(b.stop + 1, n) for b, n in zip(box, data.shape)]
-        mask = compact[tuple(slice(a, b) for a, b in zip(start, stop))] == index
+        stop = [min(b.stop + 1, n) for b, n in zip(box, data.shape, strict=False)]
+        mask = (
+            compact[tuple(slice(a, b) for a, b in zip(start, stop, strict=False))]
+            == index
+        )
         mask = np.pad(mask, 1)
         verts, faces, _, _ = marching_cubes(
             mask.astype(np.uint8), 0.5, spacing=tuple(spacing)
