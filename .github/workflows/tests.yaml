@@ -25,5 +25,5 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: uv sync --extra vis --resolution ${{ matrix.resolution }}
-      - run: uv run pytest --cov=dacapo_toolbox --cov-report=term-missing --cov-report=xml
+      - run: uv run pytest --cov --cov-report=term-missing --cov-report=xml
       - uses: codecov/codecov-action@v5
