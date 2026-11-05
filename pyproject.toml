@@ -85,6 +85,9 @@ ignore = ["E501"]  # the formatter owns line length
 "examples/**/*.py" = ["E402"]
 "__init__.py" = ["F401"]  # re-exports
 
+[tool.pytest.ini_options]
+addopts = "--cov --cov-report=term-missing"
+
 [tool.coverage.run]
 branch = true
 source = ["dacapo_toolbox"]
