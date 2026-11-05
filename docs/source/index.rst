@@ -10,6 +10,7 @@
    overview
    install
    api
+   benchmarks
    tutorials/dataset/dataset_overview
    tutorials/dataset/cremi
 

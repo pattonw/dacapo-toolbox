@@ -60,7 +60,7 @@ docs = [
 "dacapo_toolbox" = ["py.typed"]
 
 [tool.ty.src]
-include = ["src", "tests"]
+include = ["src", "tests", "benchmarks"]
 exclude = []  # only ever shrinks
 
 [tool.ty.rules]
