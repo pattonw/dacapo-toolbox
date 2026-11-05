@@ -14,3 +14,4 @@ build
 volara_logs
 lightning_logs
 *.ipynb
+benchmarks/output.json

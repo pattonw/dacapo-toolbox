@@ -4,7 +4,7 @@ import random
 import time
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from typing import Any, TypeVar
+from typing import Any
 
 import dask.array as da
 import gunpowder as gp
@@ -240,10 +240,7 @@ class PointSampling:
     sample_points_key: str
 
 
-T = TypeVar("T")
-
-
-def _as_list(values: Sequence[T] | None) -> list[T] | None:
+def _as_list[T](values: Sequence[T] | None) -> list[T] | None:
     return None if values is None else list(values)
 
 

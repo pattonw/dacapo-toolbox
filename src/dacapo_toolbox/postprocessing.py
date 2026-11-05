@@ -18,8 +18,8 @@ from volara.datasets import (
 from volara.dbs import SQLite
 from volara.lut import LUT
 from volara.workers import Worker
-from volara_torch.blockwise import Predict
-from volara_torch.models import TorchModel
+from volara_ml.blockwise import Predict
+from volara_ml.models import TorchModel
 
 
 def mutex_pipeline():
