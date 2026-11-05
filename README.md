@@ -36,7 +36,7 @@ The commands below are the ones CI runs, so a green local run means a green PR.
 ```bash
 git clone https://github.com/pattonw/dacapo-toolbox
 cd dacapo-toolbox
-uv sync --extra vis                                 # dev tools + the extras the tests use (from uv.lock)
+uv sync --extra vis --extra postprocessing          # dev tools + the extras the tests use (from uv.lock)
 uv run pytest                                       # tests with coverage
 uv run pytest --no-cov tests/<file>.py              # one file, without the coverage floor
 uv run ruff check . && uv run ruff format --check . # lint and formatting

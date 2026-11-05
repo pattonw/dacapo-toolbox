@@ -493,7 +493,7 @@ cube(
 # ## Blockwise Processing
 # Now that we have a trained model, we can use it to process the full volume.
 # We will use the `volara` library to do this. It provides a simple interface
-# for blockwise processing of large volumes. We will use the `volara_torch`
+# for blockwise processing of large volumes. We will use the `volara_ml`
 # module to wrap our trained model and use it in a blockwise pipeline.
 
 # %%

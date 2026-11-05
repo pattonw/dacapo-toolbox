@@ -13,17 +13,21 @@ jobs:
       fail-fast: false
       matrix:
         # requires-python floor and newest
-        python-version: ["3.11", "3.14"]
+        python-version: ["3.12", "3.14"]
         resolution: ["highest", "lowest-direct"]
         exclude:
-          # lowest-direct on the newest interpreter: the torch 2.7 floor has no 3.14 wheels
+          # lowest-direct on the newest interpreter: the torch 2.6 floor has no 3.14 wheels
           - python-version: "3.14"
             resolution: lowest-direct
+        include:
+          # the postprocessing extra pulls in numba, whose locked version has no 3.14 wheel
+          - python-version: "3.12"
+            extras: --extra postprocessing
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python-version }}
-      - run: uv sync --extra vis --resolution ${{ matrix.resolution }}
+      - run: uv sync --extra vis ${{ matrix.extras }} --resolution ${{ matrix.resolution }}
       - run: uv run pytest --cov-report=xml
       - uses: codecov/codecov-action@v5

@@ -3,11 +3,11 @@ name = "dacapo-toolbox"
 version = "1.0.0"
 description = "A suite of tools for large scale ND training."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "edt>=3.0.0",
-    "funlib-persistence>=0.6",
-    "gunpowder>=1.4.2",
+    "funlib-persistence>=0.8.1",
+    "gunpowder>=1.5.0",
     "scikit-learn>=1.7.1",
     "torch>=2.6.0",
 ]
@@ -16,7 +16,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project.optional-dependencies]
-postprocessing = ["volara-torch>=1.0.1", "volara>=1.0.2"]
+postprocessing = ["volara>=2.0.1", "volara-ml[torch]>=1.2.0"]
 vis = ["matplotlib>=3.10.5", "scikit-image>=0.24", "scipy>=1.13"]
 accelerators = ["accelerate>=1.10.0", "lightning>=2.5.3"]
 sample-datasets = ["wget>=3.2"]
@@ -44,8 +44,8 @@ docs = [
     "mwatershed>=0.5.3",
     "tems>=1.0.3",
     "torchvision>=0.22.0",
-    "volara>=1.0.1",
-    "volara-torch>=1.0.0",
+    "volara>=2.0.1",
+    "volara-ml[torch]>=1.2.0",
     "wget>=3.2",
     "jupytext>=1.17.2",
     "sphinx-autodoc-typehints>=2.0",
