@@ -16,7 +16,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project.optional-dependencies]
-postprocessing = ["volara>=2.0.1", "volara-ml[torch]>=1.2.0"]
+postprocessing = ["volara>=2.1.1", "volara-ml[torch]>=1.2.0"]
 vis = ["matplotlib>=3.10.5", "scikit-image>=0.24", "scipy>=1.13"]
 accelerators = ["accelerate>=1.10.0", "lightning>=2.5.3"]
 sample-datasets = ["wget>=3.2"]
@@ -44,7 +44,7 @@ docs = [
     "mwatershed>=0.5.3",
     "tems>=1.0.3",
     "torchvision>=0.22.0",
-    "volara>=2.0.1",
+    "volara>=2.1.1",
     "volara-ml[torch]>=1.2.0",
     "wget>=3.2",
     "jupytext>=1.17.2",
