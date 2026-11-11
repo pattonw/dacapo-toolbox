@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793849938369,
+  "lastUpdate": 1794425587573,
   "repoUrl": "https://github.com/pattonw/dacapo-toolbox",
   "entries": {
     "dacapo-toolbox": [
@@ -33,6 +33,41 @@ window.BENCHMARK_DATA = {
           {
             "name": "pytest wall time",
             "value": 53.625,
+            "unit": "s",
+            "extra": "`uv run pytest --cov-report=xml` in the tests job"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "William Patton",
+            "username": "pattonw",
+            "email": "wllmpttn24@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "c3073c36dada8e1c5f4a0ead6df9430ba9941673",
+          "message": "Deploy docs on version tags and by hand only (#12)\n\n* Deploy docs on version tags and by hand only\n\nThe docs workflow now runs on a v* tag push and on workflow_dispatch, and\nnot on every push or pull request commit. A tag or a manual run on main\ndeploys; a manual run on any other branch builds without deploying, which\nis how a pull request's docs are checked once it is ready to merge.\n\nCo-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>\n\n* Draw the benchmark charts on pages that load require.js\n\nThe notebook extension puts require.js on the docs pages. With an AMD\nloader present, the Chart.js bundle registers as an AMD module and never\nsets the global Chart, so the benchmarks page stayed empty although the\ndata was deployed. Hide define while Chart.js loads and restore it after.\n\nCo-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>\n\n* Run the lowest-direct test leg against the declared floors\n\nThe resolution mode was passed to `uv sync` only. The next step, a plain\n`uv run pytest`, saw a lockfile written in another mode, re-resolved to the\nnewest versions and replaced the environment, so the leg named\nlowest-direct tested unlocked newest versions instead. The mode is now set\nonce as UV_RESOLUTION for the whole job.\n\nCo-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>\n\n* Depend on volara 2.1.1\n\nvolara 2.1.1 excludes cloud-volume 12.16.0, which fails at import without\ncrackle-codec, and loads cloud-volume only on first use. With an older\nvolara floor, the lowest-direct test leg installs that volara together\nwith the newest cloud-volume and fails at collection.\n\nCo-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>\n\n---------\n\nCo-authored-by: Claude Fable 5.2 <noreply@anthropic.com>",
+          "timestamp": "2026-11-11T19:30:49Z",
+          "url": "https://github.com/pattonw/dacapo-toolbox/commit/c3073c36dada8e1c5f4a0ead6df9430ba9941673"
+        },
+        "date": 1794425577234,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "import dacapo_toolbox.dataset (cold)",
+            "value": 2653.83,
+            "range": "± 42.269",
+            "unit": "ms",
+            "extra": "interpreter startup 9.0 ms subtracted; n=10"
+          },
+          {
+            "name": "pytest wall time",
+            "value": 37.717,
             "unit": "s",
             "extra": "`uv run pytest --cov-report=xml` in the tests job"
           }
