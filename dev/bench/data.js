@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794425843295,
+  "lastUpdate": 1794439022120,
   "repoUrl": "https://github.com/pattonw/dacapo-toolbox",
   "entries": {
     "dacapo-toolbox": [
@@ -103,6 +103,41 @@ window.BENCHMARK_DATA = {
           {
             "name": "pytest wall time",
             "value": 50.714,
+            "unit": "s",
+            "extra": "`uv run pytest --cov-report=xml` in the tests job"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "William Patton",
+            "username": "pattonw",
+            "email": "wllmpttn24@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "985cb7c8e754e170a5b1a90c2f5f7d8d4b6a9c68",
+          "message": "Apply SimpleAugment downstream of DeformAugment (#13)\n\ngunpowder's SimpleAugment mirrors each requested ROI about the total\nrequest ROI without snapping to the voxel grid. Upstream of DeformAugment\nit mirrored the deformed source ROIs, which could move the ROI of a\ncoarser array off its voxel grid, so ArraySource raised 'request is not a\nmultiple of voxel_size'. The multi-resolution example in\ntutorials/dataset/dataset_overview.py hit this on every docs build.\n\nDownstream of DeformAugment it sees the centred request, which mirroring\nkeeps on the grid.\n\nCo-authored-by: Claude Fable 5.2 <noreply@anthropic.com>",
+          "timestamp": "2026-11-11T23:14:41Z",
+          "url": "https://github.com/pattonw/dacapo-toolbox/commit/985cb7c8e754e170a5b1a90c2f5f7d8d4b6a9c68"
+        },
+        "date": 1794439011554,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "import dacapo_toolbox.dataset (cold)",
+            "value": 2656.119,
+            "range": "± 41.04",
+            "unit": "ms",
+            "extra": "interpreter startup 10.0 ms subtracted; n=10"
+          },
+          {
+            "name": "pytest wall time",
+            "value": 43.226,
             "unit": "s",
             "extra": "`uv run pytest --cov-report=xml` in the tests job"
           }
