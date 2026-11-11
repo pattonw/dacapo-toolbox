@@ -502,18 +502,13 @@ def iterable_dataset(
 
     pipeline = tuple(dataset_sources) + gp.RandomProvider(weights)
 
-    if simple_augment_config is not None:
-        # gunpowder annotates these as lists; copy any sequence into one.
-        transpose_probs = simple_augment_config.transpose_probs
-        pipeline += gp.SimpleAugment(
-            mirror_only=_as_list(simple_augment_config.mirror_only),
-            transpose_only=_as_list(simple_augment_config.transpose_only),
-            mirror_probs=_as_list(simple_augment_config.mirror_probs),
-            transpose_probs=transpose_probs
-            if transpose_probs is None or isinstance(transpose_probs, dict)
-            else list(transpose_probs),
-            p=simple_augment_config.p,
-        )
+    # DeformAugment goes upstream of SimpleAugment. SimpleAugment mirrors each
+    # requested ROI about the total request ROI without snapping to the voxel
+    # grid. Downstream of DeformAugment it sees the request made below, whose
+    # ROIs share one centre, so mirroring keeps them on their grids. Upstream
+    # of it, it would see the deformed source ROIs, and mirroring those can
+    # move the ROI of a coarser array off its voxel grid ("request is not a
+    # multiple of voxel_size").
     if deform_augment_config is not None:
         pipeline += gp.DeformAugment(
             control_point_spacing=Coordinate(
@@ -529,6 +524,18 @@ def iterable_dataset(
             rotation_axes=deform_augment_config.rotation_axes,
             use_fast_points_transform=True,
             p=deform_augment_config.p,
+        )
+    if simple_augment_config is not None:
+        # gunpowder annotates these as lists; copy any sequence into one.
+        transpose_probs = simple_augment_config.transpose_probs
+        pipeline += gp.SimpleAugment(
+            mirror_only=_as_list(simple_augment_config.mirror_only),
+            transpose_only=_as_list(simple_augment_config.transpose_only),
+            mirror_probs=_as_list(simple_augment_config.mirror_probs),
+            transpose_probs=transpose_probs
+            if transpose_probs is None or isinstance(transpose_probs, dict)
+            else list(transpose_probs),
+            p=simple_augment_config.p,
         )
     if defect_augment_config is not None:
         pipeline += gp.DefectAugment(
