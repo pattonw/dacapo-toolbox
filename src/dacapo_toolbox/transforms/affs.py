@@ -79,8 +79,10 @@ class Affs(torch.nn.Module):
             in the input tensor.
         dist_func: A string or callable defining the distance function to use for computing affinities.
             If a string is provided, it should be one of the following:
+
                 - "equality": Affinity is 1 if the labels are equal, 0 otherwise.
                 - "equality-no-bg": Affinity is 1 if the labels are equal and non-zero, 0 otherwise.
+
             Alternatively, a callable can be provided that takes two tensors as input and returns a tensor
             of the same shape with affinity values. If a list of callables is provided, each callable will be
             applied to the corresponding offset in the neighborhood.

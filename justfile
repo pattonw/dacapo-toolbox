@@ -4,7 +4,7 @@ docs:
     uv run --all-extras --group docs jupytext --to notebook tutorials/dataset/cremi.py
     cp -r tutorials docs/source
     rm docs/source/tutorials/*/*.py
-    uv run --all-extras --group docs sphinx-build docs/source docs/build/html -b html
+    uv run --all-extras --group docs sphinx-build -W --keep-going docs/source docs/build/html -b html
 
 docs-clean:
     rm -rf docs/build/html

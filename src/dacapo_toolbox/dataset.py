@@ -283,12 +283,15 @@ def iterable_dataset(
         transforms: An optional dictionary mapping operations to be called on arrays during batch
             generation. The keys have the form `(("in_key_a", "in_key_b", ...), ("out_key_a", "out_key_b", ...))`.
             with support for the following shorthands:
+
                 - `"key"` is shorthand for `(("key"), ("key"))` (i.e. in-place transform)
                 - `("key_a", "key_b")` is shorthand for `(("key_a",),("key_b",))` (i.e. one-to-one transform)
-                    Similarly `("key_a", ("key_b", "key_c"))` and `(("key_a", "key_b"), "key_c")` are supported.
+                  Similarly `("key_a", ("key_b", "key_c"))` and `(("key_a", "key_b"), "key_c")` are supported.
+
         sampling_strategies: An optional list of sampling strategies to be applied to each dataset.
             If a single strategy is provided, it will be applied to all datasets. If None, no sampling
             strategy will be applied and random sampling will be used. The recommended strategies are as follows:
+
                 - `None` - Random sampling, best for densely or almost densely annotated crops.
                 - `PointSampling` - Best for large sparse annotations, requires a graph of points to sample from.
                   Points should be provided as a networkx graph with node attribute "position" containing the
@@ -299,6 +302,7 @@ def iterable_dataset(
                   use the "reject" strategy, which will randomly sample locations and reject those that do not
                   meet the minimal fraction of mask coverage required. This is extremely inefficient for very
                   sparse annotations.
+
         trim: We generally guarantee that the center voxel of the requested shape will be contained
             in the valid region of the dataset, meaning in the worst case scenario, half of the volume could
             contain padding. If you want to avoid this you can pass in the `trim` parameter, which will
