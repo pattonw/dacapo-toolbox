@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794439022120,
+  "lastUpdate": 1794506169195,
   "repoUrl": "https://github.com/pattonw/dacapo-toolbox",
   "entries": {
     "dacapo-toolbox": [
@@ -138,6 +138,41 @@ window.BENCHMARK_DATA = {
           {
             "name": "pytest wall time",
             "value": 43.226,
+            "unit": "s",
+            "extra": "`uv run pytest --cov-report=xml` in the tests job"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Will",
+            "username": "pattonw",
+            "email": "wllmpttn24@gmail.com"
+          },
+          "committer": {
+            "name": "Will",
+            "username": "pattonw",
+            "email": "wllmpttn24@gmail.com"
+          },
+          "id": "f20121b6352a09ac66cf74a791f34f50117c5af4",
+          "message": "Bump version to 1.1.1\n\nCo-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>",
+          "timestamp": "2026-11-12T16:30:05Z",
+          "url": "https://github.com/pattonw/dacapo-toolbox/commit/f20121b6352a09ac66cf74a791f34f50117c5af4"
+        },
+        "date": 1794506156802,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "import dacapo_toolbox.dataset (cold)",
+            "value": 3254.999,
+            "range": "± 54.168",
+            "unit": "ms",
+            "extra": "interpreter startup 11.9 ms subtracted; n=10"
+          },
+          {
+            "name": "pytest wall time",
+            "value": 50.542,
             "unit": "s",
             "extra": "`uv run pytest --cov-report=xml` in the tests job"
           }
