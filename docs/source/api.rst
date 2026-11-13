@@ -37,7 +37,6 @@ Affinities
         :members:
 
     .. autofunction:: dacapo_toolbox.transforms.affs.compute_affs
-        :members:
 
 Distances
 ---------

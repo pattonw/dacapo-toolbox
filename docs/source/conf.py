@@ -47,7 +47,9 @@ templates_path = ["_templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+# conf.py is listed because nbsphinx_custom_formats claims every .py file, so
+# Sphinx would otherwise read this file as a notebook and render it as a page.
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "conf.py"]
 
 # -- Options for HTML output -------------------------------------------------
 

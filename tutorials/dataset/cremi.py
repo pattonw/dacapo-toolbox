@@ -120,8 +120,8 @@ cube(
 
 # %% [markdown]
 # Here we visualize the test data:
-# ![test-data](_static/cremi/test-data.gif)
-# ![test-data-cube](_static/cremi/test-data.jpg)
+# ![test-data](_static/cremi/testing-data.gif)
+# ![test-data-cube](_static/cremi/testing-data.jpg)
 
 # %% [markdown]
 # ### DaCapo

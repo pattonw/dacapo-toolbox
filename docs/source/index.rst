@@ -14,5 +14,11 @@
    tutorials/dataset/dataset_overview
    tutorials/dataset/cremi
 
+.. The README's logo path is relative to the repository root, so skip that
+   line and place the logo with a path relative to this file.
+.. image:: _static/dacapo-toolbox-logo.png
+   :alt: dacapo-toolbox
+
 .. include:: ../../README.md
    :parser: myst_parser.sphinx_
+   :start-line: 1

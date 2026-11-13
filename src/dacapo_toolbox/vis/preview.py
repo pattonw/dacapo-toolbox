@@ -248,15 +248,17 @@ def cube(
             with optional channels.
         array_types
             A dictionary specifying the type of each array. Supported types are:
+
             - "raw": Grayscale raw data.
             - "labels": Integer labels, visualized with a random color map.
             - "affs": Affinity graphs, visualized as RGB images.
             - "pca": High-dimensional data, visualized using PCA to reduce to 3
-                channels.
+              channels.
             - "mesh": Integer labels drawn as one surface mesh per label
-                (background 0 left out) inside a translucent box marking the
-                roi, so it shows how much of the volume is labelled. The
-                whole array is read, strided down to ``mesh_voxels``.
+              (background 0 left out) inside a translucent box marking the
+              roi, so it shows how much of the volume is labelled. The
+              whole array is read, strided down to ``mesh_voxels``.
+
         filename:
             The output filename for the image.
         title:
