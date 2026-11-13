@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794506169195,
+  "lastUpdate": 1794596682501,
   "repoUrl": "https://github.com/pattonw/dacapo-toolbox",
   "entries": {
     "dacapo-toolbox": [
@@ -173,6 +173,41 @@ window.BENCHMARK_DATA = {
           {
             "name": "pytest wall time",
             "value": 50.542,
+            "unit": "s",
+            "extra": "`uv run pytest --cov-report=xml` in the tests job"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "William Patton",
+            "username": "pattonw",
+            "email": "wllmpttn24@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "6154d1ad6f3905e7a15d908ef893a9955712fc02",
+          "message": "Make docs warnings fatal and fix the warnings the build emitted (#14)\n\nAdd -W --keep-going to the sphinx-build in `just docs`, and fix the 19\nwarnings the docs build on v1.1.1 reported: an invalid :members: option\non an autofunction, conf.py being rendered as a notebook page, nested\nlists in three docstrings, the README logo path in the index include,\nand two image names in the cremi tutorial.\n\nCo-authored-by: Claude Fable 5.2 <noreply@anthropic.com>",
+          "timestamp": "2026-11-13T19:02:13Z",
+          "url": "https://github.com/pattonw/dacapo-toolbox/commit/6154d1ad6f3905e7a15d908ef893a9955712fc02"
+        },
+        "date": 1794596671189,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "import dacapo_toolbox.dataset (cold)",
+            "value": 3642.198,
+            "range": "± 36.334",
+            "unit": "ms",
+            "extra": "interpreter startup 12.6 ms subtracted; n=10"
+          },
+          {
+            "name": "pytest wall time",
+            "value": 54.639,
             "unit": "s",
             "extra": "`uv run pytest --cov-report=xml` in the tests job"
           }
