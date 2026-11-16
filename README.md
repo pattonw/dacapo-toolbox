@@ -40,7 +40,7 @@ uv sync --extra vis --extra postprocessing          # dev tools + the extras the
 uv run pytest                                       # tests with coverage
 uv run pytest --no-cov tests/<file>.py              # one file, without the coverage floor
 uv run ruff check . && uv run ruff format --check . # lint and formatting
-uv run ty check src/dacapo_toolbox                  # types
+uv run ty check --error-on-warning                  # types; paths come from [tool.ty.src]
 just docs                                           # docs (needs just, pandoc, ffmpeg)
 ```
 

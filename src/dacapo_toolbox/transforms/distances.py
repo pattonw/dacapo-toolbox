@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from edt import edt  # ty: ignore[unresolved-import]
+from edt import edt  # ty: ignore[import-not-found]
 
 
 class SignedDistanceTransform(torch.nn.Module):
