@@ -99,18 +99,20 @@ def test_blockwise_predict_mutex_segments_two_cubes(
     labels = open_ds(tmp_path / "data.zarr/labels")[:]
     assert labels.shape == raw.shape
 
-    # Each cube interior is one segment, and the two segments differ.
-    inner_a = np.unique(labels[shrink(CUBE_A)])
-    inner_b = np.unique(labels[shrink(CUBE_B)])
-    assert inner_a.size == 1 and inner_a[0] != 0
-    assert inner_b.size == 1 and inner_b[0] != 0
-    assert inner_a[0] != inner_b[0]
+    # The volume holds background and two segments, one per cube interior.
+    background_id, *segment_ids = np.unique(labels).tolist()
+    assert background_id == 0
+    assert len(segment_ids) == 2
+    inner_a = np.unique(labels[shrink(CUBE_A)]).tolist()
+    inner_b = np.unique(labels[shrink(CUBE_B)]).tolist()
+    assert sorted(inner_a + inner_b) == segment_ids
 
-    # Background two or more voxels from any cube belongs to no segment.
-    assert not labels[15:17].any()  # the gap between the cubes
-    assert not labels[0].any() and not labels[-1].any()
-    assert not labels[:, 0].any() and not labels[:, -1].any()
-    assert not labels[:, :, 0].any() and not labels[:, :, -1].any()
+    # Everything two or more voxels from a cube is background: the gap
+    # between the cubes and the border of the volume.
+    far_from_cubes = np.ones(SHAPE, dtype=bool)
+    far_from_cubes[shrink(CUBE_A, by=-1)] = False
+    far_from_cubes[shrink(CUBE_B, by=-1)] = False
+    assert (labels[far_from_cubes] == 0).all()
 
 
 def test_blockwise_predict_mutex_rejects_malformed_edge_scores(tmp_path):
