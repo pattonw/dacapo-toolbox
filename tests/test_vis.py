@@ -10,11 +10,13 @@ from dacapo_toolbox.vis.preview import (  # noqa: E402
     cube,
     draw_label_meshes,
     get_cmap,
+    gif_2d,
     graph_cube,
     label_meshes,
 )
 
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+GIF_SIGNATURE = b"GIF89a"
 ROI = Roi((0, 0, 0), (100, 100, 100))
 
 
@@ -56,27 +58,52 @@ def mesh_bounds(meshes):
     }
 
 
-@pytest.mark.parametrize("labels_type", ["labels", "mesh"])
-def test_cube_writes_a_png(tmp_path, labels_type):
-    raw = Array(
-        np.random.default_rng(0).integers(0, 255, (8, 8, 8), dtype=np.uint8),
-        offset=Coordinate(0, 0, 0),
-        voxel_size=Coordinate(4, 2, 2),
-    )
-    labels = Array(
-        (np.arange(8 * 8 * 8).reshape(8, 8, 8) // 128).astype(np.uint32),
-        offset=Coordinate(0, 0, 0),
-        voxel_size=Coordinate(4, 2, 2),
-    )
+def volume(array_type):
+    """An 8x8x8 array of the kind each array type draws, at voxel size (4, 2, 2)."""
+    rng = np.random.default_rng(0)
+    if array_type == "raw":
+        data = rng.integers(0, 255, (8, 8, 8), dtype=np.uint8)
+    elif array_type in ("labels", "mesh"):
+        data = (np.arange(8 * 8 * 8).reshape(8, 8, 8) // 128).astype(np.uint32)
+    elif array_type == "affs":
+        data = rng.random((3, 8, 8, 8), dtype=np.float32)
+    else:
+        data = rng.random((6, 8, 8, 8), dtype=np.float32)
+    return Array(data, offset=Coordinate(0, 0, 0), voxel_size=Coordinate(4, 2, 2))
+
+
+@pytest.mark.parametrize("array_type", ["labels", "mesh", "affs", "pca"])
+def test_cube_writes_a_png(tmp_path, array_type):
     out = tmp_path / "cube.png"
     cube(
-        {"raw": raw, "labels": labels},
-        {"raw": "raw", "labels": labels_type},
+        {"raw": volume("raw"), "other": volume(array_type)},
+        {"raw": "raw", "other": array_type},
         str(out),
         "test",
         dpi=40,
     )
     assert out.read_bytes()[:8] == PNG_SIGNATURE
+
+
+@pytest.mark.parametrize("array_type", ["labels", "affs", "pca"])
+def test_gif_2d_writes_a_gif(tmp_path, array_type):
+    out = tmp_path / "sections.gif"
+    gif_2d(
+        {"raw": volume("raw"), "other": volume(array_type)},
+        {"raw": "raw", "other": array_type},
+        str(out),
+        "test",
+        dpi=20,
+    )
+    assert out.read_bytes()[:6] == GIF_SIGNATURE
+
+
+@pytest.mark.parametrize("preview", [cube, gif_2d])
+def test_previews_leave_an_existing_file_when_overwrite_is_false(tmp_path, preview):
+    out = tmp_path / "preview"
+    out.write_bytes(b"already here")
+    preview({"raw": volume("raw")}, {"raw": "raw"}, str(out), "test", overwrite=False)
+    assert out.read_bytes() == b"already here"
 
 
 def test_graph_cube_writes_a_png(tmp_path):

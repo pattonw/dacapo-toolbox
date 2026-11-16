@@ -8,6 +8,7 @@ import torch
 from funlib.persistence import Array
 
 from dacapo_toolbox.dataset import (
+    DefectAugmentConfig,
     DeformAugmentConfig,
     MaskedSampling,
     PointSampling,
@@ -63,47 +64,101 @@ def test_batches_have_the_requested_shapes(dims, size, crop):
 
 
 @pytest.mark.parametrize(
-    "simple_augment_config, step_along_rows, step_along_columns",
+    "augments, step_along_rows, step_along_columns",
     [
-        (None, 32, 1),
+        ({}, 32, 1),
         (
-            SimpleAugmentConfig(
-                p=1.0,
-                mirror_only=[],
-                transpose_only=[0, 1],
-                transpose_probs={(1, 0): 1.0},
-            ),
+            {
+                "simple_augment_config": SimpleAugmentConfig(
+                    p=1.0,
+                    mirror_only=[],
+                    transpose_only=[0, 1],
+                    transpose_probs={(1, 0): 1.0},
+                )
+            },
             1,
             32,
         ),
+        (
+            {
+                "simple_augment_config": SimpleAugmentConfig(
+                    p=1.0, mirror_only=[1], mirror_probs=[1.0], transpose_only=[]
+                )
+            },
+            32,
+            -1,
+        ),
+        # a deformation with neither jitter, scaling nor rotation is the identity
+        ({"deform_augment_config": DeformAugmentConfig(p=1.0)}, 32, 1),
     ],
-    ids=["unaugmented", "transposed"],
+    ids=["unaugmented", "transposed", "mirrored", "default-deform"],
 )
 def test_batches_are_crops_of_the_array(
-    raw, simple_augment_config, step_along_rows, step_along_columns
+    raw, augments, step_along_rows, step_along_columns
 ):
     # trimmed by half the crop, so no crop reaches into the padding
-    dataset = iterable_dataset(
-        {"raw": raw},
-        shapes={"raw": (8, 8)},
-        trim=(4, 4),
-        simple_augment_config=simple_augment_config,
-    )
+    dataset = iterable_dataset({"raw": raw}, shapes={"raw": (8, 8)}, trim=4, **augments)
     for batch in islice(dataset, 4):
         assert (batch["raw"].diff(dim=0) == step_along_rows).all()
         assert (batch["raw"].diff(dim=1) == step_along_columns).all()
 
 
-def test_masked_sampling_draws_crops_inside_the_mask(raw):
+@pytest.mark.parametrize("strategy", ["integral_mask", "reject"])
+def test_masked_sampling_draws_crops_inside_the_mask(raw, strategy):
     mask = np.zeros((32, 32), dtype=np.uint8)
     mask[8:24, 8:24] = 1
     dataset = iterable_dataset(
         {"raw": raw, "mask": Array(mask, voxel_size=(1, 1))},
         shapes={"raw": (8, 8), "mask": (8, 8)},
-        sampling_strategies=MaskedSampling("mask", min_masked=1.0),
+        sampling_strategies=MaskedSampling("mask", min_masked=1.0, strategy=strategy),
     )
     for batch in islice(dataset, 8):
         assert batch["mask"].sum() == 64
+
+
+def test_each_crop_is_sampled_with_its_own_strategy():
+    # the first crop is drawn inside its mask; the second, whose mask is
+    # empty, asks for no masked voxels and is drawn anywhere
+    mask = np.zeros((32, 32), dtype=np.uint8)
+    mask[8:24, 8:24] = 1
+    dataset = iterable_dataset(
+        {
+            "raw": [constant(1, (32, 32)), constant(2, (32, 32))],
+            "mask": [Array(mask, voxel_size=(1, 1)), constant(0, (32, 32))],
+        },
+        shapes={"raw": (8, 8), "mask": (8, 8)},
+        sampling_strategies=[
+            MaskedSampling("mask", min_masked=1.0),
+            MaskedSampling("mask", min_masked=0.0),
+        ],
+        trim=4,
+    )
+    masked_voxels = {1: 64, 2: 0}
+    crops_drawn = set()
+    for batch in islice(dataset, 16):
+        crop = int(batch["raw"][0, 0])
+        assert batch["mask"].sum() == masked_voxels[crop]
+        crops_drawn.add(crop)
+    assert crops_drawn == {1, 2}
+
+
+def test_defect_augment_blanks_sections_of_its_array():
+    # 8 batches of 32 sections of ones: sections along the first axis go
+    # missing (all zero) in the raw, and the labels stay as they are
+    dataset = iterable_dataset(
+        {
+            "raw": Array(np.ones((64, 16, 16), np.float32), voxel_size=(1, 1, 1)),
+            "labels": Array(np.full((64, 16, 16), 2, np.uint32), voxel_size=(1, 1, 1)),
+        },
+        shapes={"raw": (32, 8, 8), "labels": (32, 8, 8)},
+        trim=(16, 4, 4),
+        defect_augment_config=DefectAugmentConfig("raw", p=1.0),
+    )
+    sections = set()
+    for batch in islice(dataset, 8):
+        sections.update(batch["raw"].flatten(1).unique().tolist())
+        assert (batch["labels"] == 2).all()
+    assert sections == {0.0, 1.0}
 
 
 def test_point_sampling_centres_the_crop_on_a_point(raw):
