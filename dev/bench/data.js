@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794596682501,
+  "lastUpdate": 1794857757854,
   "repoUrl": "https://github.com/pattonw/dacapo-toolbox",
   "entries": {
     "dacapo-toolbox": [
@@ -208,6 +208,41 @@ window.BENCHMARK_DATA = {
           {
             "name": "pytest wall time",
             "value": 54.639,
+            "unit": "s",
+            "extra": "`uv run pytest --cov-report=xml` in the tests job"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "William Patton",
+            "username": "pattonw",
+            "email": "wllmpttn24@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "5d2dc60974e6676013591af341d2cf28c6356ae8",
+          "message": "Run ty from its config with warnings fatal; move actions off Node 20 (#15)\n\nty: CI and the README run `uv run ty check --error-on-warning` with no path,\nso [tool.ty.src] include (src, tests, benchmarks) decides what is checked.\nty 0.0.104 no longer reports torch `forward` overrides, so the\ninvalid-mutable-override downgrade is removed and no rule is below error.\nThe one ignore comment follows ty's rule rename (import-not-found).\n\nActions: every action still on the Node 20 runtime moves to a major tag on\nNode 24.\n\nCo-authored-by: Claude <noreply@anthropic.com>",
+          "timestamp": "2026-11-16T19:33:32Z",
+          "url": "https://github.com/pattonw/dacapo-toolbox/commit/5d2dc60974e6676013591af341d2cf28c6356ae8"
+        },
+        "date": 1794857745625,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "import dacapo_toolbox.dataset (cold)",
+            "value": 3176.17,
+            "range": "± 67.416",
+            "unit": "ms",
+            "extra": "interpreter startup 12.3 ms subtracted; n=10"
+          },
+          {
+            "name": "pytest wall time",
+            "value": 47.052,
             "unit": "s",
             "extra": "`uv run pytest --cov-report=xml` in the tests job"
           }
