@@ -81,6 +81,8 @@ def test_blockwise_predict_mutex_segments_two_cubes(
     # The prediction workers inherit the environment; keep them on the CPU so
     # the result does not depend on which GPU, if any, the host has.
     monkeypatch.setenv("CUDA_VISIBLE_DEVICES", "")
+    # volara writes its `volara_logs/` into the working directory.
+    monkeypatch.chdir(tmp_path)
     raw = write_raw(tmp_path / "data.zarr/raw")
     write_affinity_model(tmp_path / "model.pt")
 
