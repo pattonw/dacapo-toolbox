@@ -29,8 +29,8 @@ jobs:
           - python-version: "3.12"
             extras: --extra postprocessing
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python-version }}
       - run: uv sync --extra vis ${{ matrix.extras }}
@@ -43,8 +43,8 @@ jobs:
       - if: github.event_name != 'pull_request' && matrix.python-version == '3.12' && matrix.resolution == 'highest'
         run: uv run python benchmarks/run.py --pytest-seconds "$PYTEST_SECONDS" --pytest-command "uv run pytest --cov-report=xml"
       - if: github.event_name != 'pull_request' && matrix.python-version == '3.12' && matrix.resolution == 'highest'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: benchmark
           path: benchmarks/output.json
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v7

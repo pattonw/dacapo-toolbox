@@ -35,7 +35,7 @@ dev = [
     "pytest-cov>=6.0.0",
     "ruff>=0.17.3",
     "pytest-xdist>=3.6.1",
-    "ty>=0.0.96",
+    "ty>=0.0.104",
 ]
 docs = [
     "h5py>=3.13.0",
@@ -64,13 +64,12 @@ include = ["src", "tests", "benchmarks"]
 exclude = []  # only ever shrinks
 
 [tool.ty.rules]
-# torch.nn.Module declares `forward` as a Callable attribute; overriding it with a
-# def trips invalid-mutable-override on every module. Recorded as a warning.
-invalid-mutable-override = "warn"
+# No rule is downgraded. ty 0.0.104 no longer reports a `forward` method that
+# overrides torch.nn.Module's Callable attribute (astral-sh/ty#4823).
 
 [tool.ty.terminal]
-# warn-level rules are recorded counters, not failures
-error-on-warning = false
+# warnings fail the check; CI passes --error-on-warning as well
+error-on-warning = true
 
 [tool.ruff]
 line-length = 88
