@@ -240,6 +240,27 @@ class PointSampling:
     sample_points_key: str
 
 
+class _RejectBelowMinMasked(gp.BatchFilter):
+    """
+    Request batches from upstream until the fraction of `mask` set in one is
+    at least `min_masked`. `gp.Reject` repeats the request it was given, and
+    `PipelineDataset` seeds its requests, so every repeat would draw the same
+    location; each retry here is a copy of the request, which carries the
+    next seed.
+    """
+
+    def __init__(self, mask: gp.ArrayKey, min_masked: float):
+        self.mask = mask
+        self.min_masked = min_masked
+
+    def provide(self, request: gp.BatchRequest) -> gp.Batch:
+        while True:
+            batch = self.get_upstream_provider().request_batch(request)
+            if batch[self.mask].data.mean() >= self.min_masked:
+                return batch
+            request = request.copy()
+
+
 def _as_list[T](values: Sequence[T] | None) -> list[T] | None:
     return None if values is None else list(values)
 
@@ -414,7 +435,7 @@ def iterable_dataset(
         crop_roi.snap_to_grid(crop_voxel_size, mode="grow")
         if trim is not None:
             if isinstance(trim, int):
-                trim = [trim] * crop_roi.dims()
+                trim = [trim] * crop_roi.dims
             trim = Coordinate(trim)
             crop_roi = crop_roi.grow(-trim * crop_voxel_size, -trim * crop_voxel_size)
 
@@ -493,9 +514,18 @@ def iterable_dataset(
                 min_masked=sampling_strategy.min_masked,
                 mask=gp.ArrayKey(sampling_strategy.mask_key),
             )
-        elif sampling_strategy == "reject":
+        elif (
+            isinstance(sampling_strategy, MaskedSampling)
+            and sampling_strategy.strategy == "reject"
+        ):
+            assert gp.ArrayKey(sampling_strategy.mask_key) in keys, (
+                f"Mask key {sampling_strategy.mask_key} must be one of the dataset keys: {keys}. "
+                "Please ensure that the mask is provided as part of the dataset."
+            )
             dataset_source += gp.RandomLocation()
-            dataset_source += gp.Reject(roi_mask_key, 1.0)
+            dataset_source += _RejectBelowMinMasked(
+                gp.ArrayKey(sampling_strategy.mask_key), sampling_strategy.min_masked
+            )
         else:
             raise ValueError(
                 f"Unsupported sampling strategy: {sampling_strategy}. "
@@ -517,11 +547,11 @@ def iterable_dataset(
         pipeline += gp.DeformAugment(
             control_point_spacing=Coordinate(
                 deform_augment_config.control_point_spacing
-                or (1,) * crop_scale[0].dims()
+                or (1,) * crops_scale[0].dims
             ),
             jitter_sigma=deform_augment_config.jitter_sigma
-            or (0,) * crop_scale[0].dims(),
-            scale_interval=deform_augment_config.scale_interval,
+            or (0,) * crops_scale[0].dims,
+            scale_interval=deform_augment_config.scale_interval or (1.0, 1.0),
             rotate=deform_augment_config.rotate,
             subsample=deform_augment_config.subsample,
             spatial_dims=deform_augment_config.spatial_dims,
@@ -532,10 +562,19 @@ def iterable_dataset(
     if simple_augment_config is not None:
         # gunpowder annotates these as lists; copy any sequence into one.
         transpose_probs = simple_augment_config.transpose_probs
+        mirror_only = _as_list(simple_augment_config.mirror_only)
+        mirror_probs = _as_list(simple_augment_config.mirror_probs)
+        if mirror_only is not None and mirror_probs is not None:
+            # `mirror_probs` holds one probability per axis in `mirror_only`;
+            # gunpowder reads one per dimension.
+            per_dimension = [0.0] * crops_scale[0].dims
+            for axis, prob in zip(mirror_only, mirror_probs, strict=True):
+                per_dimension[axis] = prob
+            mirror_probs = per_dimension
         pipeline += gp.SimpleAugment(
-            mirror_only=_as_list(simple_augment_config.mirror_only),
+            mirror_only=mirror_only,
             transpose_only=_as_list(simple_augment_config.transpose_only),
-            mirror_probs=_as_list(simple_augment_config.mirror_probs),
+            mirror_probs=mirror_probs,
             transpose_probs=transpose_probs
             if transpose_probs is None or isinstance(transpose_probs, dict)
             else list(transpose_probs),

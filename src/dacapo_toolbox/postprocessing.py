@@ -142,6 +142,12 @@ def blockwise_predict_mutex(
         Worker configuration for the relabeling step. If `None`, processing is done
         in a subprocess or in the main thread in the case of running blockwise with
         `multiprocessing=False`.
+
+    Raises
+    ------
+    ValueError
+        If an entry of `edge_scores` is not a tuple of 2 (offsets, bias) or
+        3 (name, offsets, bias) elements.
     """
 
     with tempfile.TemporaryDirectory() as tmpdir:
