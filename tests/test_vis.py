@@ -16,7 +16,6 @@ from dacapo_toolbox.vis.preview import (  # noqa: E402
 )
 
 PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
-GIF_SIGNATURE = b"GIF89a"
 ROI = Roi((0, 0, 0), (100, 100, 100))
 
 
@@ -26,16 +25,6 @@ def ax():
     fig = plt.figure()
     yield fig.add_subplot(111, projection="3d")
     plt.close(fig)
-
-
-@pytest.fixture
-def two_boxes():
-    """Labels 7 and 2**40 as two boxes in a mostly empty volume, the second
-    touching the far end of the roi."""
-    labels = np.zeros((10, 20, 20), dtype=np.uint64)
-    labels[2:5, 3:8, 3:8] = 7
-    labels[5:10, 10:20, 12:20] = 2**40
-    return Array(labels, offset=Coordinate(40, 0, 0), voxel_size=Coordinate(4, 2, 2))
 
 
 def point_xs(ax):
@@ -51,58 +40,53 @@ def segment_count(ax):
     return len(ax.collections[1].get_segments())
 
 
-def mesh_bounds(meshes):
+@pytest.fixture(scope="module")
+def volumes():
+    """One 4x8x8 array per array type the previews draw, at voxel size (4, 2, 2)."""
+    rng = np.random.default_rng(0)
+    slabs = (np.arange(4 * 8 * 8).reshape(4, 8, 8) // 128).astype(np.uint32)
+    data = {
+        "raw": rng.integers(0, 255, (4, 8, 8), dtype=np.uint8),
+        "labels": slabs,
+        "mesh": slabs,
+        "affs": rng.random((3, 4, 8, 8), dtype=np.float32),
+        "pca": rng.random((6, 4, 8, 8), dtype=np.float32),
+    }
     return {
-        label: (tuple(verts.min(axis=0)), tuple(verts.max(axis=0)))
-        for label, verts, _ in meshes
+        array_type: Array(array, voxel_size=Coordinate(4, 2, 2))
+        for array_type, array in data.items()
     }
 
 
-def volume(array_type):
-    """An 8x8x8 array of the kind each array type draws, at voxel size (4, 2, 2)."""
-    rng = np.random.default_rng(0)
-    if array_type == "raw":
-        data = rng.integers(0, 255, (8, 8, 8), dtype=np.uint8)
-    elif array_type in ("labels", "mesh"):
-        data = (np.arange(8 * 8 * 8).reshape(8, 8, 8) // 128).astype(np.uint32)
-    elif array_type == "affs":
-        data = rng.random((3, 8, 8, 8), dtype=np.float32)
-    else:
-        data = rng.random((6, 8, 8, 8), dtype=np.float32)
-    return Array(data, offset=Coordinate(0, 0, 0), voxel_size=Coordinate(4, 2, 2))
-
-
-@pytest.mark.parametrize("array_type", ["labels", "mesh", "affs", "pca"])
-def test_cube_writes_a_png(tmp_path, array_type):
-    out = tmp_path / "cube.png"
-    cube(
-        {"raw": volume("raw"), "other": volume(array_type)},
-        {"raw": "raw", "other": array_type},
-        str(out),
-        "test",
-        dpi=40,
-    )
-    assert out.read_bytes()[:8] == PNG_SIGNATURE
-
-
-@pytest.mark.parametrize("array_type", ["labels", "affs", "pca"])
-def test_gif_2d_writes_a_gif(tmp_path, array_type):
-    out = tmp_path / "sections.gif"
-    gif_2d(
-        {"raw": volume("raw"), "other": volume(array_type)},
-        {"raw": "raw", "other": array_type},
+@pytest.mark.parametrize(
+    "preview, array_types, filename, signature",
+    [
+        (cube, ["raw", "labels", "mesh", "affs", "pca"], "cube.png", PNG_SIGNATURE),
+        (gif_2d, ["raw", "labels", "affs", "pca"], "sections.gif", b"GIF89a"),
+    ],
+    ids=["cube", "gif_2d"],
+)
+def test_array_previews_draw_every_array_type(
+    tmp_path, volumes, preview, array_types, filename, signature
+):
+    out = tmp_path / filename
+    preview(
+        {array_type: volumes[array_type] for array_type in array_types},
+        {array_type: array_type for array_type in array_types},
         str(out),
         "test",
         dpi=20,
     )
-    assert out.read_bytes()[:6] == GIF_SIGNATURE
+    assert out.read_bytes()[: len(signature)] == signature
 
 
 @pytest.mark.parametrize("preview", [cube, gif_2d])
-def test_previews_leave_an_existing_file_when_overwrite_is_false(tmp_path, preview):
+def test_array_previews_leave_an_existing_file_when_overwrite_is_false(
+    tmp_path, volumes, preview
+):
     out = tmp_path / "preview"
     out.write_bytes(b"already here")
-    preview({"raw": volume("raw")}, {"raw": "raw"}, str(out), "test", overwrite=False)
+    preview({"raw": volumes["raw"]}, {"raw": "raw"}, str(out), "test", overwrite=False)
     assert out.read_bytes() == b"already here"
 
 
@@ -175,22 +159,28 @@ def test_graph_cube_splits_paths_at_nodes_without_position(ax):
     assert segment_count(ax) == 10
 
 
-def test_label_meshes_span_their_label_voxels(two_boxes):
-    # each mesh spans exactly its label's voxels in world units (z, y, x)
-    assert mesh_bounds(label_meshes(two_boxes)) == {
-        7: ((48, 6, 6), (60, 16, 16)),
-        2**40: ((60, 20, 24), (80, 40, 40)),
-    }
-
-
-def test_label_meshes_stride_to_the_voxel_budget(two_boxes):
-    # 4000 voxels against a budget of 1000: the fine axes (y, x) are read at
-    # every second voxel, so voxels 4 and 6 stand for label 7 (3 to 7) and its
-    # mesh runs from 4 * 2 - 1 to 7 * 2 + 1; likewise for the second label
-    assert mesh_bounds(label_meshes(two_boxes, max_voxels=1000)) == {
-        7: ((48, 7, 7), (60, 15, 15)),
-        2**40: ((60, 19, 23), (80, 39, 39)),
-    }
+@pytest.mark.parametrize(
+    "max_voxels, bounds",
+    [
+        # each mesh spans exactly its label's voxels in world units (z, y, x)
+        (4000, {7: ((48, 6, 6), (60, 16, 16)), 2**40: ((60, 20, 24), (80, 40, 40))}),
+        # a quarter of the 4000 voxels: y and x are read at every second voxel,
+        # so voxels 4 and 6 stand for label 7 (3 to 7) and its mesh runs from
+        # 4 * 2 - 1 to 7 * 2 + 1; likewise for the second label
+        (1000, {7: ((48, 7, 7), (60, 15, 15)), 2**40: ((60, 19, 23), (80, 39, 39))}),
+    ],
+    ids=["every-voxel", "strided-to-the-budget"],
+)
+def test_label_meshes_span_their_label_voxels(max_voxels, bounds):
+    # two boxes in a mostly empty volume, the second touching the end of the roi
+    labels = np.zeros((10, 20, 20), dtype=np.uint64)
+    labels[2:5, 3:8, 3:8] = 7
+    labels[5:10, 10:20, 12:20] = 2**40
+    arr = Array(labels, offset=Coordinate(40, 0, 0), voxel_size=Coordinate(4, 2, 2))
+    assert {
+        label: (tuple(verts.min(axis=0)), tuple(verts.max(axis=0)))
+        for label, verts, _ in label_meshes(arr, max_voxels)
+    } == bounds
 
 
 def test_draw_label_meshes_boxes_the_label_roi_inside_the_frame(ax):

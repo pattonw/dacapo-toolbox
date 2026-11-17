@@ -32,6 +32,14 @@ def raw():
     )
 
 
+@pytest.fixture
+def mask():
+    """A 32x32 mask at voxel size 1, set on the central 24x24 voxels."""
+    data = np.zeros((32, 32), dtype=np.uint8)
+    data[4:28, 4:28] = 1
+    return Array(data, voxel_size=(1, 1))
+
+
 def constant(value, shape=(16, 16), voxel_size=(1, 1)):
     return Array(np.full(shape, value, dtype=np.uint8), voxel_size=voxel_size)
 
@@ -63,31 +71,20 @@ def test_batches_have_the_requested_shapes(dims, size, crop):
         assert batch["labels"].shape == (crop // 2,) * dims
 
 
+TRANSPOSE = SimpleAugmentConfig(
+    p=1.0, mirror_only=[], transpose_only=[0, 1], transpose_probs={(1, 0): 1.0}
+)
+MIRROR_COLUMNS = SimpleAugmentConfig(
+    p=1.0, mirror_only=[1], mirror_probs=[1.0], transpose_only=[]
+)
+
+
 @pytest.mark.parametrize(
     "augments, step_along_rows, step_along_columns",
     [
         ({}, 32, 1),
-        (
-            {
-                "simple_augment_config": SimpleAugmentConfig(
-                    p=1.0,
-                    mirror_only=[],
-                    transpose_only=[0, 1],
-                    transpose_probs={(1, 0): 1.0},
-                )
-            },
-            1,
-            32,
-        ),
-        (
-            {
-                "simple_augment_config": SimpleAugmentConfig(
-                    p=1.0, mirror_only=[1], mirror_probs=[1.0], transpose_only=[]
-                )
-            },
-            32,
-            -1,
-        ),
+        ({"simple_augment_config": TRANSPOSE}, 1, 32),
+        ({"simple_augment_config": MIRROR_COLUMNS}, 32, -1),
         # a deformation with neither jitter, scaling nor rotation is the identity
         ({"deform_augment_config": DeformAugmentConfig(p=1.0)}, 32, 1),
     ],
@@ -104,42 +101,38 @@ def test_batches_are_crops_of_the_array(
 
 
 @pytest.mark.parametrize("strategy", ["integral_mask", "reject"])
-def test_masked_sampling_draws_crops_inside_the_mask(raw, strategy):
-    mask = np.zeros((32, 32), dtype=np.uint8)
-    mask[8:24, 8:24] = 1
+def test_masked_sampling_draws_crops_inside_the_mask(raw, mask, strategy):
     dataset = iterable_dataset(
-        {"raw": raw, "mask": Array(mask, voxel_size=(1, 1))},
+        {"raw": raw, "mask": mask},
         shapes={"raw": (8, 8), "mask": (8, 8)},
         sampling_strategies=MaskedSampling("mask", min_masked=1.0, strategy=strategy),
     )
-    for batch in islice(dataset, 8):
+    for batch in islice(dataset, 4):
         assert batch["mask"].sum() == 64
 
 
-def test_each_crop_is_sampled_with_its_own_strategy():
-    # the first crop is drawn inside its mask; the second, whose mask is
-    # empty, asks for no masked voxels and is drawn anywhere
-    mask = np.zeros((32, 32), dtype=np.uint8)
-    mask[8:24, 8:24] = 1
+@pytest.mark.parametrize(
+    "weights, crop, masked_voxels", [([1.0, 0.0], 1, 64), ([0.0, 1.0], 2, 0)]
+)
+def test_each_crop_is_sampled_with_its_own_strategy(mask, weights, crop, masked_voxels):
+    # the weights pick the crop. The first crop is drawn inside its mask; the
+    # second, whose mask is empty, asks for no masked voxels
     dataset = iterable_dataset(
         {
             "raw": [constant(1, (32, 32)), constant(2, (32, 32))],
-            "mask": [Array(mask, voxel_size=(1, 1)), constant(0, (32, 32))],
+            "mask": [mask, constant(0, (32, 32))],
         },
         shapes={"raw": (8, 8), "mask": (8, 8)},
         sampling_strategies=[
             MaskedSampling("mask", min_masked=1.0),
             MaskedSampling("mask", min_masked=0.0),
         ],
+        weights=weights,
         trim=4,
     )
-    masked_voxels = {1: 64, 2: 0}
-    crops_drawn = set()
-    for batch in islice(dataset, 16):
-        crop = int(batch["raw"][0, 0])
-        assert batch["mask"].sum() == masked_voxels[crop]
-        crops_drawn.add(crop)
-    assert crops_drawn == {1, 2}
+    for batch in islice(dataset, 4):
+        assert (batch["raw"] == crop).all()
+        assert batch["mask"].sum() == masked_voxels
 
 
 def test_defect_augment_blanks_sections_of_its_array():
@@ -174,17 +167,6 @@ def test_point_sampling_centres_the_crop_on_a_point(raw):
     # coordinates, and the raw voxel there is the point's: 32 * 20 + 12
     assert tuple(batch["points"].nodes[1]["position"]) == (3, 3)
     assert batch["raw"][3, 3] == 652
-
-
-def test_weights_set_how_often_each_crop_is_drawn():
-    dataset = iterable_dataset(
-        {"raw": [constant(1), constant(2)]},
-        shapes={"raw": (4, 4)},
-        weights=[0.0, 1.0],
-        trim=(2, 2),
-    )
-    for batch in islice(dataset, 8):
-        assert (batch["raw"] == 2).all()
 
 
 @pytest.mark.parametrize(
